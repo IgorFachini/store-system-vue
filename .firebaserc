@@ -1,0 +1,22 @@
+{
+  "projects": {
+    "default": "store-system-f16d9",
+    "dev": "store-system-54b7a"
+  },
+  "targets": {
+    "store-system-f16d9": {
+      "hosting": {
+        "prod": [
+          "store-system-vue"
+        ]
+      }
+    },
+    "store-system-54b7a": {
+      "hosting": {
+        "dev": [
+          "store-system-dev-vue"
+        ]
+      }
+    }
+  }
+}
