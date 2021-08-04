@@ -104,6 +104,14 @@ module.exports = configure(function (ctx) {
           type: 'javascript/auto',
           loader: '@intlify/vue-i18n-loader'
         })
+
+        cfg.resolve.alias = {
+          ...cfg.resolve.alias,
+
+          services: path.resolve(__dirname, './src/services'),
+          utils: path.resolve(__dirname, './src/utils'),
+          mixins: path.resolve(__dirname, './src/mixins')
+        }
       }
     },
 
