@@ -42,7 +42,13 @@
 
         <q-item to="/customers">
           <q-item-label>
-            Clientes
+            {{ $tc('customer', 2) }}
+          </q-item-label>
+        </q-item>
+
+        <q-item to="/categories">
+          <q-item-label>
+            {{ $tc('category', 2) }}
           </q-item-label>
         </q-item>
 

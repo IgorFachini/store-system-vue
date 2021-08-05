@@ -24,5 +24,8 @@ export default {
   invalid: 'Invalid',
   errorLocating: 'Error locating',
   search: 'Search',
-  recordsPerPage: 'Records per page'
+  recordsPerPage: 'Records per page',
+  description: 'Description',
+  category: 'Category | Categories',
+  alredyExist: 'Alredy Exist'
 }
