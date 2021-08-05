@@ -14,6 +14,68 @@
           :rules="[val => val && val.length || $t('fillTheField', { field: $t('name') })]"
         />
 
+        <q-input
+          v-model="form.cellphone"
+          :label="$t('cellphone')"
+          mask="#"
+          reverse-fill-mask
+        />
+
+        <q-input
+          v-model="form.phone"
+          :label="$t('phone')"
+          mask="#"
+          reverse-fill-mask
+        />
+
+        <q-input
+          v-model="form.observation"
+          type="textarea"
+          :label="$t('observation')"
+        />
+
+        <q-input
+          v-model="form.document"
+          :label="$t('document')"
+        />
+
+        <v-input-cep
+          v-model="form.cep"
+          label="CEP"
+          @response="setAdress"
+        />
+
+        <q-input
+          v-model="form.publicPlace"
+          :label="$t('publicPlace')"
+        />
+
+        <q-input
+          v-model="form.number"
+          :label="$t('number')"
+          type="number"
+        />
+
+        <q-input
+          v-model="form.district"
+          :label="$t('district')"
+        />
+
+        <q-input
+          v-model="form.city"
+          :label="$t('city')"
+        />
+
+        <q-input
+          v-model="form.state"
+          :label="$t('state')"
+        />
+
+        <q-input
+          v-model="form.complement"
+          :label="$t('complement')"
+        />
+
         <div class="row q-gutter-md q-mt-md">
           <q-btn
             :label="$t('save')"
@@ -37,7 +99,22 @@
         style="height: calc(100vh - 100px)"
         binary-state-sort
         :loading="loading"
+        :filter="filter"
+        :rows-per-page-label="$t('recordsPerPage')"
       >
+        <template #top-right>
+          <q-input
+            v-model="filter"
+            borderless
+            dense
+            debounce="300"
+            :placeholder="$t('search')"
+          >
+            <template #append>
+              <q-icon name="search" />
+            </template>
+          </q-input>
+        </template>
         <template #body-cell-acoes="{ row }">
           <q-td>
             <div class="row no-wrap q-gutter-md">
@@ -65,22 +142,35 @@
 <script>
 
 import { date } from 'quasar'
+import VInputCep from 'src/components/common/VInputCep.vue'
 import { defineComponent } from 'vue'
 const { formatDate } = date
 
 export default defineComponent({
-  name: 'customers',
+  name: 'Customers',
+  components: { VInputCep },
 
   setup () {
     return {
       modelForm: {
-        name: ''
+        name: '',
+        cellphone: '',
+        phone: '',
+        observation: '',
+        document: '',
+        publicPlace: '',
+        number: '',
+        district: '',
+        city: '',
+        state: '',
+        complement: ''
       }
     }
   },
 
   data () {
     return {
+      filter: '',
       pagination: {
         page: 1,
         rowsPerPage: 5,
@@ -97,7 +187,16 @@ export default defineComponent({
   computed: {
     columns () {
       return [
-        { name: 'name', label: this.$t('name'), field: 'name', sortable: true },
+        { name: 'name', label: this.$t('name'), field: 'name' },
+        { name: 'cellphone', label: this.$t('cellphone'), field: 'cellphone' },
+        { name: 'phone', label: this.$t('phone'), field: 'phone' },
+        { name: 'observation', label: this.$t('observation'), field: 'observation' },
+        { name: 'document', label: this.$t('document'), field: 'document' },
+        { name: 'publicPlace', label: this.$t('publicPlace'), field: 'publicPlace' },
+        { name: 'number', label: this.$t('number'), field: 'number' },
+        { name: 'district', label: this.$t('district'), field: 'district' },
+        { name: 'city', label: this.$t('city'), field: 'city' },
+        { city: 'complement', label: this.$t('complement'), field: 'complement' },
         {
           name: 'createdAt',
           label: this.$t('createdAt'),
@@ -128,6 +227,12 @@ export default defineComponent({
   },
 
   methods: {
+    setAdress ({ logradouro, bairro, localidade, uf }) {
+      this.form.publicPlace = logradouro
+      this.form.district = bairro
+      this.form.city = localidade
+      this.form.state = uf
+    },
     reset () {
       this.form = { ...this.modelForm }
       this.$nextTick(() => {

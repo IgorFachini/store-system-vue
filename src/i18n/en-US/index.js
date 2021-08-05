@@ -10,5 +10,19 @@ export default {
   updatedAt: 'Updated At',
   action: 'Action',
   fillTheField: 'Fill the field {field}',
-  name: 'Name'
+  name: 'Name',
+  cellphone: 'Cellphone',
+  phone: 'Phone',
+  observation: 'Observation',
+  document: 'Document',
+  publicPlace: 'Public Place',
+  number: 'Number',
+  complement: 'Complement',
+  district: 'District',
+  city: 'City',
+  state: 'State',
+  invalid: 'Invalid',
+  errorLocating: 'Error locating',
+  search: 'Search',
+  recordsPerPage: 'Records per page'
 }
