@@ -27,5 +27,10 @@ export default {
   recordsPerPage: 'Registros por página',
   category: 'Categoria | Categorias',
   description: 'Descrição',
-  alredyExist: 'Já Existe'
+  alredyExist: 'Já Existe',
+  saleValue: 'Valor de Venda',
+  code: 'Código',
+  currentInventory: 'Estoque Atual',
+  purchasePrice: 'Valor De Compra',
+  product: 'Produto | Produtos'
 }

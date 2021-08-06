@@ -52,6 +52,12 @@
           </q-item-label>
         </q-item>
 
+        <q-item to="/products">
+          <q-item-label>
+            {{ $tc('product', 2) }}
+          </q-item-label>
+        </q-item>
+
         <q-item-label
           header
           class="text-grey-8"

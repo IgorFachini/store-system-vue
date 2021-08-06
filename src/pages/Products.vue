@@ -13,13 +13,44 @@
           :label="$t('name')"
           :rules="[
             val => val && val.length || $t('fillTheField', { field: $t('name') }),
-            val => !!form.id && nameBefore === val || (!categories.map(c => c.name).includes(val) || $t('alredyExist'))]"
+            val => !!form.id && nameBefore === val || (!products.map(c => c.name).includes(val) || $t('alredyExist'))]"
         />
 
         <q-input
           v-model="form.description"
           type="textarea"
           :label="$t('description')"
+        />
+
+        <currency-input
+          v-model="form.saleValue"
+          :label="$t('saleValue')"
+        />
+
+        <v-select
+          v-model="form.category"
+          :loading="loading"
+          autocomplete
+          sorted
+          :label="$t('category')"
+          :options="categories.map(c => c.name)"
+        />
+
+        <q-input
+          v-model="form.code"
+          type="number"
+          :label="$t('code')"
+        />
+
+        <q-input
+          v-model="form.currentInventory"
+          type="number"
+          :label="$t('currentInventory')"
+        />
+
+        <currency-input
+          v-model="form.purchasePrice"
+          :label="$t('purchasePrice')"
         />
 
         <div class="row q-gutter-md q-mt-md">
@@ -38,9 +69,9 @@
     <div class="col-xs-12 col-sm-12 col-md-8">
       <q-table
         v-model:pagination="pagination"
-        :title="$tc('category', 2)"
+        :title="$tc('product', 2)"
         class="full-width"
-        :rows="categories"
+        :rows="products"
         :columns="columns"
         style="height: calc(100vh - 100px)"
         binary-state-sort
@@ -90,15 +121,27 @@
 import { date } from 'quasar'
 import { defineComponent } from 'vue'
 const { formatDate } = date
+import CurrencyInput from 'components/common/CurrencyInput.vue'
+import VSelect from 'components/common/VSelect.vue'
 
 export default defineComponent({
-  name: 'Categories',
+  name: 'Products',
+
+  components: {
+    CurrencyInput,
+    VSelect
+  },
 
   setup () {
     return {
       modelForm: {
         name: '',
-        description: ''
+        description: '',
+        saleValue: 0,
+        category: '',
+        code: '',
+        currentInventory: 0,
+        purchasePrice: 0
       }
     }
   },
@@ -115,8 +158,9 @@ export default defineComponent({
       form: {},
       loading: false,
       saving: false,
-      categories: [],
+      products: [],
       firebaseMixinInstance: null,
+      categories: [],
       nameBefore: ''
     }
   },
@@ -126,6 +170,17 @@ export default defineComponent({
       return [
         { name: 'name', label: this.$t('name'), field: 'name', sortable: true },
         { name: 'description', label: this.$t('description'), field: 'description' },
+        { name: 'saleValue', label: this.$t('saleValue'), field: 'saleValue', sortable: true },
+        {
+          name: 'category',
+          label: this.$t('category'),
+          field: 'category',
+          format: category => category ? category.name : '',
+          sortable: true
+        },
+        { name: 'code', label: this.$t('code'), field: 'code' },
+        { name: 'currentInventory', label: this.$t('currentInventory'), field: 'currentInventory', sortable: true },
+        { name: 'purchasePrice', label: this.$t('purchasePrice'), field: 'purchasePrice', sortable: true },
         {
           name: 'createdAt',
           label: this.$t('createdAt'),
@@ -150,10 +205,14 @@ export default defineComponent({
 
   mounted () {
     this.loading = true
-    this.firebaseMixinInstance = this.firebaseMixin('categories')
-    this.$bind('categories', this.firebaseMixinInstance.ref()).finally(() => {
-      this.loading = false
-    })
+    this.firebaseMixinInstance = this.firebaseMixin('products')
+    Promise.all([
+      this.$bind('products', this.firebaseMixinInstance.ref()),
+      this.$bind('categories', this.firebaseMixin('categories').ref())
+    ])
+      .finally(() => {
+        this.loading = false
+      })
   },
 
   methods: {
@@ -171,6 +230,10 @@ export default defineComponent({
     },
     save () {
       const ref = this.firebaseMixinInstance
+      if (this.form.category) {
+        const idCategory = this.categories.find(c => c.name === this.form.category).id
+        this.form.category = this.firebaseMixin('categories').id(idCategory).doc()
+      }
       const action = this.form.id
         ? ref.id(this.form.id).update : ref.add
       action(this.form).catch((err) => {
@@ -179,7 +242,7 @@ export default defineComponent({
       this.reset()
     },
     edit (row) {
-      this.form = { ...row, id: row.id }
+      this.form = { ...row, id: row.id, category: row.category ? row.category.name : '' }
       this.nameBefore = row.name
       this.$nextTick(() => {
         this.$refs.form.resetValidation()
