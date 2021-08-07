@@ -27,5 +27,10 @@ export default {
   recordsPerPage: 'Records per page',
   description: 'Description',
   category: 'Category | Categories',
-  alredyExist: 'Alredy Exist'
+  alredyExist: 'Alredy Exist',
+  saleValue: 'Sale Value',
+  code: 'Code',
+  currentInventory: 'Current Inventory',
+  purchasePrice: 'Purchase Price',
+  product: 'Product | Products'
 }

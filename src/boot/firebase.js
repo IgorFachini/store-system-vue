@@ -53,6 +53,10 @@ export default boot(({ app }) => {
 
           id (id) {
             return {
+              doc () {
+                return ref.doc(id)
+              },
+
               set (data) {
                 return ref.doc(id).set({
                   ...data,
