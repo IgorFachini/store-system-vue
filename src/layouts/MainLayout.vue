@@ -83,6 +83,7 @@
 import EssentialLink from 'components/EssentialLink.vue'
 import { useI18n } from 'vue-i18n'
 import { useQuasar } from 'quasar'
+import langDe from 'quasar/lang/pt-BR'
 
 const linksList = [
   {
@@ -154,9 +155,27 @@ export default defineComponent({
     }
   },
 
+  data () {
+    return {
+      $q: null
+    }
+  },
+
+  watch: {
+    locale (val) {
+      import(
+      /* webpackInclude: /(en-US|pt-BR)\.js$/ */
+        'quasar/lang/' + val
+      ).then(lang => {
+        this.$q.lang.set(lang.default)
+      })
+    }
+  },
+
   mounted () {
-    const $q = useQuasar()
-    this.locale = $q.lang.getLocale()
+    this.$q = useQuasar()
+    this.locale = this.$q.lang.getLocale()
+    console.log('languages', this.locale, langDe)
   }
 })
 </script>

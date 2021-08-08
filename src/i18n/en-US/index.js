@@ -32,5 +32,10 @@ export default {
   code: 'Code',
   currentInventory: 'Current Inventory',
   purchasePrice: 'Purchase Price',
-  product: 'Product | Products'
+  product: 'Product | Products',
+  sale: 'Sale | Sales',
+  date: 'Date',
+  unitaryValue: 'Unitary Value',
+  quantity: 'Quantity',
+  add: 'Add'
 }
