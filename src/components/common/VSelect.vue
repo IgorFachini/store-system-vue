@@ -18,6 +18,8 @@
     :loading="loading"
     :rules="rules"
     :hint="hint"
+    :input-class="[inputClass]"
+    :class="insideClass"
     @clear="$emit('input-value', ''), $emit('clear', '')"
     @filter="filterQSelect"
     @update:model-value="$emit('update:model-value', $event)"
@@ -36,8 +38,9 @@
 </template>
 <script>
 import { useFormChild, QSelect } from 'quasar'
+import { defineComponent } from 'vue'
 
-export default {
+export default defineComponent({
   name: 'VSelect',
 
   mixins: [QSelect],
@@ -45,6 +48,11 @@ export default {
   props: {
     sorted: Boolean,
     autocomplete: Boolean,
+
+    class: {
+      type: String,
+      default: ''
+    },
 
     options: {
       type: Array,
@@ -63,6 +71,9 @@ export default {
   },
 
   computed: {
+    insideClass () {
+      return this.class
+    },
     field () {
       if (this.mounted) {
         return this.$refs.field
@@ -128,5 +139,5 @@ export default {
       })
     }
   }
-}
+})
 </script>

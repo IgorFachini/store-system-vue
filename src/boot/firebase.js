@@ -1,13 +1,14 @@
 import { boot } from 'quasar/wrappers'
-import { firestorePlugin } from 'vuefire'
+import { firestorePlugin, rtdbPlugin } from 'vuefire'
 import firebase from 'firebase/app'
 import 'firebase/firestore'
+import 'firebase/database'
 import 'firebase/auth'
 
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
   authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-  // databaseURL: process.env.FIREBASE_DATABASE_URL,
+  databaseURL: process.env.FIREBASE_DATABASE_URL,
   projectId: process.env.FIREBASE_PROJECT_ID,
   storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
   messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
@@ -17,11 +18,13 @@ const firebaseConfig = {
 const firebaseApp = firebase.initializeApp(firebaseConfig)
 const firebaseAuth = firebaseApp.auth()
 
-const db = firebaseApp.firestore()
+const fr = firebaseApp.firestore()
+const db = firebaseApp.database()
 const { Timestamp } = firebase.firestore
 
-db.settings({ timestampsInSnapshots: true })
-db.enablePersistence()
+fr.settings({ timestampsInSnapshots: true })
+
+fr.enablePersistence()
   .then((res) => {
     console.log('persistenceok', res)
   })
@@ -32,23 +35,22 @@ db.enablePersistence()
 export default boot(({ app }) => {
   const firebaseMixin = {
     methods: {
-      firebaseMixin (refName) {
-        const ref = db.collection(refName)
+      firebaseMixin (refName, rtdb) {
+        const refThis = this
+        const ref = rtdb ? db.ref(refName) : fr.collection(refName)
 
         return {
           ref () {
             return ref
           },
 
-          syncToField (fieldName) {
-            this[fieldName] = ref
+          bindField (fieldName) {
+            return refThis[rtdb ? '$rtdbBind' : '$bind'](fieldName, ref)
           },
 
           add (data) {
-            return ref.add({
-              ...data,
-              createdAt: Timestamp.fromDate(new Date())
-            })
+            const send = { ...data, createdAt: rtdb ? new Date().getTime() : Timestamp.fromDate(new Date()) }
+            return ref[rtdb ? 'push' : 'add'](send)
           },
 
           id (id) {
@@ -58,21 +60,24 @@ export default boot(({ app }) => {
               },
 
               set (data) {
-                return ref.doc(id).set({
+                const setRef = rtdb ? db.ref(`${refName}/${id}`) : ref.doc(id)
+
+                return setRef.set({
                   ...data,
-                  updatedAt: Timestamp.fromDate(new Date())
+                  updatedAt: rtdb ? new Date().getTime() : Timestamp.fromDate(new Date())
                 })
               },
 
               update (data) {
-                return ref.doc(id).update({
+                const updateRef = rtdb ? db.ref(`${refName}/${id}`) : ref.doc(id)
+                return updateRef.update({
                   ...data,
-                  updatedAt: Timestamp.fromDate(new Date())
+                  updatedAt: rtdb ? new Date().getTime() : Timestamp.fromDate(new Date())
                 })
               },
 
-              delete (params) {
-                return ref.doc(id).delete()
+              delete () {
+                return rtdb ? db.ref(`${refName}/${id}`).remove() : ref.doc(id).delete()
               }
             }
           }
@@ -82,8 +87,9 @@ export default boot(({ app }) => {
   }
   app.mixin(firebaseMixin)
   app.use(firestorePlugin)
+  app.use(rtdbPlugin)
   app.config.globalProperties.$firestore = firebase.firestore()
   app.config.globalProperties.$firebaseAuth = firebaseAuth
 })
 
-export { firebaseAuth, db, Timestamp }
+export { firebaseAuth, fr, Timestamp }

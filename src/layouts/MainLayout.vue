@@ -58,6 +58,12 @@
           </q-item-label>
         </q-item>
 
+        <q-item to="/sales">
+          <q-item-label>
+            {{ $tc('sale', 2) }}
+          </q-item-label>
+        </q-item>
+
         <q-item-label
           header
           class="text-grey-8"
@@ -154,9 +160,26 @@ export default defineComponent({
     }
   },
 
+  data () {
+    return {
+      $q: null
+    }
+  },
+
+  watch: {
+    locale (val) {
+      import(
+      /* webpackInclude: /(en-US|pt-BR)\.js$/ */
+        'quasar/lang/' + val
+      ).then(lang => {
+        this.$q.lang.set(lang.default)
+      })
+    }
+  },
+
   mounted () {
-    const $q = useQuasar()
-    this.locale = $q.lang.getLocale()
+    this.$q = useQuasar()
+    this.locale = this.$q.lang.getLocale()
   }
 })
 </script>

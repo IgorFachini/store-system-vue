@@ -32,5 +32,12 @@ export default {
   code: 'Código',
   currentInventory: 'Estoque Atual',
   purchasePrice: 'Valor De Compra',
-  product: 'Produto | Produtos'
+  product: 'Produto | Produtos',
+  sale: 'Venda | Vendas',
+  date: 'Data',
+  unitaryValue: 'Valor Unitário',
+  quantity: 'Quantidade',
+  add: 'Adicionar',
+  additional: 'Adicional',
+  discount: 'Desconto'
 }
