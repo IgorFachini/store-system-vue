@@ -157,7 +157,7 @@
         :columns="columns"
         style="height: calc(100vh - 100px)"
         binary-state-sort
-        :loading="loading"
+        :loading="loadingTable"
         :filter="filter"
         row-key=".key"
       >
@@ -176,8 +176,14 @@
         </template>
         <template #body="props">
           <q-tr :props="props">
-            <q-td auto-width>
+            <q-td
+              v-for="col in props.cols"
+              :key="col.name"
+              :props="props"
+            >
+              {{ col.value }}
               <q-btn
+                v-if="col.name === 'expand'"
                 size="sm"
                 color="accent"
                 round
@@ -185,13 +191,6 @@
                 :icon="props.expand ? 'remove' : 'add'"
                 @click="props.expand = !props.expand"
               />
-            </q-td>
-            <q-td
-              v-for="col in props.cols"
-              :key="col.name"
-              :props="props"
-            >
-              {{ col.value }}
               <div
                 v-if="col.name === 'action'"
                 class="row no-wrap q-gutter-md"
@@ -283,12 +282,13 @@ export default defineComponent({
       productForm: {},
       pagination: {
         page: 1,
-        rowsPerPage: 5,
+        rowsPerPage: 10,
         sortBy: 'createdAt',
         descending: true
       },
       form: {},
       loading: false,
+      loadingTable: true,
       saving: false,
       sales: [],
       firebaseMixinInstance: null,
@@ -310,6 +310,7 @@ export default defineComponent({
     },
     columns () {
       return [
+        { name: 'expand', label: this.$tc('product', 2), align: 'left' },
         { name: 'date', label: this.$t('date'), field: 'date', sortable: true },
         { name: 'observation', label: this.$t('observation'), field: 'observation' },
         {
@@ -352,9 +353,10 @@ export default defineComponent({
   mounted () {
     this.loading = true
     this.firebaseMixinInstance = this.firebaseMixin('sales', true)
+    this.firebaseMixinInstance.bindField('sales').finally(() => {
+      this.loadingTable = false
+    })
     Promise.all([
-      this.$rtdbBind('sales', this.firebaseMixin('sales', true).ref()),
-      // this.firebaseMixinInstance.bindField('sales'),
       this.firebaseMixin('customers').bindField('customers'),
       this.firebaseMixin('products').bindField('products')
     ])
