@@ -55,7 +55,7 @@
                   :label="$t('product')"
                   :options="productsOptions"
                   :rules="[ val => !productForm.quantity || !!val.length ]"
-                  @update:model-value="val => productForm.unitaryValue = products.find(p => p.id === val).saleValue "
+                  @update:model-value="val => productForm.unitaryValue = currencyToFloat(products.find(p => p.id === val).saleValue)"
                 />
                 <q-input
                   v-model="productForm.quantity"
@@ -245,6 +245,7 @@ import CurrencyInput from 'components/common/CurrencyInput.vue'
 import VSelect from 'components/common/VSelect.vue'
 import VInputDatePicker from 'components/common/VInputDatePicker.vue'
 import ProductSaleInfo from 'components/product/ProductSaleInfo.vue'
+import { currencyToFloat } from 'utils/'
 
 export default defineComponent({
   name: 'Sales',
@@ -366,6 +367,7 @@ export default defineComponent({
   },
 
   methods: {
+    currencyToFloat,
     setAdress ({ logradouro, bairro, localidade, uf }) {
       this.form.publicPlace = logradouro
       this.form.district = bairro
