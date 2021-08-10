@@ -37,5 +37,7 @@ export default {
   date: 'Data',
   unitaryValue: 'Valor Unitário',
   quantity: 'Quantidade',
-  add: 'Adicionar'
+  add: 'Adicionar',
+  additional: 'Adicional',
+  discount: 'Desconto'
 }

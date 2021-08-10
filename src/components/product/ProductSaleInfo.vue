@@ -6,10 +6,11 @@
     <q-item-section>
       <label> {{ product.name }} </label>
       <label> {{ $t('unitaryValue') }}: {{ product.quantity }} - {{ $t('unitaryValue') }}: {{ product.unitaryValue }} </label>
-      <label> Total: {{ Number(product.quantity) * parseFloat(product.unitaryValue.replace(',', '.')) }} </label>
+      <label> Total: {{ (Number(product.quantity) * parseFloat(product.unitaryValue)).toFixed(2) }} </label>
     </q-item-section>
     <q-item-section side>
       <q-btn
+        v-if="!hideRemove"
         :label="$t('delete')"
         dense
         color="negative"
@@ -25,6 +26,7 @@ import { defineComponent } from 'vue'
 export default defineComponent({
   name: 'ProductSaleInfo',
   props: {
+    hideRemove: Boolean,
     product: {
       type: Object,
       required: true,

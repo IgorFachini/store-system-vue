@@ -36,7 +36,6 @@ export default boot(({ app }) => {
   const firebaseMixin = {
     methods: {
       firebaseMixin (refName, rtdb) {
-        console.log('thisM', this)
         const refThis = this
         const ref = rtdb ? db.ref(refName) : fr.collection(refName)
 

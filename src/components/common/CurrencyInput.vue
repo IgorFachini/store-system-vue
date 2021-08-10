@@ -3,6 +3,9 @@
     ref="inputRef"
     :model-value="modelValue"
     :label="label"
+    :class="insideClass"
+    :input-class="[inputClass]"
+    :disable="disable"
     @update:model-value="onInput"
   />
 </template>
@@ -16,7 +19,14 @@ export default {
 
   mixins: [QInput],
 
-  emits: ['update:modelValue'],
+  props: {
+    class: {
+      type: String,
+      default: ''
+    }
+  },
+
+  emits: ['update:modelValue', 'change'],
   setup (props) {
     const options = {
       locale: undefined,
@@ -36,9 +46,21 @@ export default {
     return { inputRef }
   },
 
+  computed: {
+    insideClass () {
+      return this.class
+    }
+  },
+
+  watch: {
+    modelValue (val) {
+      this.$emit('change', val)
+    }
+  },
+
   methods: {
     onInput (value) {
-      this.$emit('update:modelValue', value)
+      this.$emit('update:modelValue', parseFloat(value.replace(',', '.')))
     }
   }
 }

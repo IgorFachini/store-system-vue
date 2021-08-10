@@ -58,6 +58,12 @@
           </q-item-label>
         </q-item>
 
+        <q-item to="/sales">
+          <q-item-label>
+            {{ $tc('sale', 2) }}
+          </q-item-label>
+        </q-item>
+
         <q-item-label
           header
           class="text-grey-8"
@@ -83,7 +89,6 @@
 import EssentialLink from 'components/EssentialLink.vue'
 import { useI18n } from 'vue-i18n'
 import { useQuasar } from 'quasar'
-import langDe from 'quasar/lang/pt-BR'
 
 const linksList = [
   {
@@ -175,7 +180,6 @@ export default defineComponent({
   mounted () {
     this.$q = useQuasar()
     this.locale = this.$q.lang.getLocale()
-    console.log('languages', this.locale, langDe)
   }
 })
 </script>
