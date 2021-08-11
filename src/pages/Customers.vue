@@ -174,7 +174,7 @@ export default defineComponent({
       pagination: {
         page: 1,
         rowsPerPage: 5,
-        sortBy: 'updatedAt',
+        sortBy: 'createdAt',
         descending: true
       },
       form: {},
