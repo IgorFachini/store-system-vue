@@ -76,15 +76,15 @@
           :label="$t('complement')"
         />
 
-        <div class="row q-gutter-md q-mt-md">
+        <div class="row q-gutter-md q-mt-md justify-between">
+          <q-btn
+            label="Reset"
+            @click="reset"
+          />
           <q-btn
             :label="$t('save')"
             type="submit"
             color="positive"
-          />
-          <q-btn
-            label="Reset"
-            @click="reset"
           />
         </div>
       </q-form>
@@ -141,7 +141,7 @@
 
 <script>
 
-import { date } from 'quasar'
+import { date, Dialog } from 'quasar'
 import VInputCep from 'src/components/common/VInputCep.vue'
 import { defineComponent } from 'vue'
 const { formatDate } = date
@@ -170,6 +170,7 @@ export default defineComponent({
 
   data () {
     return {
+      firebaseMixinInstance: null,
       filter: '',
       pagination: {
         page: 1,
@@ -221,7 +222,9 @@ export default defineComponent({
 
   mounted () {
     this.loading = true
-    this.$bind('customers', this.firebaseMixin('customers').ref()).finally(() => {
+    this.firebaseMixinInstance = this.firebaseMixin('customers')
+
+    this.firebaseMixinInstance.bindField('customers').finally(() => {
       this.loading = false
     })
   },
@@ -240,7 +243,7 @@ export default defineComponent({
       })
     },
     save () {
-      const ref = this.firebaseMixin('customers')
+      const ref = this.firebaseMixinInstance
       const action = this.form.id
         ? ref.id(this.form.id).update : ref.add
       action(this.form).catch((err) => {
@@ -253,9 +256,15 @@ export default defineComponent({
     },
 
     deleteAction (row) {
-      row.loading = true
-      this.firebaseMixin('customers').id(row.id).delete().finally(() => {
-        row.loading = false
+      Dialog.create({
+        title: `${this.$q.lang.label.remove} ${this.$t('customer')}`,
+        cancel: true,
+        persistent: true
+      }).onOk(() => {
+        row.loading = true
+        this.firebaseMixinInstance.id(row.id).delete().finally(() => {
+          row.loading = false
+        })
       })
     }
   }

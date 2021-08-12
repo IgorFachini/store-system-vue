@@ -22,15 +22,15 @@
           :label="$t('description')"
         />
 
-        <div class="row q-gutter-md q-mt-md">
+        <div class="row q-gutter-md q-mt-md justify-between">
+          <q-btn
+            label="Reset"
+            @click="reset"
+          />
           <q-btn
             :label="$t('save')"
             type="submit"
             color="positive"
-          />
-          <q-btn
-            label="Reset"
-            @click="reset"
           />
         </div>
       </q-form>
@@ -87,7 +87,7 @@
 
 <script>
 
-import { date } from 'quasar'
+import { date, Dialog } from 'quasar'
 import { defineComponent } from 'vue'
 const { formatDate } = date
 
@@ -151,7 +151,7 @@ export default defineComponent({
   mounted () {
     this.loading = true
     this.firebaseMixinInstance = this.firebaseMixin('categories')
-    this.$bind('categories', this.firebaseMixinInstance.ref()).finally(() => {
+    this.firebaseMixinInstance.bindField('categories').finally(() => {
       this.loading = false
     })
   },
@@ -187,9 +187,15 @@ export default defineComponent({
     },
 
     deleteAction (row) {
-      row.loading = true
-      this.firebaseMixinInstance.id(row.id).delete().finally(() => {
-        row.loading = false
+      Dialog.create({
+        title: `${this.$q.lang.label.remove} ${this.$t('category')}`,
+        cancel: true,
+        persistent: true
+      }).onOk(() => {
+        row.loading = true
+        this.firebaseMixinInstance.id(row.id).delete().finally(() => {
+          row.loading = false
+        })
       })
     }
   }

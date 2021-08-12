@@ -53,15 +53,15 @@
           :label="$t('purchasePrice')"
         />
 
-        <div class="row q-gutter-md q-mt-md">
+        <div class="row q-gutter-md q-mt-md justify-between">
+          <q-btn
+            label="Reset"
+            @click="reset"
+          />
           <q-btn
             :label="$t('save')"
             type="submit"
             color="positive"
-          />
-          <q-btn
-            label="Reset"
-            @click="reset"
           />
         </div>
       </q-form>
@@ -118,7 +118,7 @@
 
 <script>
 
-import { date } from 'quasar'
+import { date, Dialog } from 'quasar'
 import { defineComponent } from 'vue'
 const { formatDate } = date
 import CurrencyInput from 'components/common/CurrencyInput.vue'
@@ -207,8 +207,8 @@ export default defineComponent({
     this.loading = true
     this.firebaseMixinInstance = this.firebaseMixin('products')
     Promise.all([
-      this.$bind('products', this.firebaseMixinInstance.ref()),
-      this.$bind('categories', this.firebaseMixin('categories').ref())
+      this.firebaseMixinInstance.bindField('products'),
+      this.firebaseMixin('categories').bindField('categories')
     ])
       .finally(() => {
         this.loading = false
@@ -250,9 +250,15 @@ export default defineComponent({
     },
 
     deleteAction (row) {
-      row.loading = true
-      this.firebaseMixinInstance.id(row.id).delete().finally(() => {
-        row.loading = false
+      Dialog.create({
+        title: `${this.$q.lang.label.remove} ${this.$t('product')}`,
+        cancel: true,
+        persistent: true
+      }).onOk(() => {
+        row.loading = true
+        this.firebaseMixinInstance.id(row.id).delete().finally(() => {
+          row.loading = false
+        })
       })
     }
   }
