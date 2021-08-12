@@ -15,7 +15,27 @@
           Quasar App
         </q-toolbar-title>
 
-        <div>Quasar v{{ $q.version }}</div>
+        <div>
+          <q-btn-dropdown
+            class="ellipsis"
+            split
+            flat
+            no-caps="no-caps"
+            label="User"
+          >
+            <q-list>
+              <q-item
+                v-close-popup
+                clickable
+                @click="logout"
+              >
+                <q-item-section>
+                  <q-item-label>Logout</q-item-label>
+                </q-item-section>
+              </q-item>
+            </q-list>
+          </q-btn-dropdown>
+        </div>
       </q-toolbar>
     </q-header>
 
@@ -64,18 +84,27 @@
           </q-item-label>
         </q-item>
 
-        <q-item-label
-          header
-          class="text-grey-8"
+        <q-btn-dropdown
+          class="ellipsis"
+          split
+          flat
+          no-caps="no-caps"
+          label="About"
         >
-          About
-        </q-item-label>
+          <q-item-label
+            header
+            class="text-grey-8"
+          >
+            About
+          </q-item-label>
 
-        <EssentialLink
-          v-for="link in essentialLinks"
-          :key="link.title"
-          v-bind="link"
-        />
+          <EssentialLink
+            v-for="link in essentialLinks"
+            :key="link.title"
+            v-bind="link"
+          />
+          <div>Quasar v{{ $q.version }}</div>
+        </q-btn-dropdown>
       </q-list>
     </q-drawer>
 
@@ -180,6 +209,14 @@ export default defineComponent({
   mounted () {
     this.$q = useQuasar()
     this.locale = this.$q.lang.getLocale()
+  },
+
+  methods: {
+    logout () {
+      this.$firebaseAuth.signOut()
+      this.$router.push('/login')
+        .catch(error => console.log('error', error))
+    }
   }
 })
 </script>

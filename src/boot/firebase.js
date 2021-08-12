@@ -17,6 +17,14 @@ const firebaseConfig = {
 
 const firebaseApp = firebase.initializeApp(firebaseConfig)
 const firebaseAuth = firebaseApp.auth()
+firebaseApp.getCurrentUser = () => {
+  return new Promise((resolve, reject) => {
+    const unsubscribe = firebaseAuth.onAuthStateChanged(user => {
+      unsubscribe()
+      resolve(user)
+    }, reject)
+  })
+}
 
 const fr = firebaseApp.firestore()
 const db = firebaseApp.database()
@@ -92,4 +100,4 @@ export default boot(({ app }) => {
   app.config.globalProperties.$firebaseAuth = firebaseAuth
 })
 
-export { firebaseAuth, fr, Timestamp }
+export { firebaseApp, firebaseAuth, fr, Timestamp }
