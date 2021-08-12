@@ -98,12 +98,18 @@
                 bordered
                 separator
               >
-                <product-sale-info
-                  v-for="product in form.products"
-                  :key="product.id"
-                  :product="product"
-                  @remove="val => form.products = form.products.filter(p => p.id !== val.id)"
-                />
+                <transition-group
+                  appear
+                  enter-active-class="animated fadeIn"
+                  leave-active-class="animated fadeOut"
+                >
+                  <product-sale-info
+                    v-for="product in form.products"
+                    :key="product.id"
+                    :product="product"
+                    @remove="val => form.products = form.products.filter(p => p.id !== val.id)"
+                  />
+                </transition-group>
               </q-list>
             </q-card-section>
           </q-card>
@@ -159,7 +165,7 @@
         binary-state-sort
         :loading="loadingTable"
         :filter="filter"
-        row-key=".key"
+        row-key="id"
       >
         <template #top-right>
           <q-input
@@ -175,70 +181,88 @@
           </q-input>
         </template>
         <template #body="props">
-          <q-tr :props="props">
-            <q-td
-              v-for="col in props.cols"
-              :key="col.name"
+          <transition
+            appear
+            enter-active-class="animated slideInRight"
+            leave-active-class="animated slideInLeft"
+          >
+            <keep-alive>
+              <q-tr
+                appear
+                :props="props"
+              >
+                <q-td
+                  v-for="col in props.cols"
+                  :key="col.name"
+                  :props="props"
+                >
+                  {{ col.value }}
+                  <q-btn
+                    v-if="col.name === 'expand'"
+                    size="sm"
+                    color="accent"
+                    round
+                    dense
+                    :icon="props.expand ? 'remove' : 'add'"
+                    @click="props.expand = !props.expand"
+                  />
+                  <div
+                    v-if="col.name === 'action'"
+                    class="row no-wrap q-gutter-md"
+                  >
+                    <q-btn
+                      :label="$t('edit')"
+                      dense
+                      color="primary"
+                      @click="edit(props.row)"
+                    />
+                    <q-btn
+                      :label="$t('delete')"
+                      dense
+                      color="negative"
+                      :loading="props.row.loading"
+                      @click="deleteAction(props.row)"
+                    />
+                  </div>
+                </q-td>
+              </q-tr>
+            </keep-alive>
+          </transition>
+          <transition
+            appear
+            enter-active-class="animated fadeIn"
+            leave-active-class="animated fadeOut"
+          >
+            <q-tr
+              v-show="props.expand"
               :props="props"
             >
-              {{ col.value }}
-              <q-btn
-                v-if="col.name === 'expand'"
-                size="sm"
-                color="accent"
-                round
-                dense
-                :icon="props.expand ? 'remove' : 'add'"
-                @click="props.expand = !props.expand"
-              />
-              <div
-                v-if="col.name === 'action'"
-                class="row no-wrap q-gutter-md"
-              >
-                <q-btn
-                  :label="$t('edit')"
-                  dense
-                  color="primary"
-                  @click="edit(props.row)"
-                />
-                <q-btn
-                  :label="$t('delete')"
-                  dense
-                  color="negative"
-                  :loading="props.row.loading"
-                  @click="deleteAction(props.row)"
-                />
-              </div>
-            </q-td>
-          </q-tr>
-          <q-tr
-            v-show="props.expand"
-            :props="props"
-          >
-            <q-td colspan="100%">
-              <q-list
-                bordered
-                separator
-              >
-                <product-sale-info
-                  v-for="product in props.row.products"
-                  :key="product.id"
-                  :product="product"
-                  hide-remove
-                  @remove="val => form.products = form.products.filter(p => p.id !== val.id)"
-                />
-              </q-list>
-            </q-td>
-          </q-tr>
+              <q-td colspan="100%">
+                <q-list
+                  bordered
+                  separator
+                >
+                  <product-sale-info
+                    v-for="product in props.row.products"
+                    :key="product.id"
+                    :product="product"
+                    hide-remove
+                    @remove="val => form.products = form.products.filter(p => p.id !== val.id)"
+                  />
+                </q-list>
+              </q-td>
+            </q-tr>
+          </transition>
         </template>
       </q-table>
+      {{ $q.lang.label.remove }}
     </div>
   </q-page>
 </template>
 
 <script>
 
-import { date } from 'quasar'
+import { date, Dialog } from 'quasar'
 import { defineComponent } from 'vue'
 const { formatDate } = date
 import CurrencyInput from 'components/common/CurrencyInput.vue'
@@ -331,13 +355,13 @@ export default defineComponent({
           name: 'createdAt',
           label: this.$t('createdAt'),
           field: 'createdAt',
-          format: val => formatDate(val, 'DD/MM/YYYY'),
+          format: val => formatDate(val.toDate(), 'DD/MM/YYYY HH:mm'),
           sortable: true
         },
         {
           name: 'updatedAt',
           label: this.$t('updatedAt'),
-          field: ({ updatedAt = null }) => updatedAt ? formatDate(updatedAt, 'DD/MM/YYYY') : '',
+          field: ({ updatedAt = null }) => updatedAt ? formatDate(updatedAt.toDate(), 'DD/MM/YYYY HH:mm') : '',
           sortable: true
         },
         { name: 'action', label: this.$t('action'), align: 'left' }
@@ -353,16 +377,16 @@ export default defineComponent({
 
   mounted () {
     this.loading = true
-    this.firebaseMixinInstance = this.firebaseMixin('sales', true)
-    this.firebaseMixinInstance.bindField('sales').finally(() => {
-      this.loadingTable = false
-    })
+    this.firebaseMixinInstance = this.firebaseMixin('sales')
+
     Promise.all([
+      this.firebaseMixinInstance.bindField('sales'),
       this.firebaseMixin('customers').bindField('customers'),
       this.firebaseMixin('products').bindField('products')
     ])
       .finally(() => {
         this.loading = false
+        this.loadingTable = false
       })
   },
 
@@ -400,7 +424,7 @@ export default defineComponent({
       this.resetProduct()
     },
     edit (row) {
-      this.form = { ...row, id: row['.key'] }
+      this.form = { ...row, id: row.id }
       this.nameBefore = row.name
       this.$nextTick(() => {
         this.$refs.form.resetValidation()
@@ -408,9 +432,15 @@ export default defineComponent({
     },
 
     deleteAction (row) {
-      row.loading = true
-      this.firebaseMixinInstance.id(row['.key']).delete().finally(() => {
-        row.loading = false
+      Dialog.create({
+        title: `${this.$q.lang.label.remove} ${this.$t('sale')}`,
+        cancel: true,
+        persistent: true
+      }).onOk(() => {
+        row.loading = true
+        this.firebaseMixinInstance.id(row.id).delete().finally(() => {
+          row.loading = false
+        })
       })
     }
   }
