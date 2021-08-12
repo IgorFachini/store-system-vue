@@ -2,6 +2,7 @@
 
 A Quasar Framework app, made for simple stores.
 
+Database: Firestore Database Only
 ## User to testing in live preview (fake)
 
 Email: staging@staging.com

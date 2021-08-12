@@ -255,7 +255,6 @@
           </transition>
         </template>
       </q-table>
-      {{ $q.lang.label.remove }}
     </div>
   </q-page>
 </template>
