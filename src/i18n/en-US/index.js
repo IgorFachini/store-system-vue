@@ -39,5 +39,12 @@ export default {
   quantity: 'Quantity',
   add: 'Add',
   additional: 'Additional',
-  discount: 'Discount'
+  discount: 'Discount',
+  expenseProduct: 'Expense Products',
+  expense: 'Expense | Expenses',
+  type: 'Type',
+  weightType: 'Weight Type',
+  weight: 'Weight',
+  entry: 'Entry',
+  exit: 'Exit'
 }

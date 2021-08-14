@@ -155,106 +155,14 @@
       </q-card>
     </div>
     <div class="col-xs-12 col-sm-12 col-md-8">
-      <q-table
-        v-model:pagination="pagination"
+      <v-table-crud
         :title="$tc('sale', 2)"
-        class="full-width"
         :rows="sales"
         :columns="columns"
-        style="height: calc(100vh - 100px)"
-        binary-state-sort
         :loading="loadingTable"
-        :filter="filter"
-        row-key="id"
-      >
-        <template #top-right>
-          <q-input
-            v-model="filter"
-            borderless
-            dense
-            debounce="300"
-            :placeholder="$t('search')"
-          >
-            <template #append>
-              <q-icon name="search" />
-            </template>
-          </q-input>
-        </template>
-        <template #body="props">
-          <transition
-            appear
-            enter-active-class="animated slideInRight"
-            leave-active-class="animated slideInLeft"
-          >
-            <keep-alive>
-              <q-tr
-                appear
-                :props="props"
-              >
-                <q-td
-                  v-for="col in props.cols"
-                  :key="col.name"
-                  :props="props"
-                >
-                  {{ col.value }}
-                  <q-btn
-                    v-if="col.name === 'expand'"
-                    size="sm"
-                    color="accent"
-                    round
-                    dense
-                    :icon="props.expand ? 'remove' : 'add'"
-                    @click="props.expand = !props.expand"
-                  />
-                  <div
-                    v-if="col.name === 'action'"
-                    class="row no-wrap q-gutter-md"
-                  >
-                    <q-btn
-                      :label="$t('edit')"
-                      dense
-                      color="primary"
-                      @click="edit(props.row)"
-                    />
-                    <q-btn
-                      :label="$t('delete')"
-                      dense
-                      color="negative"
-                      :loading="props.row.loading"
-                      @click="deleteAction(props.row)"
-                    />
-                  </div>
-                </q-td>
-              </q-tr>
-            </keep-alive>
-          </transition>
-          <transition
-            appear
-            enter-active-class="animated fadeIn"
-            leave-active-class="animated fadeOut"
-          >
-            <q-tr
-              v-show="props.expand"
-              :props="props"
-            >
-              <q-td colspan="100%">
-                <q-list
-                  bordered
-                  separator
-                >
-                  <product-sale-info
-                    v-for="product in props.row.products"
-                    :key="product.id"
-                    :product="product"
-                    hide-remove
-                    @remove="val => form.products = form.products.filter(p => p.id !== val.id)"
-                  />
-                </q-list>
-              </q-td>
-            </q-tr>
-          </transition>
-        </template>
-      </q-table>
+        @edit="edit"
+        @delete="deleteAction"
+      />
     </div>
   </q-page>
 </template>
@@ -267,8 +175,9 @@ const { formatDate } = date
 import CurrencyInput from 'components/common/CurrencyInput.vue'
 import VSelect from 'components/common/VSelect.vue'
 import VInputDatePicker from 'components/common/VInputDatePicker.vue'
-import ProductSaleInfo from 'components/product/ProductSaleInfo.vue'
+import VTableCrud from 'components/common/VTableCrud.vue'
 import { currencyToFloat } from 'utils/'
+import ProductSaleInfo from 'components/product/ProductSaleInfo.vue'
 
 export default defineComponent({
   name: 'Sales',
@@ -277,6 +186,7 @@ export default defineComponent({
     CurrencyInput,
     VSelect,
     VInputDatePicker,
+    VTableCrud,
     ProductSaleInfo
   },
 
@@ -302,14 +212,7 @@ export default defineComponent({
 
   data () {
     return {
-      filter: '',
       productForm: {},
-      pagination: {
-        page: 1,
-        rowsPerPage: 10,
-        sortBy: 'createdAt',
-        descending: true
-      },
       form: {},
       loading: false,
       loadingTable: true,
@@ -317,8 +220,7 @@ export default defineComponent({
       sales: [],
       firebaseMixinInstance: null,
       customers: [],
-      products: [],
-      nameBefore: ''
+      products: []
     }
   },
 
@@ -341,10 +243,7 @@ export default defineComponent({
           name: 'customer',
           label: this.$t('customer'),
           field: 'customer',
-          format: customer => {
-            const c = this.customers.find(c => c.id === customer)
-            if (c) return c.name
-          },
+          format: customer => customer ? customer.name : '',
           sortable: true
         },
         { name: 'additional', label: this.$t('additional'), field: 'additional', sortable: true },
@@ -411,6 +310,9 @@ export default defineComponent({
     },
     save () {
       const ref = this.firebaseMixinInstance
+      if (this.form.customer) {
+        this.form.customer = this.firebaseMixin('customers').id(this.form.customer).doc()
+      }
       const action = this.form.id
         ? ref.id(this.form.id).update : ref.add
       action(this.form).catch((err) => {
@@ -423,8 +325,7 @@ export default defineComponent({
       this.resetProduct()
     },
     edit (row) {
-      this.form = { ...row, id: row.id }
-      this.nameBefore = row.name
+      this.form = { ...row, id: row.id, customer: row.customer ? row.customer.id : '' }
       this.$nextTick(() => {
         this.$refs.form.resetValidation()
       })

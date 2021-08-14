@@ -87,6 +87,10 @@ export default defineComponent({
       this.setup()
     },
 
+    options () {
+      this.setup()
+    },
+
     value () {
       this.isValid = true
     }

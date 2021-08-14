@@ -84,6 +84,18 @@
           </q-item-label>
         </q-item>
 
+        <q-item to="/expenseProducts">
+          <q-item-label>
+            {{ $tc('expenseProduct', 2) }}
+          </q-item-label>
+        </q-item>
+
+        <q-item to="/expenses">
+          <q-item-label>
+            {{ $tc('expense', 2) }}
+          </q-item-label>
+        </q-item>
+
         <q-btn-dropdown
           class="ellipsis"
           split

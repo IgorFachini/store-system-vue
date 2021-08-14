@@ -11,69 +11,15 @@
         <q-input
           v-model="form.name"
           :label="$t('name')"
-          :rules="[val => val && val.length || $t('fillTheField', { field: $t('name') })]"
+          :rules="[
+            val => val && val.length || $t('fillTheField', { field: $t('name') }),
+            val => !!form.id && nameBefore === val || (!expenseProducts.map(c => c.name).includes(val) || $t('alredyExist'))]"
         />
 
         <q-input
-          v-model="form.cellphone"
-          :label="$t('cellphone')"
-          mask="#"
-          reverse-fill-mask
-        />
-
-        <q-input
-          v-model="form.phone"
-          :label="$t('phone')"
-          mask="#"
-          reverse-fill-mask
-        />
-
-        <q-input
-          v-model="form.observation"
+          v-model="form.description"
           type="textarea"
-          :label="$t('observation')"
-        />
-
-        <q-input
-          v-model="form.document"
-          :label="$t('document')"
-        />
-
-        <v-input-cep
-          v-model="form.cep"
-          label="CEP"
-          @response="setAdress"
-        />
-
-        <q-input
-          v-model="form.publicPlace"
-          :label="$t('publicPlace')"
-        />
-
-        <q-input
-          v-model="form.number"
-          :label="$t('number')"
-          type="number"
-        />
-
-        <q-input
-          v-model="form.district"
-          :label="$t('district')"
-        />
-
-        <q-input
-          v-model="form.city"
-          :label="$t('city')"
-        />
-
-        <q-input
-          v-model="form.state"
-          :label="$t('state')"
-        />
-
-        <q-input
-          v-model="form.complement"
-          :label="$t('complement')"
+          :label="$t('description')"
         />
 
         <div class="row q-gutter-md q-mt-md justify-between">
@@ -91,8 +37,8 @@
     </div>
     <div class="col-xs-12 col-sm-12 col-md-8">
       <v-table-crud
-        :title="$tc('customer', 2)"
-        :rows="customers"
+        :title="$tc('expenseProduct', 2)"
+        :rows="expenseProducts"
         :columns="columns"
         :loading="loading"
         @edit="edit"
@@ -105,56 +51,42 @@
 <script>
 
 import { date, Dialog } from 'quasar'
-import VInputCep from 'src/components/common/VInputCep.vue'
 import { defineComponent } from 'vue'
 const { formatDate } = date
 import VTableCrud from 'components/common/VTableCrud.vue'
 
 export default defineComponent({
-  name: 'Customers',
-  components: { VInputCep, VTableCrud },
+  name: 'Categories',
+
+  components: {
+    VTableCrud
+  },
 
   setup () {
     return {
       modelForm: {
         name: '',
-        cellphone: '',
-        phone: '',
-        observation: '',
-        document: '',
-        publicPlace: '',
-        number: '',
-        district: '',
-        city: '',
-        state: '',
-        complement: ''
+        description: ''
       }
     }
   },
 
   data () {
     return {
-      firebaseMixinInstance: null,
       form: {},
       loading: false,
       saving: false,
-      customers: []
+      expenseProducts: [],
+      firebaseMixinInstance: null,
+      nameBefore: ''
     }
   },
 
   computed: {
     columns () {
       return [
-        { name: 'name', label: this.$t('name'), field: 'name' },
-        { name: 'cellphone', label: this.$t('cellphone'), field: 'cellphone' },
-        { name: 'phone', label: this.$t('phone'), field: 'phone' },
-        { name: 'observation', label: this.$t('observation'), field: 'observation' },
-        { name: 'document', label: this.$t('document'), field: 'document' },
-        { name: 'publicPlace', label: this.$t('publicPlace'), field: 'publicPlace' },
-        { name: 'number', label: this.$t('number'), field: 'number' },
-        { name: 'district', label: this.$t('district'), field: 'district' },
-        { name: 'city', label: this.$t('city'), field: 'city' },
-        { city: 'complement', label: this.$t('complement'), field: 'complement' },
+        { name: 'name', label: this.$t('name'), field: 'name', sortable: true },
+        { name: 'description', label: this.$t('description'), field: 'description' },
         {
           name: 'createdAt',
           label: this.$t('createdAt'),
@@ -168,7 +100,7 @@ export default defineComponent({
           field: ({ updatedAt = null }) => updatedAt ? formatDate(updatedAt.toDate(), 'DD/MM/YYYY') : '',
           sortable: true
         },
-        { name: 'acoes', label: this.$t('action'), align: 'left' }
+        { name: 'action', label: this.$t('action'), align: 'left' }
       ]
     }
   },
@@ -179,9 +111,8 @@ export default defineComponent({
 
   mounted () {
     this.loading = true
-    this.firebaseMixinInstance = this.firebaseMixin('customers')
-
-    this.firebaseMixinInstance.bindField('customers').finally(() => {
+    this.firebaseMixinInstance = this.firebaseMixin('expenseProducts')
+    this.firebaseMixinInstance.bindField('expenseProducts').finally(() => {
       this.loading = false
     })
   },
@@ -210,11 +141,15 @@ export default defineComponent({
     },
     edit (row) {
       this.form = { ...row, id: row.id }
+      this.nameBefore = row.name
+      this.$nextTick(() => {
+        this.$refs.form.resetValidation()
+      })
     },
 
     deleteAction (row) {
       Dialog.create({
-        title: `${this.$q.lang.label.remove} ${this.$t('customer')}`,
+        title: `${this.$q.lang.label.remove} ${this.$t('expenseProduct')}`,
         cancel: true,
         persistent: true
       }).onOk(() => {

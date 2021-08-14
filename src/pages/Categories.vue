@@ -36,51 +36,14 @@
       </q-form>
     </div>
     <div class="col-xs-12 col-sm-12 col-md-8">
-      <q-table
-        v-model:pagination="pagination"
+      <v-table-crud
         :title="$tc('category', 2)"
-        class="full-width"
         :rows="categories"
         :columns="columns"
-        style="height: calc(100vh - 100px)"
-        binary-state-sort
         :loading="loading"
-        :filter="filter"
-        :rows-per-page-label="$t('recordsPerPage')"
-      >
-        <template #top-right>
-          <q-input
-            v-model="filter"
-            borderless
-            dense
-            debounce="300"
-            :placeholder="$t('search')"
-          >
-            <template #append>
-              <q-icon name="search" />
-            </template>
-          </q-input>
-        </template>
-        <template #body-cell-action="{ row }">
-          <q-td>
-            <div class="row no-wrap q-gutter-md">
-              <q-btn
-                :label="$t('edit')"
-                dense
-                color="primary"
-                @click="edit(row)"
-              />
-              <q-btn
-                :label="$t('delete')"
-                dense
-                color="negative"
-                :loading="row.loading"
-                @click="deleteAction(row)"
-              />
-            </div>
-          </q-td>
-        </template>
-      </q-table>
+        @edit="edit"
+        @delete="deleteAction"
+      />
     </div>
   </q-page>
 </template>
@@ -90,9 +53,14 @@
 import { date, Dialog } from 'quasar'
 import { defineComponent } from 'vue'
 const { formatDate } = date
+import VTableCrud from 'components/common/VTableCrud.vue'
 
 export default defineComponent({
   name: 'Categories',
+
+  components: {
+    VTableCrud
+  },
 
   setup () {
     return {
@@ -105,13 +73,6 @@ export default defineComponent({
 
   data () {
     return {
-      filter: '',
-      pagination: {
-        page: 1,
-        rowsPerPage: 5,
-        sortBy: 'createdAt',
-        descending: true
-      },
       form: {},
       loading: false,
       saving: false,

@@ -38,6 +38,20 @@ const routes = [
         meta: {
           requiresAuth: true
         }
+      },
+      {
+        path: '/expenseProducts',
+        component: () => import('src/pages/ExpenseProducts.vue'),
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/expenses',
+        component: () => import('src/pages/Expense.vue'),
+        meta: {
+          requiresAuth: true
+        }
       }
     ]
   },
