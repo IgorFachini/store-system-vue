@@ -12,7 +12,7 @@
     :filled="filled"
     :disable="disable"
     :readonly="readonly"
-    :mask="type === 'date' ? '##/##/####' : mask"
+    :mask="type === 'date' ? '##/##/##' : mask"
     :reverse-fill-mask="reverseFillMask"
     :style="qStyle"
     :autofocus="autofocus"
@@ -23,6 +23,7 @@
     :tabindex="tabindex"
     :hint="hint"
     :rules="rules"
+    :class="insideClass"
     @update:model-value="onInput"
     @change="$emit('change', $event)"
     @blur="$emit('blur')"
@@ -105,6 +106,11 @@ export default {
     date: Boolean,
     allowEmptySuccessRules: Boolean,
 
+    class: {
+      type: String,
+      default: ''
+    },
+
     qStyle: {
       type: [String, Array, Object],
       default: ''
@@ -127,6 +133,10 @@ export default {
   },
 
   computed: {
+    insideClass () {
+      return this.class
+    },
+
     cValue () {
       return this.modelValue
     },
@@ -171,7 +181,7 @@ export default {
       this.hasErrorCheck = Boolean(hasError)
     },
     onInput (modelValue) {
-      this.$emit('update:modelValue', modelValue)
+      this.$emit('update:modelValue', this.type === 'number' ? Number(modelValue) : modelValue)
     }
   }
 }

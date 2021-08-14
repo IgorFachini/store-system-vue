@@ -39,5 +39,12 @@ export default {
   quantity: 'Quantidade',
   add: 'Adicionar',
   additional: 'Adicional',
-  discount: 'Desconto'
+  discount: 'Desconto',
+  expenseProduct: 'Produto de Despesa | Produtos de Despesas',
+  expense: 'Despesa | Despesas',
+  type: 'Tipo',
+  weightType: 'Tipo de peso',
+  weight: 'Peso',
+  entry: 'Entrada',
+  exit: 'Saida'
 }
