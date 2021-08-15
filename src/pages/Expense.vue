@@ -10,19 +10,11 @@
           class="q-gutter-md"
           @submit="save"
         >
-          <v-input-date-picker
+          <v-input
             v-model="form.date"
             :label="$t('date')"
             :rules="['date']"
-          />
-
-          <v-select
-            v-model="form.expenseProduct"
-            :loading="loading"
-            autocomplete
-            sorted
-            :label="$t('expenseProduct')"
-            :options="expenseProductsOptions"
+            date
           />
 
           <v-select
@@ -36,7 +28,7 @@
             :rules="[ val => val && val.length ]"
           />
 
-          <q-input
+          <v-input
             v-model="form.observation"
             type="textarea"
             :label="$t('observation')"
@@ -45,35 +37,35 @@
           <q-card>
             <q-card-section>
               <div class="text-h6">
-                {{ $t('weight') }}
+                {{ $t('product') }}
               </div>
             </q-card-section>
             <q-separator />
 
             <q-card-section class="row q-col-gutter-md">
               <v-select
-                v-model="form.weightType"
-                reactive-rules
-                class="col-6"
+                v-model="form.expenseProduct"
+                class="col-12"
                 :loading="loading"
                 autocomplete
                 sorted
-                :label="$t('weightType')"
-                :options="['GR', 'ML', 'UN']"
-                :rules="[ val => val && val.length ]"
+                :label="$t('expenseProduct')"
+                :options="expenseProductsOptions"
               />
               <v-input
                 v-model="form.quantity"
                 type="number"
-                class="col-6"
+                class="col-12"
                 :label="$t('quantity')"
                 :rules="[ val => val && val.length ]"
+                :hint="`${$t('weightType')}: ${weightLabel}`"
               />
             </q-card-section>
           </q-card>
 
-          <currency-input
+          <v-input
             v-model="form.total"
+            currency
             label="Total"
           />
 
@@ -109,10 +101,8 @@
 import { date, Dialog } from 'quasar'
 import { defineComponent } from 'vue'
 const { formatDate } = date
-import CurrencyInput from 'components/common/CurrencyInput.vue'
 import VSelect from 'components/common/VSelect.vue'
 import VInput from 'components/common/VInput.vue'
-import VInputDatePicker from 'components/common/VInputDatePicker.vue'
 import VTableCrud from 'components/common/VTableCrud.vue'
 import { currencyToFloat } from 'utils/'
 
@@ -120,9 +110,9 @@ export default defineComponent({
   name: 'Sales',
 
   components: {
-    CurrencyInput,
+    // CurrencyInput,
     VSelect,
-    VInputDatePicker,
+    // VInputDatePicker,
     VTableCrud,
     VInput
   },
@@ -134,7 +124,6 @@ export default defineComponent({
         observation: '',
         expenseProduct: '',
         type: '',
-        weightType: '',
         quantity: 0,
         total: 0
       }
@@ -154,6 +143,9 @@ export default defineComponent({
   },
 
   computed: {
+    weightLabel () {
+      return this.form.expenseProduct ? this.expenseProducts.find(e => e.id === this.form.expenseProduct).weightType : ''
+    },
     typeOptions () {
       return [{ label: this.$t('entry'), value: 'entry' }, { label: this.$t('exit'), value: 'exit' }]
     },
@@ -178,7 +170,6 @@ export default defineComponent({
           sortable: true
         },
         { name: 'total', label: 'Total', field: 'total', sortable: true },
-        { name: 'weightType', label: this.$t('weightType'), field: 'weightType', sortable: true },
         { name: 'quantity', label: this.$t('quantity'), field: 'quantity', sortable: true },
         { name: 'observation', label: this.$t('observation'), field: 'observation' },
         {
