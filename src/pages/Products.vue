@@ -6,6 +6,7 @@
     <div class="col-xs-12 col-sm-12 col-md-4">
       <q-form
         ref="form"
+        class="q-gutter-sm"
         @submit="save"
       >
         <v-input
@@ -55,6 +56,83 @@
           currency
         />
 
+        <q-card>
+          <q-card-section>
+            <div class="text-h6">
+              {{ $t('recipe') }}
+            </div>
+          </q-card-section>
+          <q-separator />
+
+          <q-card-section>
+            <q-form
+              ref="recipeForm"
+              class="row"
+              @submit="saveRecipe"
+            >
+              <v-select
+                v-model="recipeForm.id"
+                reactive-rules
+                class="col-12"
+                :loading="loading"
+                autocomplete
+                sorted
+                :label="$t('product')"
+                :options="expenseProductsOptions"
+                :rules="[ val => !recipeForm.quantity || !!val.length ]"
+              />
+              <v-input
+                v-model="recipeForm.quantity"
+                reactive-rules
+                class="col-12"
+                type="number"
+                :label="$t('quantity')"
+                :rules="[ val => (recipeForm.id.length && val > 0) || !recipeForm.id ]"
+                :hint="`${$t('weightType')}: ${weightLabel}`"
+              />
+
+              <div
+                class="row full-width justify-between"
+              >
+                <q-btn
+                  label="Reset"
+                  @click="resetRecipe"
+                />
+                <q-btn
+                  :label="$t('add')"
+                  :disable="!recipeForm.id"
+                  type="submit"
+                  color="positive"
+                />
+              </div>
+            </q-form>
+          </q-card-section>
+
+          <q-separator
+            inset
+          />
+
+          <q-card-section>
+            <q-list
+              bordered
+              separator
+            >
+              <transition-group
+                appear
+                enter-active-class="animated fadeIn"
+                leave-active-class="animated fadeOut"
+              >
+                <product-recipe-info
+                  v-for="recipe in form.recipes"
+                  :key="recipe.id"
+                  :product="recipe"
+                  @remove="val => form.recipes = form.recipes.filter(p => p.id !== val.id)"
+                />
+              </transition-group>
+            </q-list>
+          </q-card-section>
+        </q-card>
+
         <div class="row q-gutter-md q-mt-md justify-between">
           <q-btn
             label="Reset"
@@ -74,6 +152,7 @@
         :rows="products"
         :columns="columns"
         :loading="loading"
+        expand-field="recipes"
         @edit="edit"
         @delete="deleteAction"
       />
@@ -86,9 +165,14 @@
 import { date, Dialog } from 'quasar'
 import { defineComponent } from 'vue'
 const { formatDate } = date
+import ProductRecipeInfo from 'components/product/ProductRecipeInfo.vue'
 
 export default defineComponent({
   name: 'Products',
+
+  components: {
+    ProductRecipeInfo
+  },
 
   setup () {
     return {
@@ -99,7 +183,13 @@ export default defineComponent({
         category: '',
         code: '',
         currentInventory: 0,
-        purchasePrice: 0
+        purchasePrice: 0,
+        recipes: []
+      },
+
+      modelRecipeForm: {
+        id: '',
+        quantity: 0
       }
     }
   },
@@ -107,18 +197,27 @@ export default defineComponent({
   data () {
     return {
       form: {},
+      recipeForm: {},
       loading: false,
       saving: false,
-      products: [],
       firebaseMixinInstance: null,
+      products: [],
       categories: [],
+      expenseProducts: [],
       nameBefore: ''
     }
   },
 
   computed: {
+    weightLabel () {
+      return this.recipeForm.id ? this.expenseProducts.find(e => e.id === this.recipeForm.id).weightType : ''
+    },
+    expenseProductsOptions () {
+      return this.expenseProducts.map(e => ({ label: e.name, value: e.id }))
+    },
     columns () {
       return [
+        { name: 'expand', label: this.$tc('recipe'), align: 'left' },
         { name: 'name', label: this.$t('name'), field: 'name', sortable: true },
         { name: 'description', label: this.$t('description'), field: 'description' },
         { name: 'saleValue', label: this.$t('saleValue'), field: 'saleValue', sortable: true },
@@ -152,6 +251,7 @@ export default defineComponent({
 
   created () {
     this.form = { ...this.modelForm }
+    this.recipeForm = { ...this.modelRecipeForm }
   },
 
   mounted () {
@@ -159,7 +259,8 @@ export default defineComponent({
     this.firebaseMixinInstance = this.firebaseMixin('products')
     Promise.all([
       this.firebaseMixinInstance.bindField('products'),
-      this.firebaseMixin('categories').bindField('categories')
+      this.firebaseMixin('categories').bindField('categories'),
+      this.firebaseMixin('expenseProducts').bindField('expenseProducts')
     ])
       .finally(() => {
         this.loading = false
@@ -167,6 +268,16 @@ export default defineComponent({
   },
 
   methods: {
+    saveRecipe () {
+      this.form.recipes.push(this.recipeForm)
+      this.resetRecipe()
+    },
+    resetRecipe () {
+      this.recipeForm = { ...this.modelRecipeForm }
+      this.$nextTick(() => {
+        this.$refs.recipeForm.resetValidation()
+      })
+    },
     setAdress ({ logradouro, bairro, localidade, uf }) {
       this.form.publicPlace = logradouro
       this.form.district = bairro
@@ -174,7 +285,8 @@ export default defineComponent({
       this.form.state = uf
     },
     reset () {
-      this.form = { ...this.modelForm }
+      this.resetRecipe()
+      this.form = { ...this.modelForm, recipes: [] }
       this.$nextTick(() => {
         this.$refs.form.resetValidation()
       })
@@ -193,7 +305,12 @@ export default defineComponent({
       this.reset()
     },
     edit (row) {
-      this.form = { ...row, id: row.id, category: row.category ? row.category.name : '' }
+      this.form = {
+        ...row,
+        id: row.id,
+        category: row.category ? row.category.name : '',
+        recipes: row.recipes ? row.recipes : []
+      }
       this.nameBefore = row.name
       this.$nextTick(() => {
         this.$refs.form.resetValidation()

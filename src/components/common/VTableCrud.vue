@@ -84,6 +84,7 @@
         >
           <q-td colspan="100%">
             <q-list
+              v-if="expandField === 'products'"
               bordered
               separator
             >
@@ -91,6 +92,18 @@
                 v-for="product in props.row.products"
                 :key="product.id"
                 :product="product"
+                hide-remove
+              />
+            </q-list>
+            <q-list
+              v-if="expandField === 'recipes'"
+              bordered
+              separator
+            >
+              <product-recipe-info
+                v-for="recipe in props.row.recipes"
+                :key="recipe.id"
+                :product="recipe"
                 hide-remove
               />
             </q-list>
@@ -103,17 +116,23 @@
 <script>
 import { QTable } from 'quasar'
 import ProductSaleInfo from 'components/product/ProductSaleInfo.vue'
+import ProductRecipeInfo from 'components/product/ProductRecipeInfo.vue'
 
 export default {
   name: 'VTableCrud',
 
   components: {
-    ProductSaleInfo
+    ProductSaleInfo,
+    ProductRecipeInfo
   },
 
   mixins: [QTable],
 
   props: {
+    expandField: {
+      type: String,
+      default: ''
+    }
   },
 
   emits: ['edit', 'delete'],

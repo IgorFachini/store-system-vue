@@ -46,5 +46,6 @@ export default {
   weightType: 'Tipo de peso',
   weight: 'Peso',
   entry: 'Entrada',
-  exit: 'Saida'
+  exit: 'Saida',
+  recipe: 'Receita | Receitas'
 }
