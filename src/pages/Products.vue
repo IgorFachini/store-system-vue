@@ -14,7 +14,7 @@
           :label="$t('name')"
           :rules="[
             val => val && val.length || $t('fillTheField', { field: $t('name') }),
-            val => !!form.id && nameBefore === val || (!products.map(c => c.name).includes(val) || $t('alredyExist'))]"
+            val => !!form.id && nameBefore === val || (!products.map(c => c.name.toLowerCase()).includes(val.toLowerCase()) || $t('alredyExist'))]"
         />
 
         <v-input
@@ -79,7 +79,10 @@
                 sorted
                 :label="$t('product')"
                 :options="expenseProductsOptions"
-                :rules="[ val => !recipeForm.quantity || !!val.length ]"
+                :rules="[
+                  val => !recipeForm.quantity || !!val.length,
+                  val => !form.recipes.map(c => c.id).includes(val) || $t('alredyExist')
+                ]"
               />
               <v-input
                 v-model="recipeForm.quantity"

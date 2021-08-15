@@ -25,6 +25,7 @@
     :rules="rules"
     :class="insideClass"
     :reactive-rules="reactiveRules"
+    step="any"
     @update:model-value="onInput"
     @change="$emit('change', $event)"
     @blur="$emit('blur')"
