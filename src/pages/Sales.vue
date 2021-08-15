@@ -165,6 +165,7 @@
         :rows="sales"
         :columns="columns"
         :loading="loadingTable"
+        expand-field="products"
         @edit="edit"
         @delete="deleteAction"
       />
@@ -294,6 +295,7 @@ export default defineComponent({
       this.form.state = uf
     },
     reset () {
+      this.resetProduct()
       this.form = { ...this.modelForm, products: [], total: 0 }
       this.$nextTick(() => {
         this.$refs.form.resetValidation()

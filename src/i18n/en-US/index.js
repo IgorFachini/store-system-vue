@@ -46,5 +46,6 @@ export default {
   weightType: 'Weight Type',
   weight: 'Weight',
   entry: 'Entry',
-  exit: 'Exit'
+  exit: 'Exit',
+  recipe: 'Recipe | Recipes'
 }
