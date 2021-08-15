@@ -5,7 +5,8 @@
   >
     <q-item-section>
       <label> {{ product.name }} </label>
-      <label> {{ $t('unitaryValue') }}: {{ product.quantity }} - {{ $t('unitaryValue') }}: {{ product.unitaryValue }} </label>
+      <label> {{ $t('quantity') }}: {{ product.quantity }} </label>
+      <label> {{ $t('unitaryValue') }}: {{ product.unitaryValue }} </label>
       <label> Total: {{ (Number(product.quantity) * parseFloat(product.unitaryValue)).toFixed(2) }} </label>
     </q-item-section>
     <q-item-section side>
