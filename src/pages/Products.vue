@@ -8,7 +8,7 @@
         ref="form"
         @submit="save"
       >
-        <q-input
+        <v-input
           v-model="form.name"
           :label="$t('name')"
           :rules="[
@@ -16,15 +16,16 @@
             val => !!form.id && nameBefore === val || (!products.map(c => c.name).includes(val) || $t('alredyExist'))]"
         />
 
-        <q-input
+        <v-input
           v-model="form.description"
           type="textarea"
           :label="$t('description')"
         />
 
-        <currency-input
+        <v-input
           v-model="form.saleValue"
           :label="$t('saleValue')"
+          currency
         />
 
         <v-select
@@ -36,21 +37,22 @@
           :options="categories.map(c => c.name)"
         />
 
-        <q-input
+        <v-input
           v-model="form.code"
           type="number"
           :label="$t('code')"
         />
 
-        <q-input
+        <v-input
           v-model="form.currentInventory"
           type="number"
           :label="$t('currentInventory')"
         />
 
-        <currency-input
+        <v-input
           v-model="form.purchasePrice"
           :label="$t('purchasePrice')"
+          currency
         />
 
         <div class="row q-gutter-md q-mt-md justify-between">
@@ -84,18 +86,9 @@
 import { date, Dialog } from 'quasar'
 import { defineComponent } from 'vue'
 const { formatDate } = date
-import CurrencyInput from 'components/common/CurrencyInput.vue'
-import VSelect from 'components/common/VSelect.vue'
-import VTableCrud from 'components/common/VTableCrud.vue'
 
 export default defineComponent({
   name: 'Products',
-
-  components: {
-    CurrencyInput,
-    VSelect,
-    VTableCrud
-  },
 
   setup () {
     return {

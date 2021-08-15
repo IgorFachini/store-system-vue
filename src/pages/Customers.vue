@@ -8,27 +8,30 @@
         ref="form"
         @submit="save"
       >
-        <q-input
+        <v-input
           v-model="form.name"
           :label="$t('name')"
-          :rules="[val => val && val.length || $t('fillTheField', { field: $t('name') })]"
+          :rules="[
+            val => val && val.length || $t('fillTheField', { field: $t('name') }),
+            val => !!form.id && nameBefore === val || (!customers.map(c => c.name).includes(val) || $t('alredyExist'))
+          ]"
         />
 
-        <q-input
+        <v-input
           v-model="form.cellphone"
           :label="$t('cellphone')"
           mask="#"
           reverse-fill-mask
         />
 
-        <q-input
+        <v-input
           v-model="form.phone"
           :label="$t('phone')"
           mask="#"
           reverse-fill-mask
         />
 
-        <q-input
+        <v-input
           v-model="form.observation"
           type="textarea"
           :label="$t('observation')"
@@ -45,33 +48,33 @@
           @response="setAdress"
         />
 
-        <q-input
+        <v-input
           v-model="form.publicPlace"
           :label="$t('publicPlace')"
         />
 
-        <q-input
+        <v-input
           v-model="form.number"
           :label="$t('number')"
           type="number"
         />
 
-        <q-input
+        <v-input
           v-model="form.district"
           :label="$t('district')"
         />
 
-        <q-input
+        <v-input
           v-model="form.city"
           :label="$t('city')"
         />
 
-        <q-input
+        <v-input
           v-model="form.state"
           :label="$t('state')"
         />
 
-        <q-input
+        <v-input
           v-model="form.complement"
           :label="$t('complement')"
         />
@@ -108,11 +111,10 @@ import { date, Dialog } from 'quasar'
 import VInputCep from 'src/components/common/VInputCep.vue'
 import { defineComponent } from 'vue'
 const { formatDate } = date
-import VTableCrud from 'components/common/VTableCrud.vue'
 
 export default defineComponent({
   name: 'Customers',
-  components: { VInputCep, VTableCrud },
+  components: { VInputCep },
 
   setup () {
     return {

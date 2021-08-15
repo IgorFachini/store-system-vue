@@ -16,6 +16,17 @@
             val => !!form.id && nameBefore === val || (!expenseProducts.map(c => c.name).includes(val) || $t('alredyExist'))]"
         />
 
+        <v-select
+          v-model="form.weightType"
+          reactive-rules
+          :loading="loading"
+          autocomplete
+          sorted
+          :label="$t('weightType')"
+          :options="['GR', 'ML', 'UN']"
+          :rules="[ val => val && val.length ]"
+        />
+
         <q-input
           v-model="form.description"
           type="textarea"
@@ -54,19 +65,22 @@ import { date, Dialog } from 'quasar'
 import { defineComponent } from 'vue'
 const { formatDate } = date
 import VTableCrud from 'components/common/VTableCrud.vue'
+import VSelect from 'components/common/VSelect.vue'
 
 export default defineComponent({
   name: 'Categories',
 
   components: {
-    VTableCrud
+    VTableCrud,
+    VSelect
   },
 
   setup () {
     return {
       modelForm: {
         name: '',
-        description: ''
+        description: '',
+        weightTYpe: ''
       }
     }
   },
@@ -86,6 +100,7 @@ export default defineComponent({
     columns () {
       return [
         { name: 'name', label: this.$t('name'), field: 'name', sortable: true },
+        { name: 'weightType', label: this.$t('weightType'), field: 'weightType', sortable: true },
         { name: 'description', label: this.$t('description'), field: 'description' },
         {
           name: 'createdAt',

@@ -10,10 +10,11 @@
           class="q-gutter-md"
           @submit="save"
         >
-          <v-input-date-picker
+          <v-input
             v-model="form.date"
             :label="$t('date')"
             :rules="['date']"
+            date
           />
 
           <v-select
@@ -25,7 +26,7 @@
             :options="customersOptions"
           />
 
-          <q-input
+          <v-input
             v-model="form.observation"
             type="textarea"
             :label="$t('observation')"
@@ -57,7 +58,7 @@
                   :rules="[ val => !productForm.quantity || !!val.length ]"
                   @update:model-value="val => productForm.unitaryValue = currencyToFloat(products.find(p => p.id === val).saleValue)"
                 />
-                <q-input
+                <v-input
                   v-model="productForm.quantity"
                   reactive-rules
                   class="col-6"
@@ -66,10 +67,11 @@
                   :rules="[ val => (productForm.id.length && val > 0) || !productForm.id ]"
                 />
 
-                <currency-input
+                <v-input
                   v-model="productForm.unitaryValue"
                   class="col-6"
                   :label="$t('unitaryValue')"
+                  currency
                 />
 
                 <div
@@ -122,17 +124,20 @@
             </q-card-section>
             <q-separator />
             <q-card-section>
-              <currency-input
+              <v-input
                 v-model="form.additional"
                 :label="$t('additional')"
+                currency
               />
-              <currency-input
+              <v-input
                 v-model="form.discount"
                 :label="$t('discount')"
+                currency
               />
-              <currency-input
+              <v-input
                 :model-value="(totalProducts + form.additional - form.discount).toFixed(2)"
                 label="Total"
+                currency
                 disable
                 @change="val => form.total = val"
               />
@@ -172,10 +177,6 @@
 import { date, Dialog } from 'quasar'
 import { defineComponent } from 'vue'
 const { formatDate } = date
-import CurrencyInput from 'components/common/CurrencyInput.vue'
-import VSelect from 'components/common/VSelect.vue'
-import VInputDatePicker from 'components/common/VInputDatePicker.vue'
-import VTableCrud from 'components/common/VTableCrud.vue'
 import { currencyToFloat } from 'utils/'
 import ProductSaleInfo from 'components/product/ProductSaleInfo.vue'
 
@@ -183,10 +184,6 @@ export default defineComponent({
   name: 'Sales',
 
   components: {
-    CurrencyInput,
-    VSelect,
-    VInputDatePicker,
-    VTableCrud,
     ProductSaleInfo
   },
 

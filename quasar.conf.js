@@ -26,7 +26,8 @@ module.exports = configure(function (ctx) {
     boot: [
       'axios',
       'firebase',
-      'i18n'
+      'i18n',
+      'config'
     ],
 
     // https://v2.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css

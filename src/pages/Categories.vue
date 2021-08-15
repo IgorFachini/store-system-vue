@@ -8,7 +8,7 @@
         ref="form"
         @submit="save"
       >
-        <q-input
+        <v-input
           v-model="form.name"
           :label="$t('name')"
           :rules="[
@@ -16,7 +16,7 @@
             val => !!form.id && nameBefore === val || (!categories.map(c => c.name).includes(val) || $t('alredyExist'))]"
         />
 
-        <q-input
+        <v-input
           v-model="form.description"
           type="textarea"
           :label="$t('description')"
@@ -53,14 +53,9 @@
 import { date, Dialog } from 'quasar'
 import { defineComponent } from 'vue'
 const { formatDate } = date
-import VTableCrud from 'components/common/VTableCrud.vue'
 
 export default defineComponent({
   name: 'Categories',
-
-  components: {
-    VTableCrud
-  },
 
   setup () {
     return {
