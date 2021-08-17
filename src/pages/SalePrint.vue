@@ -1,58 +1,86 @@
 <template>
   <q-page class="q-col-gutter-md">
-    <v-input
-      :model-value="sale.date"
+    <q-field
       :label="$t('date')"
-    />
-    <v-input
-      :model-value="sale.customer.name"
+      stack-label
+    >
+      <template #control>
+        {{ sale.date }}
+      </template>
+    </q-field>
+    <q-field
       :label="$t('customer')"
-      autogrow
-    />
-    <v-input
-      :model-value="sale.customer.document"
+      stack-label
+    >
+      <template #control>
+        {{ sale.customer.name }}
+      </template>
+    </q-field>
+    <q-field
       :label="$t('document')"
-      autogrow
-    />
+      stack-label
+    >
+      <template #control>
+        {{ sale.customer.document }}
+      </template>
+    </q-field>
     <div class="row q-col-gutter-md">
-      <v-input
-        :model-value="sale.customer.publicPlace"
+      <q-field
         :label="$t('publicPlace')"
+        stack-label
         class="col-6"
-        autogrow
-      />
-      <v-input
-        :model-value="sale.customer.number"
+      >
+        <template #control>
+          {{ sale.customer.publicPlace }}
+        </template>
+      </q-field>
+      <q-field
         :label="$t('number')"
+        stack-label
         class="col-2"
-        autogrow
-      />
-      <v-input
-        :model-value="sale.customer.district"
+      >
+        <template #control>
+          {{ sale.customer.number }}
+        </template>
+      </q-field>
+      <q-field
         :label="$t('district')"
+        stack-label
         class="col-4"
-        autogrow
-      />
+      >
+        <template #control>
+          {{ sale.customer.district }}
+        </template>
+      </q-field>
     </div>
     <div class="row q-col-gutter-md">
-      <v-input
-        :model-value="sale.customer.cep"
+      <q-field
         label="CEP"
+        stack-label
         class="col-4"
-        autogrow
-      />
-      <v-input
-        :model-value="sale.customer.city"
+      >
+        <template #control>
+          {{ sale.customer.cep }}
+        </template>
+      </q-field>
+      <q-field
         :label="$t('city')"
+        stack-label
         class="col-6"
-        autogrow
-      />
-      <v-input
-        :model-value="sale.customer.state"
+      >
+        <template #control>
+          {{ sale.customer.city }}
+        </template>
+      </q-field>
+      <q-field
         :label="$t('state')"
+        stack-label
         class="col-2"
-        autogrow
-      />
+      >
+        <template #control>
+          {{ sale.customer.state }}
+        </template>
+      </q-field>
     </div>
     <div class="row">
       <q-table
@@ -70,24 +98,33 @@
           <q-tr>
             <q-td colspan="100%">
               <div class="row q-col-gutter-md">
-                <v-input
-                  :model-value="sale.additional"
+                <q-field
                   :label="$t('additional')"
+                  stack-label
                   class="col-4"
-                  autogrow
-                />
-                <v-input
-                  :model-value="sale.discount"
+                >
+                  <template #control>
+                    {{ sale.additional }}
+                  </template>
+                </q-field>
+                <q-field
                   :label="$t('discount')"
+                  stack-label
                   class="col-4"
-                  autogrow
-                />
-                <v-input
-                  :model-value="sale.total"
-                  label="Total"
+                >
+                  <template #control>
+                    {{ sale.discount }}
+                  </template>
+                </q-field>
+                <q-field
+                  :label="$t('total')"
+                  stack-label
                   class="col-4"
-                  autogrow
-                />
+                >
+                  <template #control>
+                    {{ sale.total }}
+                  </template>
+                </q-field>
               </div>
             </q-td>
           </q-tr>
@@ -170,7 +207,7 @@ export default {
             if (customerDoc.exists) {
               this.sale.customer = customerDoc.data()
               this.$nextTick(() => {
-                this.printPageAfterDOMLoaded()
+                this.print()
               })
             }
           })
@@ -185,8 +222,9 @@ export default {
 
   methods: {
 
-    printPageAfterDOMLoaded () {
-      setTimeout(window.print, 500)
+    async print () {
+      // Pass the element id here
+      await this.$htmlToPaper('html')
     }
   }
 }
