@@ -68,6 +68,13 @@
                   :loading="props.row.loading"
                   @click="$emit('delete', props.row)"
                 />
+                <q-btn
+                  v-if="printSale"
+                  label="Print"
+                  dense
+                  color="blue"
+                  :to="`/sales/${props.row.id}/print`"
+                />
               </div>
             </q-td>
           </q-tr>
@@ -132,7 +139,8 @@ export default {
     expandField: {
       type: String,
       default: ''
-    }
+    },
+    printSale: Boolean
   },
 
   emits: ['edit', 'delete'],

@@ -60,7 +60,15 @@ const routes = [
     path: '/',
     component: () => import('layouts/EmptyLayout.vue'),
     children: [
-      { path: 'login', component: () => import('src/pages/Login.vue') }
+      { path: 'login', component: () => import('src/pages/Login.vue') },
+      {
+        path: '/sales/:id/print',
+        props: true,
+        component: () => import('src/pages/SalePrint.vue'),
+        meta: {
+          requiresAuth: true
+        }
+      }
     ]
   },
 
