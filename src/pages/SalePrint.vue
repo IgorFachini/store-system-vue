@@ -222,10 +222,8 @@ export default {
 
   methods: {
 
-    async print () {
-      // Pass the element id here
+    print () {
       window.print()
-      // await this.$htmlToPaper('html')
     }
   }
 }
