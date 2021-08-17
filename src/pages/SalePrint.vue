@@ -9,6 +9,11 @@
       :label="$t('customer')"
       autogrow
     />
+    <v-input
+      :model-value="sale.customer.document"
+      :label="$t('document')"
+      autogrow
+    />
     <div class="row q-col-gutter-md">
       <v-input
         :model-value="sale.customer.publicPlace"

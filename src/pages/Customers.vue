@@ -140,7 +140,8 @@ export default defineComponent({
       form: {},
       loading: false,
       saving: false,
-      customers: []
+      customers: [],
+      nameBefore: ''
     }
   },
 
@@ -211,6 +212,7 @@ export default defineComponent({
       this.reset()
     },
     edit (row) {
+      this.nameBefore = row.name
       this.form = { ...row, id: row.id }
     },
 
