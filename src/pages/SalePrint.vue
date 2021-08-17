@@ -117,7 +117,7 @@
                   </template>
                 </q-field>
                 <q-field
-                  :label="$t('total')"
+                  label="Total"
                   stack-label
                   class="col-4"
                 >
@@ -222,9 +222,8 @@ export default {
 
   methods: {
 
-    async print () {
-      // Pass the element id here
-      await this.$htmlToPaper('html')
+    print () {
+      window.print()
     }
   }
 }
