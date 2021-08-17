@@ -166,6 +166,7 @@
         :columns="columns"
         :loading="loadingTable"
         expand-field="products"
+        print-sale
         @edit="edit"
         @delete="deleteAction"
       />

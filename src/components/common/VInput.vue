@@ -179,6 +179,7 @@ export default {
 
     modelValue (v) {
       this.cValue = this.currency ? toBRLCurrency(v).replace('R$', '') : v
+      this.$emit('change', this.currency ? currencyToFloat(this.cValue) : this.cValue)
       this.checkError(v)
     }
   },

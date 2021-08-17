@@ -156,7 +156,7 @@ export default defineComponent({
         { name: 'number', label: this.$t('number'), field: 'number' },
         { name: 'district', label: this.$t('district'), field: 'district' },
         { name: 'city', label: this.$t('city'), field: 'city' },
-        { city: 'complement', label: this.$t('complement'), field: 'complement' },
+        { name: 'complement', label: this.$t('complement'), field: 'complement' },
         {
           name: 'createdAt',
           label: this.$t('createdAt'),
@@ -170,7 +170,7 @@ export default defineComponent({
           field: ({ updatedAt = null }) => updatedAt ? formatDate(updatedAt.toDate(), 'DD/MM/YYYY') : '',
           sortable: true
         },
-        { name: 'acoes', label: this.$t('action'), align: 'left' }
+        { name: 'action', label: this.$t('action'), align: 'left' }
       ]
     }
   },
