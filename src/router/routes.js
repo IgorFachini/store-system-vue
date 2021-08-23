@@ -48,7 +48,7 @@ const routes = [
       },
       {
         path: '/expenses',
-        component: () => import('src/pages/Expense.vue'),
+        component: () => import('src/pages/Expenses.vue'),
         meta: {
           requiresAuth: true
         }

@@ -1,7 +1,7 @@
 <template>
   <q-input
     ref="inputRef"
-    :model-value="cValue"
+    :model-value="dataLabel"
     :clearable="clearable"
     :lazy-rules="lazyRules"
     :counter="counter"
@@ -11,8 +11,8 @@
     :label="label"
     :filled="filled"
     :disable="disable"
-    :readonly="readonly"
-    :mask="date ? '##/##/##' : mask"
+    :readonly="readonly || range"
+    :mask="date && !range ? '##/##/##' : mask"
     :reverse-fill-mask="reverseFillMask"
     :style="qStyle"
     :autofocus="autofocus"
@@ -26,7 +26,7 @@
     :class="insideClass"
     :reactive-rules="reactiveRules"
     step="any"
-    @update:model-value="onInput"
+    @update:model-value="val => onInput(val, true)"
     @change="$emit('change', $event)"
     @blur="$emit('blur')"
   >
@@ -60,9 +60,12 @@
             mask="DD/MM/YY"
             :disable="disable"
             :readonly="readonly"
+            :range="range"
             @update:model-value="onInput"
             @change="$emit('change', $event)"
             @blur="$emit('blur')"
+            @range-start="$emit('range-start', $event)"
+            @range-end="$emit('range-end', $event)"
           >
             <div
               class="row items-center justify-end"
@@ -103,6 +106,7 @@ export default {
   props: {
     successRules: Boolean,
     date: Boolean,
+    range: Boolean,
     currency: Boolean,
 
     class: {
@@ -120,7 +124,7 @@ export default {
       default: ''
     }
   },
-  emits: ['update:model-value', 'change', 'blur'],
+  emits: ['update:model-value', 'change', 'blur', 'range-start', 'range-end'],
   setup (props) {
     if (props.currency) {
       const options = {
@@ -153,6 +157,11 @@ export default {
   },
 
   computed: {
+    dataLabel () {
+      return this.range
+        ? this.modelValue && this.modelValue.from ? `${this.modelValue.from} - ${this.modelValue.to}` : 'DD/MM/YY - DD/MM/YY'
+        : this.cValue
+    },
     typeField () {
       return this.showPassword ? 'text' : this.type
     },
@@ -202,7 +211,7 @@ export default {
 
       this.hasErrorCheck = Boolean(hasError)
     },
-    onInput (modelValue) {
+    onInput (modelValue, isInput) {
       if (this.currency) {
         this.cValue = String(modelValue).replace(/\./g, '') || '0'
         modelValue = currencyToFloat(modelValue)

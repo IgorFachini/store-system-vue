@@ -107,12 +107,10 @@ import VTableCrud from 'components/common/VTableCrud.vue'
 import { currencyToFloat } from 'utils/'
 
 export default defineComponent({
-  name: 'Sales',
+  name: 'Expenses',
 
   components: {
-    // CurrencyInput,
     VSelect,
-    // VInputDatePicker,
     VTableCrud,
     VInput
   },
