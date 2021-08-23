@@ -1,7 +1,7 @@
 <template>
   <q-input
     ref="inputRef"
-    :model-value="dataRangeLabel"
+    :model-value="dataLabel"
     :clearable="clearable"
     :lazy-rules="lazyRules"
     :counter="counter"
@@ -157,8 +157,10 @@ export default {
   },
 
   computed: {
-    dataRangeLabel () {
-      return this.modelValue && this.modelValue.from ? `${this.modelValue.from} - ${this.modelValue.to}` : 'DD/MM/YY - DD/MM/YY'
+    dataLabel () {
+      return this.range
+        ? this.modelValue && this.modelValue.from ? `${this.modelValue.from} - ${this.modelValue.to}` : 'DD/MM/YY - DD/MM/YY'
+        : this.cValue
     },
     typeField () {
       return this.showPassword ? 'text' : this.type
