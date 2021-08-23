@@ -60,6 +60,12 @@
           />
         </q-item>
 
+        <q-item to="/">
+          <q-item-label>
+            HOME
+          </q-item-label>
+        </q-item>
+
         <q-item to="/customers">
           <q-item-label>
             {{ $tc('customer', 2) }}
