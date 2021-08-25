@@ -165,11 +165,31 @@
         :rows="sales"
         :columns="columns"
         :loading="loadingTable"
-        expand-field="products"
-        print-sale
         @edit="edit"
         @delete="deleteAction"
-      />
+      >
+        <template #action-more="props">
+          <q-btn
+            label="Print"
+            dense
+            color="blue"
+            :to="`/sales/${props.row.id}/print`"
+          />
+        </template>
+        <template #expand="props">
+          <q-list
+            bordered
+            separator
+          >
+            <product-sale-info
+              v-for="product in props.row.products"
+              :key="product.id"
+              :product="product"
+              hide-remove
+            />
+          </q-list>
+        </template>
+      </v-table-crud>
     </div>
   </q-page>
 </template>

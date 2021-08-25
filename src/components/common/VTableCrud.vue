@@ -68,12 +68,9 @@
                   :loading="props.row.loading"
                   @click="$emit('delete', props.row)"
                 />
-                <q-btn
-                  v-if="printSale"
-                  label="Print"
-                  dense
-                  color="blue"
-                  :to="`/sales/${props.row.id}/print`"
+                <slot
+                  name="action-more"
+                  v-bind="props"
                 />
               </div>
             </q-td>
@@ -90,58 +87,32 @@
           :props="props"
         >
           <q-td colspan="100%">
-            <q-list
-              v-if="expandField === 'products'"
-              bordered
-              separator
-            >
-              <product-sale-info
-                v-for="product in props.row.products"
-                :key="product.id"
-                :product="product"
-                hide-remove
-              />
-            </q-list>
-            <q-list
-              v-if="expandField === 'recipes'"
-              bordered
-              separator
-            >
-              <product-recipe-info
-                v-for="recipe in props.row.recipes"
-                :key="recipe.id"
-                :product="recipe"
-                hide-remove
-              />
-            </q-list>
+            <slot
+              name="expand"
+              v-bind="props"
+            />
           </q-td>
         </q-tr>
       </transition>
+    </template>
+    <template
+      v-for="propSlot in Object.keys($slots)"
+      #[propSlot]="props"
+    >
+      <slot
+        :name="propSlot"
+        v-bind="props"
+      />
     </template>
   </q-table>
 </template>
 <script>
 import { QTable } from 'quasar'
-import ProductSaleInfo from 'components/product/ProductSaleInfo.vue'
-import ProductRecipeInfo from 'components/product/ProductRecipeInfo.vue'
 
 export default {
   name: 'VTableCrud',
 
-  components: {
-    ProductSaleInfo,
-    ProductRecipeInfo
-  },
-
   mixins: [QTable],
-
-  props: {
-    expandField: {
-      type: String,
-      default: ''
-    },
-    printSale: Boolean
-  },
 
   emits: ['edit', 'delete'],
 

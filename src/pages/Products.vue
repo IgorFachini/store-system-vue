@@ -155,10 +155,23 @@
         :rows="products"
         :columns="columns"
         :loading="loading"
-        expand-field="recipes"
         @edit="edit"
         @delete="deleteAction"
-      />
+      >
+        <template #expand="props">
+          <q-list
+            bordered
+            separator
+          >
+            <product-recipe-info
+              v-for="recipe in props.row.recipes"
+              :key="recipe.id"
+              :product="recipe"
+              hide-remove
+            />
+          </q-list>
+        </template>
+      </v-table-crud>
     </div>
   </q-page>
 </template>
