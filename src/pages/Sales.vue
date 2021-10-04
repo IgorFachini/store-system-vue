@@ -37,6 +37,13 @@
               <div class="text-h6">
                 {{ $tc('product', 2) }}
               </div>
+              <div>
+                <q-checkbox
+                  v-model="decreaseStock"
+                  :label="$t('decreaseStock')"
+                  left-label
+                />
+              </div>
             </q-card-section>
             <q-separator />
 
@@ -196,7 +203,7 @@
 
 <script>
 
-import { date, Dialog } from 'quasar'
+import { date, Dialog, Notify } from 'quasar'
 import { defineComponent } from 'vue'
 const { formatDate } = date
 import { currencyToFloat } from 'utils/'
@@ -231,6 +238,7 @@ export default defineComponent({
 
   data () {
     return {
+      decreaseStock: false,
       productForm: {},
       form: {},
       loading: false,
@@ -316,6 +324,7 @@ export default defineComponent({
       this.form.state = uf
     },
     reset () {
+      this.decreaseStock = false
       this.resetProduct()
       this.form = { ...this.modelForm, products: [], total: 0 }
       this.$nextTick(() => {
@@ -333,10 +342,24 @@ export default defineComponent({
       if (this.form.customer) {
         this.form.customer = this.firebaseMixin('customers').id(this.form.customer).doc()
       }
+      if (this.decreaseStock) {
+        this.form.products.forEach(p => {
+          const product = this.products.find(pFind => pFind.id === p.id)
+          this.firebaseMixin('products').id(p.id).update({
+            currentInventory: (product.currentInventory - p.quantity)
+          })
+          console.log('(product.currentInventory - p.quantity)', (product.currentInventory - p.quantity))
+        })
+      }
       const action = this.form.id
         ? ref.id(this.form.id).update : ref.add
       action(this.form).catch((err) => {
         console.log('err', err)
+      })
+      Notify.create({
+        message: this.$t('savedOperation'),
+        color: 'positive',
+        closeBtn: true
       })
       this.reset()
     },
@@ -349,6 +372,7 @@ export default defineComponent({
       this.$nextTick(() => {
         this.$refs.form.resetValidation()
       })
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     },
 
     deleteAction (row) {
@@ -360,6 +384,11 @@ export default defineComponent({
         row.loading = true
         this.firebaseMixinInstance.id(row.id).delete().finally(() => {
           row.loading = false
+          Notify.create({
+            message: this.$t('savedOperation'),
+            color: 'positive',
+            closeBtn: true
+          })
         })
       })
     }
