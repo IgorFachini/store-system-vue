@@ -47,5 +47,7 @@ export default {
   weight: 'Peso',
   entry: 'Entrada',
   exit: 'Saida',
-  recipe: 'Receita | Receitas'
+  recipe: 'Receita | Receitas',
+  decreaseStock: 'Diminuir Estoque',
+  savedOperation: 'Operação Salva'
 }
