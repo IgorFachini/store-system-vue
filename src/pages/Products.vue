@@ -155,17 +155,30 @@
         :rows="products"
         :columns="columns"
         :loading="loading"
-        expand-field="recipes"
         @edit="edit"
         @delete="deleteAction"
-      />
+      >
+        <template #expand="props">
+          <q-list
+            bordered
+            separator
+          >
+            <product-recipe-info
+              v-for="recipe in props.row.recipes"
+              :key="recipe.id"
+              :product="recipe"
+              hide-remove
+            />
+          </q-list>
+        </template>
+      </v-table-crud>
     </div>
   </q-page>
 </template>
 
 <script>
 
-import { date, Dialog } from 'quasar'
+import { date, Dialog, Notify } from 'quasar'
 import { defineComponent } from 'vue'
 const { formatDate } = date
 import ProductRecipeInfo from 'components/product/ProductRecipeInfo.vue'
@@ -305,6 +318,11 @@ export default defineComponent({
       action(this.form).catch((err) => {
         console.log('err', err)
       })
+      Notify.create({
+        message: this.$t('savedOperation'),
+        color: 'positive',
+        closeBtn: true
+      })
       this.reset()
     },
     edit (row) {
@@ -318,6 +336,7 @@ export default defineComponent({
       this.$nextTick(() => {
         this.$refs.form.resetValidation()
       })
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     },
 
     deleteAction (row) {
@@ -329,6 +348,11 @@ export default defineComponent({
         row.loading = true
         this.firebaseMixinInstance.id(row.id).delete().finally(() => {
           row.loading = false
+          Notify.create({
+            message: this.$t('savedOperation'),
+            color: 'positive',
+            closeBtn: true
+          })
         })
       })
     }
