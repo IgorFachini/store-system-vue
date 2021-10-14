@@ -11,6 +11,7 @@
         <v-input
           v-model="form.name"
           :label="$t('name')"
+          :disable="viewMode"
           :rules="[
             val => val && val.length || $t('fillTheField', { field: $t('name') }),
             val => !!form.id && nameBefore === val || (!customers.map(c => c.name.toLowerCase()).includes(val.toLowerCase()) || $t('alredyExist'))
@@ -20,6 +21,7 @@
         <v-input
           v-model="form.cellphone"
           :label="$t('cellphone')"
+          :disable="viewMode"
           mask="#"
           reverse-fill-mask
         />
@@ -27,6 +29,7 @@
         <v-input
           v-model="form.phone"
           :label="$t('phone')"
+          :disable="viewMode"
           mask="#"
           reverse-fill-mask
         />
@@ -35,48 +38,57 @@
           v-model="form.observation"
           type="textarea"
           :label="$t('observation')"
+          :disable="viewMode"
         />
 
         <q-input
           v-model="form.document"
           :label="$t('document')"
+          :disable="viewMode"
         />
 
         <v-input-cep
           v-model="form.cep"
           label="CEP"
+          :disable="viewMode"
           @response="setAdress"
         />
 
         <v-input
           v-model="form.publicPlace"
           :label="$t('publicPlace')"
+          :disable="viewMode"
         />
 
         <v-input
           v-model="form.number"
           :label="$t('number')"
+          :disable="viewMode"
           type="number"
         />
 
         <v-input
           v-model="form.district"
           :label="$t('district')"
+          :disable="viewMode"
         />
 
         <v-input
           v-model="form.city"
           :label="$t('city')"
+          :disable="viewMode"
         />
 
         <v-input
           v-model="form.state"
           :label="$t('state')"
+          :disable="viewMode"
         />
 
         <v-input
           v-model="form.complement"
           :label="$t('complement')"
+          :disable="viewMode"
         />
 
         <div class="row q-gutter-md q-mt-md justify-between">
@@ -88,6 +100,7 @@
             :label="$t('save')"
             type="submit"
             color="positive"
+            :disable="viewMode"
           />
         </div>
       </q-form>
@@ -98,6 +111,7 @@
         :rows="customers"
         :columns="columns"
         :loading="loading"
+        @view="view"
         @edit="edit"
         @delete="deleteAction"
       />
@@ -141,18 +155,21 @@ export default defineComponent({
       loading: false,
       saving: false,
       customers: [],
-      nameBefore: ''
+      nameBefore: '',
+      viewMode: false
     }
   },
 
   computed: {
     columns () {
       return [
+        { name: 'actionView', label: this.$t('view'), align: 'left' },
         { name: 'name', label: this.$t('name'), field: 'name' },
         { name: 'cellphone', label: this.$t('cellphone'), field: 'cellphone' },
         { name: 'phone', label: this.$t('phone'), field: 'phone' },
         { name: 'observation', label: this.$t('observation'), field: 'observation' },
         { name: 'document', label: this.$t('document'), field: 'document' },
+        { name: 'cep', label: 'CEP', field: 'cep' },
         { name: 'publicPlace', label: this.$t('publicPlace'), field: 'publicPlace' },
         { name: 'number', label: this.$t('number'), field: 'number' },
         { name: 'district', label: this.$t('district'), field: 'district' },
@@ -197,6 +214,7 @@ export default defineComponent({
       this.form.state = uf
     },
     reset () {
+      this.viewMode = false
       this.form = { ...this.modelForm }
       this.$nextTick(() => {
         this.$refs.form.resetValidation()
@@ -217,6 +235,14 @@ export default defineComponent({
       this.reset()
     },
     edit (row) {
+      this.viewMode = false
+      this.nameBefore = row.name
+      this.form = { ...row, id: row.id }
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    },
+
+    view (row) {
+      this.viewMode = true
       this.nameBefore = row.name
       this.form = { ...row, id: row.id }
       window.scrollTo({ top: 0, behavior: 'smooth' })

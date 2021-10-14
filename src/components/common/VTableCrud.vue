@@ -52,6 +52,17 @@
                 @click="props.expand = !props.expand"
               />
               <div
+                v-if="col.name === 'actionView'"
+                class="row no-wrap q-gutter-md"
+              >
+                <q-btn
+                  :label="$t('view')"
+                  dense
+                  color="primary"
+                  @click="$emit('view', props.row)"
+                />
+              </div>
+              <div
                 v-if="col.name === 'action'"
                 class="row no-wrap q-gutter-md"
               >
@@ -114,7 +125,7 @@ export default {
 
   mixins: [QTable],
 
-  emits: ['edit', 'delete'],
+  emits: ['view', 'edit', 'delete'],
 
   data () {
     return {
