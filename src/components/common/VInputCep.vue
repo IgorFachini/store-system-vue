@@ -28,7 +28,19 @@
     @update:model-value="onInput"
     @change="$emit('change', $event)"
     @blur="$emit('blur')"
-  />
+  >
+    <template #after>
+      <q-btn
+        round
+        dense
+        flat
+        icon="download"
+        :disable="disable"
+        :loading="loadingInside"
+        @click="load"
+      />
+    </template>
+  </q-input>
 </template>
 <script>
 import CepService from 'services/Cep'
@@ -76,39 +88,34 @@ export default {
     }
   },
 
-  watch: {
-    modelValue (val) {
-      if (val && val.length === 9) {
-        this.loadingInside = true
-
-        CepService.get(val.replace('-', ''))
-          .then((res) => {
-            if (res.data.erro) {
-              this.isCepValid = false
-              return this.$emit('error', res.data.erro)
-            }
-
-            this.isCepValid = true
-            this.$emit('response', res.data)
-          })
-          .catch((err) => {
-            this.isCepValid = false
-            this.$emit('error', err)
-          })
-          .finally(() => {
-            this.loadingInside = false
-            this.$refs.field.validate()
-          })
-      }
-    }
-  },
-
   mounted () {
     this.mounted = true
     useFormChild({ validate: this.validate, resetValidation: this.field.resetValidation, requiresQForm: true })
   },
 
   methods: {
+    load () {
+      this.loadingInside = true
+
+      CepService.get(this.modelValue.replace('-', ''))
+        .then((res) => {
+          if (res.data.erro) {
+            this.isCepValid = false
+            return this.$emit('error', res.data.erro)
+          }
+
+          this.isCepValid = true
+          this.$emit('response', res.data)
+        })
+        .catch((err) => {
+          this.isCepValid = false
+          this.$emit('error', err)
+        })
+        .finally(() => {
+          this.loadingInside = false
+          this.$refs.field.validate()
+        })
+    },
     validate () {
       return this.field.validate()
     },

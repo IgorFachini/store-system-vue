@@ -49,5 +49,6 @@ export default {
   exit: 'Exit',
   recipe: 'Recipe | Recipes',
   decreaseStock: 'Decrease Stock',
-  savedOperation: 'Saved Operation'
+  savedOperation: 'Saved Operation',
+  view: 'View'
 }

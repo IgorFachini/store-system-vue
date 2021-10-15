@@ -49,5 +49,6 @@ export default {
   exit: 'Saida',
   recipe: 'Receita | Receitas',
   decreaseStock: 'Diminuir Estoque',
-  savedOperation: 'Operação Salva'
+  savedOperation: 'Operação Salva',
+  view: 'Ver'
 }
