@@ -50,5 +50,6 @@ export default {
   recipe: 'Receita | Receitas',
   decreaseStock: 'Diminuir Estoque',
   savedOperation: 'Operação Salva',
-  view: 'Ver'
+  view: 'Ver',
+  readBarcode: 'Ler código de barras'
 }
