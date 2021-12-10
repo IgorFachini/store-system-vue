@@ -38,9 +38,17 @@
           :options="categories.map(c => c.name)"
         />
 
+        <div class="full-width">
+          <q-btn
+            color="primary"
+            :label="$t('readBarcode')"
+            class="full-width"
+            @click="openBarcodeReader()"
+          />
+        </div>
+
         <v-input
           v-model="form.code"
-          type="number"
           :label="$t('code')"
         />
 
@@ -173,6 +181,10 @@
         </template>
       </v-table-crud>
     </div>
+    <barcode-reader-modal
+      ref="barcodeReaderModal"
+      @success="setProductCode"
+    />
   </q-page>
 </template>
 
@@ -182,12 +194,14 @@ import { date, Dialog, Notify } from 'quasar'
 import { defineComponent } from 'vue'
 const { formatDate } = date
 import ProductRecipeInfo from 'components/product/ProductRecipeInfo.vue'
+import BarcodeReaderModal from 'components/common/BarcodeReaderModal.vue'
 
 export default defineComponent({
   name: 'Products',
 
   components: {
-    ProductRecipeInfo
+    ProductRecipeInfo,
+    BarcodeReaderModal
   },
 
   setup () {
@@ -284,6 +298,13 @@ export default defineComponent({
   },
 
   methods: {
+    openBarcodeReader () {
+      this.$refs.barcodeReaderModal.openReader()
+    },
+    setProductCode (res) {
+      const code = res.codeResult.code
+      this.form.code = code
+    },
     saveRecipe () {
       this.form.recipes.push(this.recipeForm)
       this.resetRecipe()

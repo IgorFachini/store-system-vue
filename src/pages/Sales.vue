@@ -335,7 +335,7 @@ export default defineComponent({
     },
     setProductCode (res) {
       const code = res.codeResult.code
-      const product = this.products.find(p => p.code === code)
+      const product = this.products.find(p => String(p.code) === code)
       if (product) {
         this.productForm.id = product.id
       }
