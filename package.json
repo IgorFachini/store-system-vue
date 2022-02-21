@@ -15,6 +15,7 @@
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
     "firebase": "^8.8.0-202162022140",
+    "quagga": "^0.12.1",
     "quasar": "^2.0.0",
     "vue-currency-input": "^2.0.1",
     "vue-i18n": "^9.1.7",

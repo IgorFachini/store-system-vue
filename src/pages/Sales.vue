@@ -53,6 +53,14 @@
                 class="row q-col-gutter-md"
                 @submit="saveProduct"
               >
+                <div class="full-width">
+                  <q-btn
+                    color="primary"
+                    :label="$t('readBarcode')"
+                    class="full-width"
+                    @click="openBarcodeReader()"
+                  />
+                </div>
                 <v-select
                   v-model="productForm.id"
                   reactive-rules
@@ -198,6 +206,10 @@
         </template>
       </v-table-crud>
     </div>
+    <barcode-reader-modal
+      ref="barcodeReaderModal"
+      @success="setProductCode"
+    />
   </q-page>
 </template>
 
@@ -208,12 +220,14 @@ import { defineComponent } from 'vue'
 const { formatDate } = date
 import { currencyToFloat } from 'utils/'
 import ProductSaleInfo from 'components/product/ProductSaleInfo.vue'
+import BarcodeReaderModal from 'components/common/BarcodeReaderModal.vue'
 
 export default defineComponent({
   name: 'Sales',
 
   components: {
-    ProductSaleInfo
+    ProductSaleInfo,
+    BarcodeReaderModal
   },
 
   setup () {
@@ -316,6 +330,16 @@ export default defineComponent({
   },
 
   methods: {
+    openBarcodeReader () {
+      this.$refs.barcodeReaderModal.openReader()
+    },
+    setProductCode (res) {
+      const code = res.codeResult.code
+      const product = this.products.find(p => String(p.code) === code)
+      if (product) {
+        this.productForm.id = product.id
+      }
+    },
     currencyToFloat,
     setAdress ({ logradouro, bairro, localidade, uf }) {
       this.form.publicPlace = logradouro

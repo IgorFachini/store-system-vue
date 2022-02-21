@@ -50,5 +50,6 @@ export default {
   recipe: 'Recipe | Recipes',
   decreaseStock: 'Decrease Stock',
   savedOperation: 'Saved Operation',
-  view: 'View'
+  view: 'View',
+  readBarcode: 'Read Barcode'
 }
