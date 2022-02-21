@@ -38,7 +38,7 @@
           :options="categories.map(c => c.name)"
         />
 
-        <div class="full-width">
+        <div class="row">
           <q-btn
             color="primary"
             :label="$t('readBarcode')"

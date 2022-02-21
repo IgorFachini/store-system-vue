@@ -61,7 +61,8 @@ module.exports = configure(function (ctx) {
         FIREBASE_STORAGE_BUCKET: env.FIREBASE_STORAGE_BUCKET,
         FIREBASE_MESSAGING_SENDER_ID: env.FIREBASE_MESSAGING_SENDER_ID,
         FIREBASE_APP_ID: env.FIREBASE_APP_ID,
-        FIREBASE_MEASUREMENT_ID: env.FIREBASE_MEASUREMENT_ID
+        FIREBASE_MEASUREMENT_ID: env.FIREBASE_MEASUREMENT_ID,
+        DEPLOY: env.DEPLOY || ''
       },
 
       // transpile: false,
@@ -192,8 +193,8 @@ module.exports = configure(function (ctx) {
       },
 
       manifest: {
-        name: 'store-system',
-        short_name: 'store-system',
+        name: 'store-system ' + env.DEPLOY || '',
+        short_name: 'store-system ' + env.DEPLOY || '',
         description: 'A Quasar Framework app',
         display: 'standalone',
         orientation: 'portrait',

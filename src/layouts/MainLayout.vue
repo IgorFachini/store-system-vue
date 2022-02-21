@@ -12,7 +12,7 @@
         />
 
         <q-toolbar-title>
-          Quasar App
+          Quasar App {{ deploy }}
         </q-toolbar-title>
 
         <div>
@@ -209,7 +209,8 @@ export default defineComponent({
 
   data () {
     return {
-      $q: null
+      $q: null,
+      deploy: ''
     }
   },
 
@@ -227,6 +228,7 @@ export default defineComponent({
   mounted () {
     this.$q = useQuasar()
     this.locale = this.$q.lang.getLocale()
+    this.deploy = process.env.DEPLOY
   },
 
   methods: {

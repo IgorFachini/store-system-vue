@@ -24,6 +24,10 @@ FIREBASE_MESSAGING_SENDER_ID=variable
 FIREBASE_APP_ID=variable
 FIREBASE_MEASUREMENT_ID=variable
 ```
+
+# Firebase Query Search
+
+In home, have a search by date, to it works, need configure a [index](https://console.cloud.google.com/firestore/indexes/composite), for sales and expenses, fields createdAt and date
 ## Install the dependencies
 ```bash
 yarn
