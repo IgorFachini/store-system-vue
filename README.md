@@ -28,8 +28,8 @@ FIREBASE_MEASUREMENT_ID=variable
 # Firebase Query Search
 
 In home, have a search by date, to it works, need configure a [index](https://console.cloud.google.com/firestore/indexes/composite), for 
-sales: type, date.
-expenses:  createdAt, date
+- sales: type, date.
+- expenses:  createdAt, date
 ## Install the dependencies
 ```bash
 yarn
