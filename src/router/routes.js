@@ -33,6 +33,30 @@ const routes = [
         }
       },
       {
+        path: '/products/add',
+        name: 'products.add',
+        component: () => import('src/pages/ProductsAddEdit.vue'),
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/products/edit/:id',
+        name: 'products.edit',
+        component: () => import('src/pages/ProductsAddEdit.vue'),
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/products/stock-history/:id',
+        name: 'products.stockHistory',
+        component: () => import('src/pages/ProductStockHistory.vue'),
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
         path: '/sales',
         component: () => import('src/pages/Sales.vue'),
         meta: {

@@ -51,5 +51,9 @@ export default {
   decreaseStock: 'Diminuir Estoque',
   savedOperation: 'Operação Salva',
   view: 'Ver',
-  readBarcode: 'Ler código de barras'
+  readBarcode: 'Ler código de barras',
+  notExist: 'Não existe',
+  history: 'Histórico',
+  stockHistory: 'Histórico de Estoque',
+  inStock: 'Em Estoque'
 }
