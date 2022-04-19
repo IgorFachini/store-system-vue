@@ -51,5 +51,9 @@ export default {
   decreaseStock: 'Decrease Stock',
   savedOperation: 'Saved Operation',
   view: 'View',
-  readBarcode: 'Read Barcode'
+  readBarcode: 'Read Barcode',
+  notExist: 'Not Exist',
+  history: 'History',
+  stockHistory: 'Stock History',
+  inStock: 'In Stock'
 }

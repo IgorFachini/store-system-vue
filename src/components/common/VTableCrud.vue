@@ -42,6 +42,13 @@
               :props="props"
             >
               {{ col.value }}
+              <template
+                v-if="col.name === 'productStockHistoryCount'"
+              >
+                <product-stock-history-count
+                  :product="props.row"
+                />
+              </template>
               <q-btn
                 v-if="col.name === 'expand'"
                 size="sm"
@@ -133,7 +140,7 @@ export default {
       search: '',
       paginationInside: {
         page: 1,
-        rowsPerPage: 10,
+        rowsPerPage: 25,
         sortBy: 'createdAt',
         descending: true
       }
