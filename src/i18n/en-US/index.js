@@ -55,5 +55,7 @@ export default {
   notExist: 'Not Exist',
   history: 'History',
   stockHistory: 'Stock History',
-  inStock: 'In Stock'
+  inStock: 'In Stock',
+  cashFlow: 'Cash Flow',
+  shoppingCart: 'Shopping Cart'
 }

@@ -76,6 +76,13 @@ const routes = [
         meta: {
           requiresAuth: true
         }
+      },
+      {
+        path: '/cart-shop',
+        component: () => import('src/pages/CartShop.vue'),
+        meta: {
+          requiresAuth: true
+        }
       }
     ]
   },

@@ -1,10 +1,12 @@
 <template>
-  {{ quantity }}
   <q-skeleton
     v-if="loading"
     type="text"
     width="150px"
   />
+  <div v-else>
+    {{ quantity }}
+  </div>
 </template>
 
 <script>

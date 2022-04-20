@@ -102,6 +102,12 @@
           </q-item-label>
         </q-item>
 
+        <q-item to="/cart-shop">
+          <q-item-label>
+            {{ $t('shoppingCart') }}
+          </q-item-label>
+        </q-item>
+
         <q-btn-dropdown
           class="ellipsis"
           split

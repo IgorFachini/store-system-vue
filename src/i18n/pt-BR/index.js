@@ -55,5 +55,7 @@ export default {
   notExist: 'Não existe',
   history: 'Histórico',
   stockHistory: 'Histórico de Estoque',
-  inStock: 'Em Estoque'
+  inStock: 'Em Estoque',
+  cashFlow: 'Fluxo de Caixa',
+  shoppingCart: 'Carrinho de Compras'
 }
