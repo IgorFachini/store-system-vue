@@ -15,7 +15,7 @@
       >
         <q-tab
           name="products"
-          :label="$tc('product', 2)"
+          :label="$t('product', 2)"
         />
         <q-tab
           name="shoppingCart"
@@ -39,7 +39,7 @@
           class="full-width table-cart-shop"
           grid
           grid-header
-          :title="$tc('product', 2)"
+          :title="$t('product', 2)"
           :rows="products"
           :columns="columns"
           row-key="name"
@@ -317,7 +317,7 @@ import { Dialog, Notify } from 'quasar'
 import { defineComponent } from 'vue'
 
 export default defineComponent({
-  name: 'CartShop',
+  name: 'PageCartShop',
 
   data () {
     return {

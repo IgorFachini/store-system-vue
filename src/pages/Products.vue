@@ -4,7 +4,7 @@
     padding
   >
     <v-table-crud
-      :title="$tc('product', 2)"
+      :title="$t('product', 2)"
       :rows="products"
       :columns="columns"
       :loading="loading"
@@ -32,7 +32,7 @@
       <q-btn
         class="q-ma-md"
         color="accent"
-        :label="$tc('add')"
+        :label="$t('add')"
         @click="$router.push('/products/add')"
       />
     </div>
@@ -47,7 +47,7 @@ const { formatDate } = date
 import ProductRecipeInfo from 'components/product/ProductRecipeInfo.vue'
 
 export default defineComponent({
-  name: 'Products',
+  name: 'PageProducts',
 
   components: {
     ProductRecipeInfo
@@ -67,7 +67,7 @@ export default defineComponent({
     columns () {
       return [
         { name: 'actionView', label: this.$t('view'), align: 'left' },
-        { name: 'expand', label: this.$tc('recipe'), align: 'left' },
+        { name: 'expand', label: this.$t('recipe'), align: 'left' },
         { name: 'name', label: this.$t('name'), field: 'name', sortable: true },
         { name: 'saleValue', label: this.$t('saleValue'), field: 'saleValue', sortable: true },
         { name: 'purchasePrice', label: this.$t('purchasePrice'), field: 'purchasePrice', sortable: true },

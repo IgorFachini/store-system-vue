@@ -298,6 +298,14 @@ const labels = {
   totalDiscount: {
     enUS: 'Total discount',
     pt: 'Desconto total'
+  },
+  entry: {
+    enUS: 'Entry',
+    pt: 'Entrada'
+  },
+  password: {
+    enUS: 'Password',
+    pt: 'Senha'
   }
 }
 

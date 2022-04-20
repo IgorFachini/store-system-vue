@@ -13,7 +13,7 @@
 
     <v-input
       :model-value="`${totalSales} - ${totalExpenses} = ${(totalSales - totalExpenses).toFixed(2)}`"
-      :label="`${$tc('sale', 2)} - ${$tc('expense', 2)} = total`"
+      :label="`${$t('sale', 2)} - ${$t('expense', 2)} = total`"
       readonly
     />
   </q-page>

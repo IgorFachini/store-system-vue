@@ -68,37 +68,37 @@
 
         <q-item to="/customers">
           <q-item-label>
-            {{ $tc('customer', 2) }}
+            {{ $t('customer', 2) }}
           </q-item-label>
         </q-item>
 
         <q-item to="/categories">
           <q-item-label>
-            {{ $tc('category', 2) }}
+            {{ $t('category', 2) }}
           </q-item-label>
         </q-item>
 
         <q-item to="/products">
           <q-item-label>
-            {{ $tc('product', 2) }}
+            {{ $t('product', 2) }}
           </q-item-label>
         </q-item>
 
         <q-item to="/sales">
           <q-item-label>
-            {{ $tc('sale', 2) }}
+            {{ $t('sale', 2) }}
           </q-item-label>
         </q-item>
 
         <q-item to="/expenseProducts">
           <q-item-label>
-            {{ $tc('expenseProduct', 2) }}
+            {{ $t('expenseProduct', 2) }}
           </q-item-label>
         </q-item>
 
         <q-item to="/expenses">
           <q-item-label>
-            {{ $tc('expense', 2) }}
+            {{ $t('expense', 2) }}
           </q-item-label>
         </q-item>
 
@@ -141,7 +141,6 @@
 <script>
 import EssentialLink from 'components/EssentialLink.vue'
 import { useI18n } from 'vue-i18n'
-import { useQuasar } from 'quasar'
 
 const linksList = [
   {
@@ -222,18 +221,11 @@ export default defineComponent({
 
   watch: {
     locale (val) {
-      import(
-      /* webpackInclude: /(en-US|pt-BR)\.js$/ */
-        'quasar/lang/' + val
-      ).then(lang => {
-        this.$q.lang.set(lang.default)
-      })
+      this.$q.lang.set(val)
     }
   },
 
   mounted () {
-    this.$q = useQuasar()
-    this.locale = this.$q.lang.getLocale()
     this.deploy = process.env.DEPLOY
   },
 

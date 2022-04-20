@@ -5,7 +5,7 @@
   >
     <div class="col-xs-12 col-sm-12 col-md-8">
       <v-table-crud
-        :title="`${$tc('stockHistory', 2)}.
+        :title="`${$t('stockHistory', 2)}.
         ${$t('inStock')}: ${quantity}`"
         :rows="stockHistory"
         :columns="columns"

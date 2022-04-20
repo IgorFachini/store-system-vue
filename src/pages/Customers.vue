@@ -14,7 +14,7 @@
           :disable="viewMode"
           :rules="[
             val => val && val.length || $t('fillTheField', { field: $t('name') }),
-            val => !!form.id && nameBefore === val || (!customers.map(c => c.name.toLowerCase()).includes(val.toLowerCase()) || $t('alredyExist'))
+            val => !!form.id && nameBefore === val || (!customers.map(c => c.name.toLowerCase()).includes(val.toLowerCase()) || t('alredyExist'))
           ]"
         />
 
@@ -107,7 +107,7 @@
     </div>
     <div class="col-xs-12 col-sm-12 col-md-8">
       <v-table-crud
-        :title="$tc('customer', 2)"
+        :title="$t('customer', 2)"
         :rows="customers"
         :columns="columns"
         :loading="loading"
@@ -127,7 +127,7 @@ import { defineComponent } from 'vue'
 const { formatDate } = date
 
 export default defineComponent({
-  name: 'Customers',
+  name: 'PageCustomers',
   components: { VInputCep },
 
   setup () {

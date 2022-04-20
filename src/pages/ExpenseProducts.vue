@@ -13,7 +13,7 @@
           :label="$t('name')"
           :rules="[
             val => val && val.length || $t('fillTheField', { field: $t('name') }),
-            val => !!form.id && nameBefore === val || (!expenseProducts.map(c => c.name.toLowerCase()).includes(val.toLowerCase()) || $t('alredyExist'))]"
+            val => !!form.id && nameBefore === val || (!expenseProducts.map(c => c.name.toLowerCase()).includes(val.toLowerCase()) || t('alredyExist'))]"
         />
 
         <v-select
@@ -48,7 +48,7 @@
     </div>
     <div class="col-xs-12 col-sm-12 col-md-8">
       <v-table-crud
-        :title="$tc('expenseProduct', 2)"
+        :title="$t('expenseProduct', 2)"
         :rows="expenseProducts"
         :columns="columns"
         :loading="loading"
@@ -68,7 +68,7 @@ import VTableCrud from 'components/common/VTableCrud.vue'
 import VSelect from 'components/common/VSelect.vue'
 
 export default defineComponent({
-  name: 'Categories',
+  name: 'PageExpenseProducts',
 
   components: {
     VTableCrud,

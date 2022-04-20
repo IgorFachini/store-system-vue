@@ -197,7 +197,7 @@ export default {
     this.mounted = true
     this.cValue = this.currency ? toBRLCurrency(this.modelValue).replace('R$', '') : this.modelValue
     this.checkError()
-    useFormChild({ validate: this.validate, resetValidation: this.field.resetValidation, requiresQForm: true })
+    useFormChild({ validate: this.validate, resetValidation: this.field.resetValidation, requiresQForm: false })
   },
 
   methods: {

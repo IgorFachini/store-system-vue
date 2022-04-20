@@ -1,9 +1,9 @@
 import { boot } from 'quasar/wrappers'
 import { firestorePlugin, rtdbPlugin } from 'vuefire'
-import firebase from 'firebase/app'
-import 'firebase/firestore'
-import 'firebase/database'
-import 'firebase/auth'
+import firebase from 'firebase/compat/app'
+import 'firebase/compat/firestore'
+import 'firebase/compat/database'
+import 'firebase/compat/auth'
 
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
@@ -16,7 +16,7 @@ const firebaseConfig = {
 }
 
 const firebaseApp = firebase.initializeApp(firebaseConfig)
-const firebaseAuth = firebaseApp.auth()
+const firebaseAuth = firebase.auth()
 firebaseApp.getCurrentUser = () => {
   return new Promise((resolve, reject) => {
     const unsubscribe = firebaseAuth.onAuthStateChanged(user => {

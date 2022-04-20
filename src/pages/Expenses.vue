@@ -85,7 +85,7 @@
     </div>
     <div class="col-xs-12 col-sm-12 col-md-8">
       <v-table-crud
-        :title="$tc('expense', 2)"
+        :title="$t('expense', 2)"
         :rows="expenses"
         :columns="columns"
         :loading="loadingTable"
@@ -107,7 +107,7 @@ import VTableCrud from 'components/common/VTableCrud.vue'
 import { currencyToFloat } from 'utils/'
 
 export default defineComponent({
-  name: 'Expenses',
+  name: 'PageExpenses',
 
   components: {
     VSelect,

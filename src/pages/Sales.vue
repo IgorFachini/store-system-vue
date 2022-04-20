@@ -35,7 +35,7 @@
           <q-card>
             <q-card-section>
               <div class="text-h6">
-                {{ $tc('product', 2) }}
+                {{ $t('product', 2) }}
               </div>
               <div>
                 <q-checkbox
@@ -176,7 +176,7 @@
     </div>
     <div class="col-xs-12 col-sm-12 col-md-8">
       <v-table-crud
-        :title="$tc('sale', 2)"
+        :title="$t('sale', 2)"
         :rows="sales"
         :columns="columns"
         :loading="loadingTable"
@@ -223,7 +223,7 @@ import ProductSaleInfo from 'components/product/ProductSaleInfo.vue'
 import BarcodeReaderModal from 'components/common/BarcodeReaderModal.vue'
 
 export default defineComponent({
-  name: 'Sales',
+  name: 'PageSales',
 
   components: {
     ProductSaleInfo,
@@ -277,7 +277,7 @@ export default defineComponent({
     },
     columns () {
       return [
-        { name: 'expand', label: this.$tc('product', 2), align: 'left' },
+        { name: 'expand', label: this.$t('product', 2), align: 'left' },
         { name: 'date', label: this.$t('date'), field: 'date', sortable: true },
         { name: 'observation', label: this.$t('observation'), field: 'observation' },
         {
