@@ -131,8 +131,11 @@ export default {
   },
 
   watch: {
+    type () {
+      this.discountValue = 0
+    },
     discountValue (value) {
-      if (value > this.options.value) {
+      if (this.type === 'value' && value > this.options.value) {
         this.discountValue = this.options.value
         this.$nextTick(() => {
           this.forceRerender()
