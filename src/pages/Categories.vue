@@ -13,7 +13,7 @@
           :label="$t('name')"
           :rules="[
             val => val && val.length || $t('fillTheField', { field: $t('name') }),
-            val => !!form.id && nameBefore === val || (!categories.map(c => c.name.toLowerCase()).includes(val.toLowerCase()) || t('alredyExist'))]"
+            val => !!form.id && nameBefore === val || (!categories.map(c => c.name.toLowerCase()).includes(val.toLowerCase()) || $t('alredyExist'))]"
         />
 
         <v-input

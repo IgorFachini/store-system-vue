@@ -10,19 +10,19 @@
       <q-card-section>
         <div class="q-gutter-sm row">
           <q-radio
-            v-model="type"
+            v-model="discountObject.type"
             val="value"
             :label="$t('value')"
           />
           <q-radio
-            v-model="type"
+            v-model="discountObject.type"
             val="percentage"
             :label="$t('percentage')"
           />
         </div>
         <v-input
           v-if="render"
-          v-model="discountValue"
+          v-model="discountObject.discount"
           class="full-width"
           :label="$t('discount')"
           currency
@@ -53,13 +53,13 @@
               caption
               class="text-blue"
             >
-              {{ options.value }}
+              {{ options.value.toFixed(2) }}
             </q-item-label>
           </q-item-section>
         </q-item>
         <q-item>
           <q-item-section>
-            <q-item-label> {{ $t('discountValue') }}</q-item-label>
+            <q-item-label> {{ $t('discount') }}</q-item-label>
           </q-item-section>
 
           <q-item-section
@@ -69,7 +69,7 @@
               caption
               class="text-red"
             >
-              -{{ discountValueLabel }}
+              -{{ discountLabel }}
             </q-item-label>
           </q-item-section>
         </q-item>
@@ -111,32 +111,40 @@ export default {
   data () {
     return {
       open: false,
-      type: 'value',
-      discountValue: 0,
       options: {
         title: '',
-        value: 0,
-        id: ''
+        id: '',
+        value: 0
+      },
+      discountObject: {
+        type: 'value',
+        discount: 0
       }
     }
   },
 
   computed: {
-    discountValueLabel () {
-      return this.discountValue + ' ' + (this.type === 'value' ? '$' : '%')
+    discountLabel () {
+      return this.discountObject.discount + ' ' + (this.discountObject.type === 'value' ? '$' : '%')
     },
     finalValueLabel () {
-      return this.type === 'value' ? (this.options.value - this.discountValue).toFixed(2) : this.options.value - (this.options.value * this.discountValue / 100).toFixed(2)
+      return this.discountObject.type === 'value' ? (this.options.value - this.discountObject.discount).toFixed(2) : this.options.value - (this.options.value * this.discountObject.discount / 100).toFixed(2)
     }
   },
 
   watch: {
-    type () {
-      this.discountValue = 0
+    'discountObject.type' () {
+      this.discountObject.discount = 0
     },
-    discountValue (value) {
-      if (this.type === 'value' && value > this.options.value) {
-        this.discountValue = this.options.value
+    'discountObject.discount' (value) {
+      if (this.discountObject.type === 'value' && value > this.options.value) {
+        this.discountObject.discount = this.options.value
+        this.$nextTick(() => {
+          this.forceRerender()
+        })
+      }
+      if (this.discountObject.type === 'percentage' && value > 100) {
+        this.discountObject.discount = 100
         this.$nextTick(() => {
           this.forceRerender()
         })
@@ -145,19 +153,21 @@ export default {
   },
 
   methods: {
-    openModal (options) {
-      this.type = 'value'
-      this.discountValue = options.discount || 0
+    openModal (options, discountObject) {
+      this.discountObject = (discountObject?.type && discountObject) || {
+        type: 'value',
+        discount: 0
+      }
       this.open = true
       this.options = options
     },
     cancel () {
       this.open = false
-      this.$emit('cancel', { id: this.options.id })
+      this.$emit('cancel', { options: this.options })
     },
     confirm () {
       this.open = false
-      this.$emit('confirm', { id: this.options.id, discount: this.discountValue })
+      this.$emit('confirm', { options: this.options, discountObject: this.discountObject })
     }
   }
 }

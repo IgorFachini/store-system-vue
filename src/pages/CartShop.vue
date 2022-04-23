@@ -34,6 +34,12 @@
       keep-alive
     >
       <q-tab-panel name="products">
+        <q-btn
+          class="q-ma-md"
+          color="accent"
+          :label="$t('add')"
+          @click="addProductModalOpen = true"
+        />
         <q-table
           v-model:pagination="pagination"
           class="full-width table-cart-shop"
@@ -74,7 +80,7 @@
                   <div class="q-table__grid-item-title">
                     {{ col.label }}
                   </div><div class="q-table__grid-item-value">
-                    {{ props.row[col.field] }}
+                    {{ col.format ? col.format(props.row[col.field]) : props.row[col.field] }}
                     <product-stock-history-count
                       v-if="col.name === 'productStockHistoryCount'"
                       :product="props.row"
@@ -107,7 +113,7 @@
               >
                 <q-item-label
                   caption
-                  :class="item.discount ? 'text-grey' : 'text-blue'"
+                  :class="item.discountObject ? 'text-grey' : 'text-blue'"
                 >
                   {{ item.product.saleValue }}
                   <v-input
@@ -119,10 +125,10 @@
                 </q-item-label>
               </q-item-section>
             </q-item>
-            <q-item v-if="item.discount">
+            <q-item v-if="item.discountObject">
               <q-item-section>
                 <q-item-label class="text-red">
-                  {{ item.discount }}
+                  -{{ item.discountObject.type === 'value' ? '$' : '%' }} {{ item.discountObject.discount }}
                 </q-item-label>
               </q-item-section>
 
@@ -133,23 +139,35 @@
                   caption
                   class="text-blue"
                 >
-                  {{ (item.unitaryValue - item.discount).toFixed(2) }}
+                  {{ calcDiscountResult(item.discountObject, item.unitaryValue).toFixed(2) }}
                 </q-item-label>
               </q-item-section>
             </q-item>
             <q-item>
               <q-item-section>
-                <v-input
-                  v-model="cartShopProducts[item.product.id].quantity"
-                  type="number"
-                  :label="$t('quantity')"
-                  @update:model-value="val => updateCartShopItemQuantity(item.product.id, val)"
-                />
-                <q-btn
-                  icon="local_offer"
-                  color="green"
-                  @click="openDiscountModal(item.product.id)"
-                />
+                <div class="row">
+                  <v-input
+                    v-model="cartShopProducts[item.product.id].quantity"
+                    type="number"
+                    class="col-3"
+                    :label="$t('quantity')"
+                    @update:model-value="val => updateCartShopItemQuantity(item.product.id, val)"
+                  />
+                  <q-btn
+                    icon="local_offer"
+                    color="green"
+                    class="col-2"
+                    flat
+                    @click="openDiscountModal(item.product.id)"
+                  />
+                  <q-btn
+                    icon="delete"
+                    color="red"
+                    class="col-2"
+                    flat
+                    @click="removeItem(item.product.id)"
+                  />
+                </div>
               </q-item-section>
 
               <q-item-section
@@ -224,7 +242,7 @@
               </q-item-section>
             </q-item>
             <q-item
-              v-if="subtotalDiscount"
+              v-if="subtotalDiscountObject?.type"
               class="full-width justify-between"
             >
               <q-item-section>
@@ -238,7 +256,7 @@
                   caption
                   class="text-red"
                 >
-                  {{ subtotalDiscount }}
+                  -{{ subtotalDiscountObject.type === 'value' ? '$' : '%' }} {{ subtotalDiscountObject.discount }}
                 </q-item-label>
               </q-item-section>
             </q-item>
@@ -308,12 +326,67 @@
       @cancel="val => setDiscount(val, true)"
       @confirm="setDiscount"
     />
+    <q-dialog
+      v-model="addProductModalOpen"
+    >
+      <q-card>
+        <q-card-section>
+          <products-add-edit-form
+            @done="addProductModalOpen = false"
+          />
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn
+            v-close-popup
+            flat
+            :label="$t('close')"
+            color="primary"
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+    <q-dialog
+      v-model="saveDialogOpen"
+      position="bottom"
+    >
+      <q-card style="width: 250px">
+        <q-card-section class="row">
+          <div>
+            {{ $t('select') }}
+          </div>
+          <q-btn
+            flat
+            class="col-12 text-end"
+            icon="person"
+            align="left"
+            :label="$t('customer')"
+          />
+          <q-btn
+            flat
+            class="col-12"
+            icon="arrow_upward"
+            align="left"
+            :label="$t('fastSale')"
+            @click="save"
+          />
+          <q-btn
+            v-close-popup
+            flat
+            class="col-12"
+            icon="close"
+            align="left"
+            :label="$t('cancel')"
+          />
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
 <script>
 
-import { Dialog, Notify } from 'quasar'
+import { date, Dialog, Notify } from 'quasar'
+const { formatDate } = date
 import { defineComponent } from 'vue'
 
 export default defineComponent({
@@ -329,10 +402,14 @@ export default defineComponent({
       firebaseMixinInstance: null,
       products: [],
       pagination: {
-        rowsPerPage: 0
+        rowsPerPage: 0,
+        sortBy: 'createdAt',
+        descending: true
       },
       cartShopProducts: {},
-      subtotalDiscount: 0
+      subtotalDiscountObject: {},
+      addProductModalOpen: false,
+      saveDialogOpen: false
     }
   },
 
@@ -344,11 +421,18 @@ export default defineComponent({
       return [
         { name: 'name', label: this.$t('name'), field: 'name', sortable: true },
         { name: 'saleValue', label: this.$t('saleValue'), field: 'saleValue', sortable: true },
-        { name: 'productStockHistoryCount', label: this.$t('currentInventory') }
+        { name: 'productStockHistoryCount', label: this.$t('currentInventory') },
+        {
+          name: 'createdAt',
+          label: this.$t('createdAt'),
+          field: 'createdAt',
+          format: val => formatDate(val ? val.toDate() : '', 'DD/MM/YYYY'),
+          sortable: true
+        }
       ]
     },
     cartShopGroupedArrayDiscountSum () {
-      return this.cartShopGroupedArray.reduce((acc, item) => acc + item.discount || 0, 0)
+      return this.cartShopGroupedArray.reduce((acc, item) => acc + this.getDiscountValue(item.discountObject, item.unitaryValue) || 0, 0)
     },
     subtotal () {
       return this.cartShopGroupedArray.reduce((acc, item) => acc + item.unitaryValue * item.quantity, 0)
@@ -356,11 +440,14 @@ export default defineComponent({
     totalProductsWithDiscount () {
       return this.cartShopGroupedArrayDiscountSum ? this.cartShopGroupedArray.reduce((acc, item) => acc + item.unitaryValue * item.quantity, 0) - this.cartShopGroupedArrayDiscountSum : 0
     },
+    discountSubTotalValue () {
+      return this.calcDiscountResult(this.subtotalDiscountObject.discount, this.totalProductsWithDiscount)
+    },
     totalDiscount () {
-      return (this.cartShopGroupedArrayDiscountSum + this.subtotalDiscount)
+      return (this.cartShopGroupedArrayDiscountSum + this.discountSubTotalValue)
     },
     total () {
-      return this.cartShopGroupedArrayDiscountSum ? (this.totalProductsWithDiscount - this.subtotalDiscount) : this.subtotal
+      return this.cartShopGroupedArrayDiscountSum ? this.totalProductsWithDiscount - this.getDiscountValue(this.subtotalDiscountObject, this.totalProductsWithDiscount) : this.subtotal
     }
   },
 
@@ -380,33 +467,52 @@ export default defineComponent({
   },
 
   methods: {
-    setDiscount (item, cancel) {
-      if (cancel && this.cartShopProducts[item.id]) {
-        delete this.cartShopProducts[item.id].discount
+    calcDiscountResult (discountObject, value) {
+      if (!discountObject?.type) {
+        return 0
       }
-      if (item.id === 'subtotalDiscount') {
-        if (cancel) {
-          this.subtotalDiscount = 0
-          return
-        }
-        this.subtotalDiscount = item.discount
+      return discountObject.type === 'value'
+        ? (value - discountObject.discount)
+        : value - (value * discountObject.discount / 100)
+    },
+    getDiscountValue (discountObject, value) {
+      if (!discountObject?.type) {
+        return 0
+      }
+      return discountObject.type === 'value'
+        ? discountObject.discount
+        : (value * discountObject.discount / 100)
+    },
+    setDiscount (result, cancel) {
+      if (cancel && this.cartShopProducts[result.options.id]) {
+        delete this.cartShopProducts[result.options.id].discountObject
         return
       }
-      this.cartShopProducts[item.id].discount = item.discount
+      if (result.options.id === 'subtotalDiscountObject') {
+        if (cancel) {
+          this.subtotalDiscountObject = {}
+          return
+        }
+        this.subtotalDiscountObject = result.discountObject
+        return
+      }
+      this.cartShopProducts[result.options.id].discountObject = result.discountObject
     },
     updateCartShopItemQuantity (id, quantity) {
-      delete this.cartShopProducts[id].discount
       if (quantity < 1) {
-        Dialog.create({
-          title: `${this.$t('removeItem')}?`,
-          cancel: true,
-          persistent: true
-        }).onOk(() => {
-          delete this.cartShopProducts[id]
-        }).onCancel(() => {
-          this.cartShopProducts[id].quantity = 1
-        })
+        this.removeItem(id)
       }
+    },
+    removeItem (id) {
+      Dialog.create({
+        title: `${this.$t('removeItem')}?`,
+        cancel: true,
+        persistent: true
+      }).onOk(() => {
+        delete this.cartShopProducts[id]
+      }).onCancel(() => {
+        this.cartShopProducts[id].quantity = 1
+      })
     },
     back () {
       if (this.tab === 'products') {
@@ -424,23 +530,28 @@ export default defineComponent({
       if (this.tab === 'products') {
         this.tab = 'shoppingCart'
       } else {
-        this.save()
+        if (this.$route.params.customerId) {
+          this.save(this.$route.params?.customerId)
+          return
+        }
+        this.saveDialogOpen = true
       }
     },
     openDiscountModal (itemId) {
       const options = {
         title: this.$t('discountInSubtotal'),
         value: this.total,
-        discount: this.subtotalDiscount,
-        id: 'subtotalDiscount'
+        id: 'subtotalDiscountObject'
       }
+      let discountObject = this.subtotalDiscountObject
       if (itemId) {
-        options.title = this.cartShopProducts[itemId].product.name
-        options.value = this.cartShopProducts[itemId].unitaryValue
-        options.discount = this.cartShopProducts[itemId].discount || 0
+        const cartShopProduct = this.cartShopProducts[itemId]
+        options.title = cartShopProduct.product.name
+        options.value = cartShopProduct.unitaryValue
         options.id = itemId
+        discountObject = cartShopProduct.discountObject
       }
-      this.$refs.discountModal.openModal(options)
+      this.$refs.discountModal.openModal(options, discountObject)
     },
     addToCartShop (product) {
       if (this.cartShopProducts[product.id]) {
@@ -456,8 +567,16 @@ export default defineComponent({
         }
       }
     },
-    save () {
-
+    save (customerId) {
+      this.saveDialogOpen = false
+      if (this.$route.params.customerId) {
+        return
+      }
+      const sale = {
+        type: 'falstSale',
+        ...(this.subtotalDiscountObject.type) && { subtotalDiscountObject: this.subtotalDiscountObject }
+      }
+      console.log(sale)
     },
     deleteAction (row) {
       Dialog.create({

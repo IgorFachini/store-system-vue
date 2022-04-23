@@ -4,6 +4,7 @@ import VSelect from '../components/common/VSelect.vue'
 import VTableCrud from '../components/common/VTableCrud.vue'
 import ProductStockHistoryCount from '../components/product/ProductStockHistoryCount.vue'
 import DiscountModal from '../components/product/DiscountModal.vue'
+import ProductsAddEditForm from '../components/product/ProductsAddEditForm.vue'
 import Screen from 'mixins/Screen'
 
 export default boot(({ app }) => {
@@ -12,6 +13,7 @@ export default boot(({ app }) => {
   app.component('VTableCrud', VTableCrud)
   app.component('ProductStockHistoryCount', ProductStockHistoryCount)
   app.component('DiscountModal', DiscountModal)
+  app.component('ProductsAddEditForm', ProductsAddEditForm)
   app.mixin(Screen)
 })
 

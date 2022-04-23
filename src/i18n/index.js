@@ -306,6 +306,18 @@ const labels = {
   password: {
     enUS: 'Password',
     pt: 'Senha'
+  },
+  select: {
+    enUS: 'Select',
+    pt: 'Selecionar'
+  },
+  fastSale: {
+    enUS: 'Fast Sale',
+    pt: 'Venda Rápida'
+  },
+  quickExit: {
+    enUS: 'Quick Exit',
+    pt: 'Saída Rápida'
   }
 }
 
