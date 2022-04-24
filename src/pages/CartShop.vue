@@ -47,7 +47,7 @@
           grid-header
           :title="$t('product', 2)"
           :rows="products"
-          :columns="columns"
+          :columns="columnsProduct"
           row-key="name"
           :filter="filter"
           hide-header
@@ -73,7 +73,7 @@
             >
               <div class="q-table__grid-item-card q-table__card fit">
                 <div
-                  v-for="col in columns"
+                  v-for="col in columnsProduct"
                   :key="col.name"
                   class="q-table__grid-item-row"
                 >
@@ -166,6 +166,11 @@
                     class="col-2"
                     flat
                     @click="removeItem(item.product.id)"
+                  />
+                  <q-checkbox
+                    v-model="item.decreaseStock"
+                    :label="$t('decreaseStock')"
+                    left-label
                   />
                 </div>
               </q-item-section>
@@ -297,6 +302,16 @@
                 </q-item-label>
               </q-item-section>
             </q-item>
+            <q-item>
+              <q-item-section>
+                <v-input
+                  v-model="date"
+                  :label="$t('date')"
+                  :rules="['date']"
+                  date
+                />
+              </q-item-section>
+            </q-item>
           </q-card>
         </div>
       </q-tab-panel>
@@ -367,7 +382,7 @@
             icon="arrow_upward"
             align="left"
             :label="$t('fastSale')"
-            @click="save"
+            @click="save()"
           />
           <q-btn
             v-close-popup
@@ -395,7 +410,6 @@ export default defineComponent({
   data () {
     return {
       tab: 'products',
-      form: {},
       loading: false,
       saving: false,
       filter: '',
@@ -409,7 +423,8 @@ export default defineComponent({
       cartShopProducts: {},
       subtotalDiscountObject: {},
       addProductModalOpen: false,
-      saveDialogOpen: false
+      saveDialogOpen: false,
+      date: ''
     }
   },
 
@@ -417,7 +432,7 @@ export default defineComponent({
     cartShopGroupedArray () {
       return Object.keys(this.cartShopProducts).map(key => this.cartShopProducts[key])
     },
-    columns () {
+    columnsProduct () {
       return [
         { name: 'name', label: this.$t('name'), field: 'name', sortable: true },
         { name: 'saleValue', label: this.$t('saleValue'), field: 'saleValue', sortable: true },
@@ -452,7 +467,7 @@ export default defineComponent({
   },
 
   created () {
-    this.form = { ...this.modelForm }
+    this.date = formatDate(Date.now(), 'DD/MM/YY')
   },
 
   mounted () {
@@ -563,7 +578,8 @@ export default defineComponent({
             ...product
           },
           unitaryValue: product.saleValue,
-          quantity: 1
+          quantity: 1,
+          decreaseStock: true
         }
       }
     },
@@ -573,10 +589,43 @@ export default defineComponent({
         return
       }
       const sale = {
-        type: 'falstSale',
-        ...(this.subtotalDiscountObject.type) && { subtotalDiscountObject: this.subtotalDiscountObject }
+        type: 'fastSale',
+        ...(this.subtotalDiscountObject?.type) && { subtotalDiscountObject: this.subtotalDiscountObject },
+        date: this.date,
+        total: this.total,
+        products: this.cartShopGroupedArray.map(item => ({
+          id: item.product.id,
+          name: item.product.name,
+          quantity: item.quantity,
+          unitaryValue: item.unitaryValue,
+          ...(item.discountObject?.type) && { discountObject: item.discountObject }
+        }))
       }
+      this.firebaseMixin('cashFlow').add(sale)
+      this.cartShopGroupedArray.forEach(item => {
+        if (item.decreaseStock) {
+          const productRef = this.firebaseMixin('products').id(item.product.id).doc()
+          this.firebaseMixin('stockHistory').add({
+            product: productRef,
+            quantity: -Math.abs(item.quantity),
+            description: `${this.$t('boughtBy')} fastSale`
+          })
+        }
+      })
+
+      Notify.create({
+        message: this.$t('savedOperation'),
+        color: 'positive',
+        closeBtn: true
+      })
+      this.reset()
       console.log(sale)
+    },
+    reset () {
+      this.date = formatDate(Date.now(), 'DD/MM/YY')
+      this.cartShopProducts = {}
+      this.subtotalDiscountObject = {}
+      this.tab = 'products'
     },
     deleteAction (row) {
       Dialog.create({

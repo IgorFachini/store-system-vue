@@ -318,6 +318,10 @@ const labels = {
   quickExit: {
     enUS: 'Quick Exit',
     pt: 'Saída Rápida'
+  },
+  boughtBy: {
+    enUS: 'Bought By',
+    pt: 'Comprado por'
   }
 }
 
