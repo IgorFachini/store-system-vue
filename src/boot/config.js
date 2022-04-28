@@ -6,6 +6,8 @@ import ProductStockHistoryCount from '../components/product/ProductStockHistoryC
 import DiscountModal from '../components/product/DiscountModal.vue'
 import ProductsAddEditForm from '../components/product/ProductsAddEditForm.vue'
 import Screen from 'mixins/Screen'
+import CustomersForm from '../components/customer/CustomersForm.vue'
+import CustomersTable from '../components/customer/CustomersTable.vue'
 
 export default boot(({ app }) => {
   app.component('VInput', VInput)
@@ -14,6 +16,8 @@ export default boot(({ app }) => {
   app.component('ProductStockHistoryCount', ProductStockHistoryCount)
   app.component('DiscountModal', DiscountModal)
   app.component('ProductsAddEditForm', ProductsAddEditForm)
+  app.component('CustomersForm', CustomersForm)
+  app.component('CustomersTable', CustomersTable)
   app.mixin(Screen)
 })
 

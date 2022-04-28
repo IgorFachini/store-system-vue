@@ -96,7 +96,7 @@ export default {
   },
 
   mounted () {
-    console.log(this.$t)
+    console.log('pei', this.$t, this.t)
   },
 
   methods: {

@@ -19,6 +19,30 @@ const routes = [
         }
       },
       {
+        path: '/customers/add',
+        name: 'customers.add',
+        component: () => import('src/pages/CustomersForm.vue'),
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/customers/edit/:idCustomerEdit',
+        name: 'customers.edit',
+        component: () => import('src/pages/CustomersForm.vue'),
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/customers/view/:idCustomerView',
+        name: 'customers.view',
+        component: () => import('src/pages/CustomersForm.vue'),
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
         path: '/categories',
         component: () => import('src/pages/Categories.vue'),
         meta: {
