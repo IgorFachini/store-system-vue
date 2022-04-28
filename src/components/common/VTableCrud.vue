@@ -70,6 +70,17 @@
                 />
               </div>
               <div
+                v-if="col.name === 'actionChoose'"
+                class="row no-wrap q-gutter-md"
+              >
+                <q-btn
+                  :label="$t('choose')"
+                  dense
+                  color="primary"
+                  @click="$emit('choose', props.row)"
+                />
+              </div>
+              <div
                 v-if="col.name === 'action'"
                 class="row no-wrap q-gutter-md"
               >
@@ -132,7 +143,7 @@ export default {
 
   mixins: [QTable],
 
-  emits: ['view', 'edit', 'delete'],
+  emits: ['view', 'edit', 'delete', 'choose'],
 
   data () {
     return {

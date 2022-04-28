@@ -322,6 +322,26 @@ const labels = {
   boughtBy: {
     enUS: 'Bought By',
     pt: 'Comprado por'
+  },
+  choose: {
+    enUS: 'Choose',
+    pt: 'Escolher'
+  },
+  buyPayed: {
+    enUS: 'Buy Payed',
+    pt: 'Compra Paga'
+  },
+  no: {
+    enUS: 'No',
+    pt: 'Não'
+  },
+  yes: {
+    enUS: 'Yes',
+    pt: 'Sim'
+  },
+  confirmPurchase: {
+    enUS: 'Confirm Purchase',
+    pt: 'Confirmar Compra'
   }
 }
 

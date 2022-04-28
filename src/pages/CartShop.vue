@@ -361,6 +361,58 @@
       </q-card>
     </q-dialog>
     <q-dialog
+      v-model="chooseCustomerModalOpen"
+    >
+      <q-card>
+        <q-card-section>
+          <div class="row">
+            <q-dialog
+              v-model="addCustomerModalOpen"
+            >
+              <q-card>
+                <q-card-section>
+                  <div class="row">
+                    <customers-form
+                      choose-mode
+                      @done="addCustomerModalOpen = false"
+                    />
+                  </div>
+                </q-card-section>
+                <q-card-actions align="right">
+                  <q-btn
+                    v-close-popup
+                    flat
+                    :label="$t('close')"
+                    color="primary"
+                  />
+                </q-card-actions>
+              </q-card>
+            </q-dialog>
+            <customers-table
+              choose-mode
+              @choose="val => save(val.id)"
+            />
+          </div>
+          <div class="row full-width justify-center">
+            <q-btn
+              class="q-ma-md"
+              color="accent"
+              :label="$t('add')"
+              @click="addCustomerModalOpen = true"
+            />
+          </div>
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn
+            v-close-popup
+            flat
+            :label="$t('close')"
+            color="primary"
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+    <q-dialog
       v-model="saveDialogOpen"
       position="bottom"
     >
@@ -375,6 +427,7 @@
             icon="person"
             align="left"
             :label="$t('customer')"
+            @click="chooseCustomerModalOpen = true"
           />
           <q-btn
             flat
@@ -424,6 +477,8 @@ export default defineComponent({
       subtotalDiscountObject: {},
       addProductModalOpen: false,
       saveDialogOpen: false,
+      chooseCustomerModalOpen: false,
+      addCustomerModalOpen: false,
       date: ''
     }
   },
@@ -583,43 +638,86 @@ export default defineComponent({
         }
       }
     },
-    save (customerId) {
+    async save (customerId) {
+      this.chooseCustomerModalOpen = false
       this.saveDialogOpen = false
-      if (this.$route.params.customerId) {
-        return
+      let customer = {}
+      if (this.$route.params.customerId || customerId) {
+        const customerRes = await this.firebaseMixin('customers').id(customerId).doc().get()
+        if (customerRes.exists) {
+          customer = customerRes.data()
+        } else {
+          Notify.create({
+            message: `${this.$t('customer')} ${this.$t('notExist')}`,
+            color: 'negative',
+            closeBtn: true
+          })
+          return
+        }
       }
-      const sale = {
-        type: 'fastSale',
-        ...(this.subtotalDiscountObject?.type) && { subtotalDiscountObject: this.subtotalDiscountObject },
-        date: this.date,
-        total: this.total,
-        products: this.cartShopGroupedArray.map(item => ({
-          id: item.product.id,
-          name: item.product.name,
-          quantity: item.quantity,
-          unitaryValue: item.unitaryValue,
-          ...(item.discountObject?.type) && { discountObject: item.discountObject }
-        }))
-      }
-      this.firebaseMixin('cashFlow').add(sale)
-      this.cartShopGroupedArray.forEach(item => {
-        if (item.decreaseStock) {
-          const productRef = this.firebaseMixin('products').id(item.product.id).doc()
-          this.firebaseMixin('stockHistory').add({
-            product: productRef,
-            quantity: -Math.abs(item.quantity),
-            description: `${this.$t('boughtBy')} fastSale`
+      Dialog.create({
+        title: this.$t('confirmPurchase') + '?',
+        message: customerId ? `${this.$t('customer')}: ${customer.name}` : this.$t('fastSale'),
+        persistent: true,
+        cancel: true
+      }).onOk(async () => {
+        const sale = {
+          type: customer.name ? 'buy' : 'fastSale',
+          ...(this.subtotalDiscountObject?.type) && { subtotalDiscountObject: this.subtotalDiscountObject },
+          date: this.date,
+          total: this.total,
+          ...customerId && {
+            customer: {
+              id: customerId,
+              name: customer.name
+            }
+          },
+          products: this.cartShopGroupedArray.map(item => ({
+            id: item.product.id,
+            name: item.product.name,
+            quantity: item.quantity,
+            unitaryValue: item.unitaryValue,
+            ...(item.discountObject?.type) && { discountObject: item.discountObject }
+          }))
+        }
+        this.firebaseMixin('cashFlow').add(sale)
+        this.cartShopGroupedArray.forEach(item => {
+          if (item.decreaseStock) {
+            const productRef = this.firebaseMixin('products').id(item.product.id).doc()
+            this.firebaseMixin('stockHistory').add({
+              product: productRef,
+              quantity: -Math.abs(item.quantity),
+              description: `${this.$t('boughtBy')} fastSale`
+            })
+          }
+        })
+
+        if (customer.name) {
+          Dialog.create({
+            title: this.$t('buyPayed') + '?',
+            cancel: {
+              text: this.$t('no')
+            },
+            ok: {
+              text: this.$t('yes')
+            },
+            persistent: true
+          }).onOk(() => {
+            this.firebaseMixin('cashFlow').add({
+              type: 'pay',
+              total: sale.total,
+              customer: sale.customer,
+              date: sale.date
+            })
           })
         }
+        Notify.create({
+          message: this.$t('savedOperation'),
+          color: 'positive',
+          closeBtn: true
+        })
+        this.reset()
       })
-
-      Notify.create({
-        message: this.$t('savedOperation'),
-        color: 'positive',
-        closeBtn: true
-      })
-      this.reset()
-      console.log(sale)
     },
     reset () {
       this.date = formatDate(Date.now(), 'DD/MM/YY')

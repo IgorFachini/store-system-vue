@@ -7,6 +7,7 @@
     @view="view"
     @edit="edit"
     @delete="deleteAction"
+    @choose="val => $emit('choose', val)"
   />
 </template>
 
@@ -23,6 +24,8 @@ export default defineComponent({
     chooseMode: Boolean
   },
 
+  emits: ['choose'],
+
   data () {
     return {
       firebaseMixinInstance: null,
@@ -34,7 +37,7 @@ export default defineComponent({
   computed: {
     columns () {
       return [
-        { name: 'actionView', label: this.$t('view'), align: 'left' },
+        ...this.chooseMode ? [{ name: 'actionChoose', label: this.$t('choose'), align: 'left' }] : [{ name: 'actionView', label: this.$t('view'), align: 'left' }],
         { name: 'name', label: this.$t('name'), field: 'name' },
         { name: 'cellphone', label: this.$t('cellphone'), field: 'cellphone' },
         { name: 'phone', label: this.$t('phone'), field: 'phone' },
@@ -59,7 +62,7 @@ export default defineComponent({
           field: ({ updatedAt = null }) => updatedAt ? formatDate(updatedAt.toDate(), 'DD/MM/YYYY') : '',
           sortable: true
         },
-        { name: 'action', label: this.$t('action'), align: 'left' }
+        ...this.chooseMode ? [] : [{ name: 'action', label: this.$t('action'), align: 'left' }]
       ]
     }
   },
