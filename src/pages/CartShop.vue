@@ -687,7 +687,7 @@ export default defineComponent({
             this.firebaseMixin('stockHistory').add({
               product: productRef,
               quantity: -Math.abs(item.quantity),
-              description: `${this.$t('boughtBy')} fastSale`
+              description: `${this.$t('boughtBy')} ` + customerId ? `${this.$t('customer')}: ${customer.name}` : this.$t('fastSale')
             })
           }
         })
@@ -724,28 +724,6 @@ export default defineComponent({
       this.cartShopProducts = {}
       this.subtotalDiscountObject = {}
       this.tab = 'products'
-    },
-    deleteAction (row) {
-      Dialog.create({
-        title: `${this.$q.lang.label.remove} ${this.$t('product')}`,
-        cancel: true,
-        persistent: true
-      }).onOk(() => {
-        row.loading = true
-        this.firebaseMixin('stockHistory').ref().where('product', '==', this.firebaseMixinInstance.id(row.id).doc()).get().then(snapshot => {
-          snapshot.docs.forEach(doc => {
-            doc.ref.delete()
-          })
-        })
-        this.firebaseMixinInstance.id(row.id).delete().finally(() => {
-          row.loading = false
-          Notify.create({
-            message: this.$t('savedOperation'),
-            color: 'positive',
-            closeBtn: true
-          })
-        })
-      })
     }
   }
 })
