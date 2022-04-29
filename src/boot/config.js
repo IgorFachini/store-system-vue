@@ -8,6 +8,7 @@ import ProductsAddEditForm from '../components/product/ProductsAddEditForm.vue'
 import Screen from 'mixins/Screen'
 import CustomersForm from '../components/customer/CustomersForm.vue'
 import CustomersTable from '../components/customer/CustomersTable.vue'
+import CashFlowTable from '../components/cashFlow/CashFlowTable.vue'
 
 export default boot(({ app }) => {
   app.component('VInput', VInput)
@@ -18,6 +19,7 @@ export default boot(({ app }) => {
   app.component('ProductsAddEditForm', ProductsAddEditForm)
   app.component('CustomersForm', CustomersForm)
   app.component('CustomersTable', CustomersTable)
+  app.component('CashFlowTable', CashFlowTable)
   app.mixin(Screen)
 })
 

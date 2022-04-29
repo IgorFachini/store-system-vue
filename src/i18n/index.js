@@ -342,6 +342,22 @@ const labels = {
   confirmPurchase: {
     enUS: 'Confirm Purchase',
     pt: 'Confirmar Compra'
+  },
+  purchase: {
+    enUS: 'Purchase',
+    pt: 'Compra'
+  },
+  payment: {
+    enUS: 'Payment',
+    pt: 'Pagamento'
+  },
+  by: {
+    enUS: 'By',
+    pt: 'Por'
+  },
+  debt: {
+    enUS: 'debt',
+    pt: 'Débito'
   }
 }
 

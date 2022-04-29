@@ -662,7 +662,7 @@ export default defineComponent({
         cancel: true
       }).onOk(async () => {
         const sale = {
-          type: customer.name ? 'buy' : 'fastSale',
+          type: customer.name ? 'purchase' : 'fastSale',
           ...(this.subtotalDiscountObject?.type) && { subtotalDiscountObject: this.subtotalDiscountObject },
           date: this.date,
           total: this.total,
@@ -704,7 +704,7 @@ export default defineComponent({
             persistent: true
           }).onOk(() => {
             this.firebaseMixin('cashFlow').add({
-              type: 'pay',
+              type: 'payment',
               total: sale.total,
               customer: sale.customer,
               date: sale.date

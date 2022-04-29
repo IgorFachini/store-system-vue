@@ -108,6 +108,12 @@
           </q-item-label>
         </q-item>
 
+        <q-item to="/cash-flow">
+          <q-item-label>
+            {{ $t('cashFlow') }}
+          </q-item-label>
+        </q-item>
+
         <q-btn-dropdown
           class="ellipsis"
           split

@@ -107,6 +107,21 @@ const routes = [
         meta: {
           requiresAuth: true
         }
+      },
+      {
+        path: '/cash-flow',
+        component: () => import('src/pages/CashFlow.vue'),
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/customers/cash-flow/:id',
+        name: 'customer.cashFlow',
+        component: () => import('src/pages/CashFlow.vue'),
+        meta: {
+          requiresAuth: true
+        }
       }
     ]
   },
