@@ -1,5 +1,6 @@
 import { boot } from 'quasar/wrappers'
 import { firestorePlugin, rtdbPlugin } from 'vuefire'
+import { covertDateFieldName } from 'src/utils/index'
 import firebase from 'firebase/compat/app'
 import 'firebase/compat/firestore'
 import 'firebase/compat/database'
@@ -40,6 +41,14 @@ fr.enablePersistence()
     console.log('persistenceErr', err)
   })
 
+const firebaseDateFn = (date) => {
+  return Timestamp.fromDate(new Date(date))
+}
+
+const dateGetTimeFn = (date) => {
+  return new Date(date).getTime()
+}
+
 export default boot(({ app }) => {
   const firebaseMixin = {
     methods: {
@@ -57,6 +66,7 @@ export default boot(({ app }) => {
           },
 
           add (data) {
+            data = covertDateFieldName(data, null, rtdb ? dateGetTimeFn : firebaseDateFn)
             const send = { ...data, createdAt: rtdb ? new Date().getTime() : Timestamp.fromDate(new Date()) }
             return ref[rtdb ? 'push' : 'add'](send)
           },
@@ -68,6 +78,7 @@ export default boot(({ app }) => {
               },
 
               set (data) {
+                data = covertDateFieldName(data, null, rtdb ? dateGetTimeFn : firebaseDateFn)
                 const setRef = rtdb ? db.ref(`${refName}/${id}`) : ref.doc(id)
 
                 return setRef.set({
@@ -77,6 +88,7 @@ export default boot(({ app }) => {
               },
 
               update (data) {
+                data = covertDateFieldName(data, null, rtdb ? dateGetTimeFn : firebaseDateFn)
                 const updateRef = rtdb ? db.ref(`${refName}/${id}`) : ref.doc(id)
                 return updateRef.update({
                   ...data,

@@ -84,7 +84,7 @@ export default defineComponent({
   },
 
   created () {
-    this.date = formatDate(Date.now(), 'DD/MM/YY HH:mm')
+    this.date = formatDate(Date.now(), 'YYYY/MM/DD HH:mm')
   },
 
   mounted () {
@@ -153,7 +153,7 @@ export default defineComponent({
       })
     },
     reset () {
-      this.date = formatDate(Date.now(), 'DD/MM/YY HH:mm')
+      this.date = formatDate(Date.now(), 'YYYY/MM/DD HH:mm')
       this.total = 0
       this.description = ''
       this.forceRerender()

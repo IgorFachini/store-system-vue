@@ -105,7 +105,7 @@ export default defineComponent({
           label: this.$t('description')
         },
         { name: 'total', label: 'Total', field: 'total', classes: row => this.getClassColor(row.type), sortable: true },
-        { name: 'date', label: this.$t('date'), field: 'date', sortable: true },
+        { name: 'date', label: this.$t('date'), field: 'date', sortable: true, format: val => formatDate(val.toDate(), 'DD/MM/YYYY HH:mm') },
         {
           name: 'createdAt',
           label: this.$t('createdAt'),
@@ -138,6 +138,7 @@ export default defineComponent({
     },
     getClassColor (type) {
       const colorMapType = {
+        quickExit: 'text-red',
         payment: 'text-green',
         fastSale: 'text-green',
         purchase: 'text-blue'

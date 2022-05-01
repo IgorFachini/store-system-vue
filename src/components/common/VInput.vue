@@ -12,7 +12,7 @@
     :filled="filled"
     :disable="disable"
     :readonly="readonly || range"
-    :mask="date && !range ? '##/##/## ##:##' : mask"
+    :mask="date && !range ? '####/##/## ##:##' : mask"
     :reverse-fill-mask="reverseFillMask"
     :style="qStyle"
     :autofocus="autofocus"
@@ -43,8 +43,11 @@
         >
           <q-date
             :model-value="cValue"
-            mask="DD/MM/YY HH:mm"
+            :mask="range ? 'YYYY/MM/DD' : 'YYYY/MM/DD HH:mm'"
             today-btn
+            :disable="disable"
+            :readonly="readonly"
+            :range="range"
             @update:model-value="onInput"
             @change="$emit('change', $event)"
             @blur="$emit('blur')"
@@ -91,7 +94,9 @@
         >
           <q-time
             :model-value="cValue"
-            mask="DD/MM/YY HH:mm"
+            mask="YYYY/MM/DD HH:mm"
+            :disable="disable"
+            :readonly="readonly"
             format24h
             now-btn
             @update:model-value="onInput"
@@ -109,6 +114,13 @@
           </q-time>
         </q-popup-proxy>
       </q-icon>
+      <q-btn
+        v-if="clearable && cValue"
+        icon="close"
+        color="primary"
+        flat
+        @click="clear"
+      />
     </template>
 
     <template
@@ -188,7 +200,7 @@ export default {
   computed: {
     dataLabel () {
       return this.range
-        ? this.modelValue && this.modelValue.from ? `${this.modelValue.from} - ${this.modelValue.to}` : 'DD/MM/YY - DD/MM/YY'
+        ? this.modelValue && this.modelValue.from ? `${this.modelValue.from} - ${this.modelValue.to}` : 'YYYY/MM/DD - YYYY/MM/DD'
         : this.cValue
     },
     typeField () {
@@ -246,6 +258,10 @@ export default {
         modelValue = currencyToFloat(modelValue)
       }
       this.$emit('update:model-value', this.type === 'number' ? Number(modelValue) : modelValue)
+    },
+    clear () {
+      this.cValue = ''
+      this.$emit('update:model-value', '')
     }
   }
 }

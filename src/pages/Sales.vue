@@ -277,7 +277,7 @@ export default defineComponent({
     columns () {
       return [
         { name: 'expand', label: this.$t('product', 2), align: 'left' },
-        { name: 'date', label: this.$t('date'), field: 'date', sortable: true },
+        { name: 'date', label: this.$t('date'), field: 'date', sortable: true, format: val => formatDate(val.toDate(), 'DD/MM/YYYY HH:mm') },
         { name: 'observation', label: this.$t('observation'), field: 'observation' },
         {
           name: 'customer',
@@ -308,7 +308,7 @@ export default defineComponent({
   },
 
   created () {
-    this.modelForm.date = formatDate(Date.now(), 'DD/MM/YY HH:mm')
+    this.modelForm.date = formatDate(Date.now(), 'YYYY/MM/DD HH:mm')
     this.form = { ...this.modelForm }
     this.productForm = { ...this.modelProductForm }
   },

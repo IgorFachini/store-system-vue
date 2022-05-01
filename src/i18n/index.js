@@ -362,6 +362,22 @@ const labels = {
   buildCart: {
     enUS: 'Build Cart',
     pt: 'Construir Carrinho'
+  },
+  toReceive: {
+    enUS: 'To Receive',
+    pt: 'A Receber'
+  },
+  receveid: {
+    enUS: 'Receveid',
+    pt: 'Recebido'
+  },
+  totalEntry: {
+    enUS: 'Total Entry',
+    pt: 'Entrada Total'
+  },
+  sold: {
+    enUS: 'Sold',
+    pt: 'Vendido'
   }
 }
 

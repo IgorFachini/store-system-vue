@@ -151,7 +151,7 @@ export default defineComponent({
     },
     columns () {
       return [
-        { name: 'date', label: this.$t('date'), field: 'date', sortable: true },
+        { name: 'date', label: this.$t('date'), field: 'date', sortable: true, format: val => formatDate(val.toDate(), 'DD/MM/YYYY HH:mm') },
         {
           name: 'expenseProduct',
           label: this.$t('expenseProduct'),
@@ -188,7 +188,7 @@ export default defineComponent({
   },
 
   created () {
-    this.modelForm.date = formatDate(Date.now(), 'DD/MM/YY HH:mm')
+    this.modelForm.date = formatDate(Date.now(), 'YYYY/MM/DD HH:mm')
     this.form = { ...this.modelForm }
   },
 
