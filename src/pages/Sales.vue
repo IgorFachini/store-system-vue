@@ -277,7 +277,7 @@ export default defineComponent({
     columns () {
       return [
         { name: 'expand', label: this.$t('product', 2), align: 'left' },
-        { name: 'date', label: this.$t('date'), field: 'date', sortable: true, format: val => formatDate(val.toDate(), 'DD/MM/YYYY HH:mm') },
+        { name: 'date', label: this.$t('date'), field: 'date', sortable: true, format: val => typeof val === 'object' ? formatDate(val.toDate(), 'DD/MM/YYYY HH:mm') : val },
         { name: 'observation', label: this.$t('observation'), field: 'observation' },
         {
           name: 'customer',

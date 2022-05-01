@@ -105,7 +105,7 @@ export default defineComponent({
           label: this.$t('description')
         },
         { name: 'total', label: 'Total', field: 'total', classes: row => this.getClassColor(row.type), sortable: true },
-        { name: 'date', label: this.$t('date'), field: 'date', sortable: true, format: val => formatDate(val.toDate(), 'DD/MM/YYYY HH:mm') },
+        { name: 'date', label: this.$t('date'), field: 'date', sortable: true, format: val => typeof val === 'object' ? formatDate(val.toDate(), 'DD/MM/YYYY HH:mm') : val },
         {
           name: 'createdAt',
           label: this.$t('createdAt'),
