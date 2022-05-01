@@ -11,7 +11,6 @@
         <div class="row justify-center">
           <div class="column">
             <q-img
-              class="turbina"
               :src="Logo"
               sizes="500px"
               to="/"
@@ -40,7 +39,7 @@
           v-model="form.password"
           type="password"
           class="col-12"
-          label="Password"
+          :label="$t('password')"
           outlined
           lazy-rules
           :rules="[
@@ -70,17 +69,11 @@
 
 <script>
 
-import VInput from 'components/common/VInput'
-
 import Screen from 'mixins/Screen'
 import Logo from 'assets/quasar-logo-vertical.svg'
 
 export default {
   name: 'PageLogin',
-
-  components: {
-    VInput
-  },
 
   mixins: [Screen],
 
@@ -100,6 +93,10 @@ export default {
     loginValid () {
       this.validateForm()
     }
+  },
+
+  mounted () {
+    console.log('pei', this.$t, this.t)
   },
 
   methods: {

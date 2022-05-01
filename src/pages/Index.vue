@@ -8,14 +8,70 @@
       :label="$t('date')"
       date
       range
-      @range-end="loadSales"
+      clearable
+      @range-end="loadCashFlow"
     />
 
-    <v-input
-      :model-value="`${totalSales} - ${totalExpenses} = ${(totalSales - totalExpenses).toFixed(2)}`"
-      :label="`${$tc('sale', 2)} - ${$tc('expense', 2)} = total`"
-      readonly
-    />
+    <div class="row q-col-gutter-md">
+      <div class="col-6">
+        <q-field
+          :label="$t('sold')"
+          readonly
+          stack-label
+        >
+          <div class="text-blue">
+            {{ totalPurchase.toFixed(2) }}
+          </div>
+        </q-field>
+        <q-field
+          :label="$t('receveid')"
+          readonly
+          stack-label
+        >
+          <div class="text-green">
+            {{ totalPayment.toFixed(2) }}
+          </div>
+        </q-field>
+        <q-field
+          :label="$t('fastSale')"
+          readonly
+          stack-label
+        >
+          <div class="text-green">
+            {{ totalFastsale.toFixed(2) }}
+          </div>
+        </q-field>
+        <q-field
+          :label="$t('totalEntry')"
+          readonly
+          stack-label
+        >
+          <div class="text-green">
+            {{ totalEntry.toFixed(2) }}
+          </div>
+        </q-field>
+      </div>
+      <div class="col-6">
+        <q-field
+          :label="$t('expense', 2)"
+          readonly
+          stack-label
+        >
+          <div class="text-red">
+            {{ totalExpenses.toFixed(2) }}
+          </div>
+        </q-field>
+        <q-field
+          :label="$t('quickExit')"
+          readonly
+          stack-label
+        >
+          <div class="text-red">
+            {{ totalQuickExit.toFixed(2) }}
+          </div>
+        </q-field>
+      </div>
+    </div>
   </q-page>
 </template>
 
@@ -28,7 +84,7 @@ export default defineComponent({
 
   data () {
     return {
-      sales: [],
+      cashFlow: [],
       expenses: [],
       modelData: {
         from: '',
@@ -38,12 +94,62 @@ export default defineComponent({
   },
 
   computed: {
-    totalSales () {
-      return this.sales.reduce((a, b) => a + (b.total || 0), 0)
+    cashFlowFilterDateRange () {
+      if (!this.modelData.from || !this.modelData.to) {
+        return this.cashFlow
+      }
+      const startDate = new Date(this.modelData.from)
+      const endDate = new Date(this.modelData.to)
+      return this.cashFlow.filter(c => {
+        const date = typeof c.date === 'object' ? new Date(c.date.toDate()) : c.date
+        return (date >= startDate && date <= endDate)
+      })
+    },
+    expensesFilterDateRange () {
+      if (!this.modelData.from || !this.modelData.to) {
+        return this.expenses
+      }
+      const startDate = new Date(this.modelData.from)
+      const endDate = new Date(this.modelData.to)
+      return this.expenses.filter(c => {
+        const date = typeof c.date === 'object' ? new Date(c.date.toDate()) : c.date
+        return (date >= startDate && date <= endDate)
+      })
+    },
+    totalPurchase () {
+      return this.cashFlowFilterDateRange.filter(c => c.type === 'purchase').reduce((total, item) => {
+        return total + item.total
+      }, 0)
+    },
+    totalFastsale () {
+      return this.cashFlowFilterDateRange.filter(c => c.type === 'fastSale').reduce((total, item) => {
+        return total + item.total
+      }, 0)
+    },
+    totalPayment () {
+      return this.cashFlowFilterDateRange.filter(c => c.type === 'payment').reduce((total, item) => {
+        return total + item.total
+      }, 0)
+    },
+    totalQuickExit () {
+      return this.cashFlowFilterDateRange.filter(c => c.type === 'quickExit').reduce((total, item) => {
+        return total + item.total
+      }, 0)
+    },
+    toReceive () {
+      return this.totalPurchase - this.totalPayment
+    },
+
+    totalEntry () {
+      return this.totalFastsale + this.totalPayment
+    },
+
+    totalCashFlow () {
+      return this.cashFlowFilterDateRange.reduce((a, b) => a + (b.total || 0), 0)
     },
 
     totalExpenses () {
-      return this.expenses.reduce((a, b) => a + (b.total || 0), 0)
+      return this.expensesFilterDateRange.reduce((a, b) => a + (b.total || 0), 0)
     }
   },
 
@@ -56,13 +162,13 @@ export default defineComponent({
       const date = new Date(), y = date.getFullYear(), m = date.getMonth()
       const firstDay = new Date(y, m, 1)
       const lastDay = new Date(y, m + 1, 0)
-      this.modelData.from = formatDate(firstDay, 'DD/MM/YY')
-      this.modelData.to = formatDate(lastDay, 'DD/MM/YY')
-      this.loadSales()
+      this.modelData.from = formatDate(firstDay, 'YYYY/MM/DD')
+      this.modelData.to = formatDate(lastDay, 'YYYY/MM/DD')
+      this.loadCashFlow()
     },
-    loadSales () {
-      this.$bind('sales', this.firebaseMixin('sales').ref().orderBy('date').startAt(this.modelData.from).endAt(this.modelData.to))
-      this.$bind('expenses', this.firebaseMixin('expenses').ref().where('type', '==', 'entry').orderBy('date').startAt(this.modelData.from).endAt(this.modelData.to))
+    loadCashFlow () {
+      this.firebaseMixin('cashFlow').bindField('cashFlow')
+      this.firebaseMixin('expenses').bindField('expenses')
     }
   }
 })

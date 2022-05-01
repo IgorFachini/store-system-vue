@@ -19,6 +19,30 @@ const routes = [
         }
       },
       {
+        path: '/customers/add',
+        name: 'customers.add',
+        component: () => import('src/pages/CustomersForm.vue'),
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/customers/edit/:idCustomerEdit',
+        name: 'customers.edit',
+        component: () => import('src/pages/CustomersForm.vue'),
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/customers/view/:idCustomerView',
+        name: 'customers.view',
+        component: () => import('src/pages/CustomersForm.vue'),
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
         path: '/categories',
         component: () => import('src/pages/Categories.vue'),
         meta: {
@@ -73,6 +97,36 @@ const routes = [
       {
         path: '/expenses',
         component: () => import('src/pages/Expenses.vue'),
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/cart-shop',
+        component: () => import('src/pages/CartShop.vue'),
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/cash-flow',
+        component: () => import('src/pages/CashFlow.vue'),
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/customers/cash-flow/:id',
+        name: 'customer.cashFlow',
+        component: () => import('src/pages/CashFlowCustomer.vue'),
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/customers/cart-shop/:customerId',
+        name: 'customer.cartShop',
+        component: () => import('src/pages/CartShop.vue'),
         meta: {
           requiresAuth: true
         }

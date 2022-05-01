@@ -12,7 +12,7 @@
     :filled="filled"
     :disable="disable"
     :readonly="readonly || range"
-    :mask="date && !range ? '##/##/##' : mask"
+    :mask="date && !range ? '####/##/## ##:##' : mask"
     :reverse-fill-mask="reverseFillMask"
     :style="qStyle"
     :autofocus="autofocus"
@@ -30,6 +30,42 @@
     @change="$emit('change', $event)"
     @blur="$emit('blur')"
   >
+    <template #prepend>
+      <q-icon
+        v-if="date"
+        name="event"
+        class="cursor-pointer"
+      >
+        <q-popup-proxy
+          cover
+          transition-show="scale"
+          transition-hide="scale"
+        >
+          <q-date
+            :model-value="cValue"
+            :mask="range ? 'YYYY/MM/DD' : 'YYYY/MM/DD HH:mm'"
+            today-btn
+            :disable="disable"
+            :readonly="readonly"
+            :range="range"
+            @update:model-value="onInput"
+            @change="$emit('change', $event)"
+            @blur="$emit('blur')"
+            @range-start="$emit('range-start', $event)"
+            @range-end="$emit('range-end', $event)"
+          >
+            <div class="row items-center justify-end">
+              <q-btn
+                v-close-popup
+                :label="$q.lang.label.close"
+                color="primary"
+                flat
+              />
+            </div>
+          </q-date>
+        </q-popup-proxy>
+      </q-icon>
+    </template>
     <template
       #append
     >
@@ -47,29 +83,27 @@
       />
 
       <q-icon
-        v-if="date"
-        name="event"
+        v-if="date && !range"
+        name="access_time"
         class="cursor-pointer"
       >
         <q-popup-proxy
+          cover
           transition-show="scale"
           transition-hide="scale"
         >
-          <q-date
+          <q-time
             :model-value="cValue"
-            mask="DD/MM/YY"
+            mask="YYYY/MM/DD HH:mm"
             :disable="disable"
             :readonly="readonly"
-            :range="range"
+            format24h
+            now-btn
             @update:model-value="onInput"
             @change="$emit('change', $event)"
             @blur="$emit('blur')"
-            @range-start="$emit('range-start', $event)"
-            @range-end="$emit('range-end', $event)"
           >
-            <div
-              class="row items-center justify-end"
-            >
+            <div class="row items-center justify-end">
               <q-btn
                 v-close-popup
                 :label="$q.lang.label.close"
@@ -77,9 +111,16 @@
                 flat
               />
             </div>
-          </q-date>
+          </q-time>
         </q-popup-proxy>
       </q-icon>
+      <q-btn
+        v-if="clearable && cValue"
+        icon="close"
+        color="primary"
+        flat
+        @click="clear"
+      />
     </template>
 
     <template
@@ -159,7 +200,7 @@ export default {
   computed: {
     dataLabel () {
       return this.range
-        ? this.modelValue && this.modelValue.from ? `${this.modelValue.from} - ${this.modelValue.to}` : 'DD/MM/YY - DD/MM/YY'
+        ? this.modelValue && this.modelValue.from ? `${this.modelValue.from} - ${this.modelValue.to}` : 'YYYY/MM/DD - YYYY/MM/DD'
         : this.cValue
     },
     typeField () {
@@ -197,7 +238,7 @@ export default {
     this.mounted = true
     this.cValue = this.currency ? toBRLCurrency(this.modelValue).replace('R$', '') : this.modelValue
     this.checkError()
-    useFormChild({ validate: this.validate, resetValidation: this.field.resetValidation, requiresQForm: true })
+    useFormChild({ validate: this.validate, resetValidation: this.field.resetValidation, requiresQForm: false })
   },
 
   methods: {
@@ -217,6 +258,10 @@ export default {
         modelValue = currencyToFloat(modelValue)
       }
       this.$emit('update:model-value', this.type === 'number' ? Number(modelValue) : modelValue)
+    },
+    clear () {
+      this.cValue = ''
+      this.$emit('update:model-value', '')
     }
   }
 }

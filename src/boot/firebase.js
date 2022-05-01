@@ -1,22 +1,23 @@
 import { boot } from 'quasar/wrappers'
 import { firestorePlugin, rtdbPlugin } from 'vuefire'
-import firebase from 'firebase/app'
-import 'firebase/firestore'
-import 'firebase/database'
-import 'firebase/auth'
+import { covertDateFieldName } from 'src/utils/index'
+import firebase from 'firebase/compat/app'
+import 'firebase/compat/firestore'
+import 'firebase/compat/database'
+import 'firebase/compat/auth'
 
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
-  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-  databaseURL: process.env.FIREBASE_DATABASE_URL,
   projectId: process.env.FIREBASE_PROJECT_ID,
+  databaseURL: process.env.FIREBASE_DATABASE_URL,
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
   storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
   messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.FIREBASE_APP_ID
 }
 
 const firebaseApp = firebase.initializeApp(firebaseConfig)
-const firebaseAuth = firebaseApp.auth()
+const firebaseAuth = firebase.auth()
 firebaseApp.getCurrentUser = () => {
   return new Promise((resolve, reject) => {
     const unsubscribe = firebaseAuth.onAuthStateChanged(user => {
@@ -40,6 +41,14 @@ fr.enablePersistence()
     console.log('persistenceErr', err)
   })
 
+const firebaseDateFn = (date) => {
+  return Timestamp.fromDate(new Date(date))
+}
+
+const dateGetTimeFn = (date) => {
+  return new Date(date).getTime()
+}
+
 export default boot(({ app }) => {
   const firebaseMixin = {
     methods: {
@@ -57,6 +66,7 @@ export default boot(({ app }) => {
           },
 
           add (data) {
+            data = covertDateFieldName(data, null, rtdb ? dateGetTimeFn : firebaseDateFn)
             const send = { ...data, createdAt: rtdb ? new Date().getTime() : Timestamp.fromDate(new Date()) }
             return ref[rtdb ? 'push' : 'add'](send)
           },
@@ -68,6 +78,7 @@ export default boot(({ app }) => {
               },
 
               set (data) {
+                data = covertDateFieldName(data, null, rtdb ? dateGetTimeFn : firebaseDateFn)
                 const setRef = rtdb ? db.ref(`${refName}/${id}`) : ref.doc(id)
 
                 return setRef.set({
@@ -77,6 +88,7 @@ export default boot(({ app }) => {
               },
 
               update (data) {
+                data = covertDateFieldName(data, null, rtdb ? dateGetTimeFn : firebaseDateFn)
                 const updateRef = rtdb ? db.ref(`${refName}/${id}`) : ref.doc(id)
                 return updateRef.update({
                   ...data,

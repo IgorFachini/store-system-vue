@@ -37,7 +37,7 @@
     </div>
     <div class="col-xs-12 col-sm-12 col-md-8">
       <v-table-crud
-        :title="$tc('category', 2)"
+        :title="$t('category', 2)"
         :rows="categories"
         :columns="columns"
         :loading="loading"
@@ -55,7 +55,7 @@ import { defineComponent } from 'vue'
 const { formatDate } = date
 
 export default defineComponent({
-  name: 'Categories',
+  name: 'PageCategories',
 
   setup () {
     return {

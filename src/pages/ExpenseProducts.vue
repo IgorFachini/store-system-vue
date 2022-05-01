@@ -48,7 +48,7 @@
     </div>
     <div class="col-xs-12 col-sm-12 col-md-8">
       <v-table-crud
-        :title="$tc('expenseProduct', 2)"
+        :title="$t('expenseProduct', 2)"
         :rows="expenseProducts"
         :columns="columns"
         :loading="loading"
@@ -68,7 +68,7 @@ import VTableCrud from 'components/common/VTableCrud.vue'
 import VSelect from 'components/common/VSelect.vue'
 
 export default defineComponent({
-  name: 'Categories',
+  name: 'PageExpenseProducts',
 
   components: {
     VTableCrud,

@@ -13,7 +13,6 @@
           <v-input
             v-model="form.date"
             :label="$t('date')"
-            :rules="['date']"
             date
           />
 
@@ -85,7 +84,7 @@
     </div>
     <div class="col-xs-12 col-sm-12 col-md-8">
       <v-table-crud
-        :title="$tc('expense', 2)"
+        :title="$t('expense', 2)"
         :rows="expenses"
         :columns="columns"
         :loading="loadingTable"
@@ -107,7 +106,7 @@ import VTableCrud from 'components/common/VTableCrud.vue'
 import { currencyToFloat } from 'utils/'
 
 export default defineComponent({
-  name: 'Expenses',
+  name: 'PageExpenses',
 
   components: {
     VSelect,
@@ -152,7 +151,7 @@ export default defineComponent({
     },
     columns () {
       return [
-        { name: 'date', label: this.$t('date'), field: 'date', sortable: true },
+        { name: 'date', label: this.$t('date'), field: 'date', sortable: true, format: val => typeof val === 'object' ? formatDate(val.toDate(), 'DD/MM/YYYY HH:mm') : val },
         {
           name: 'expenseProduct',
           label: this.$t('expenseProduct'),
@@ -189,7 +188,7 @@ export default defineComponent({
   },
 
   created () {
-    this.modelForm.date = formatDate(Date.now(), 'DD/MM/YY')
+    this.modelForm.date = formatDate(Date.now(), 'YYYY/MM/DD HH:mm')
     this.form = { ...this.modelForm }
   },
 

@@ -1,18 +1,18 @@
 <template>
   <q-page
-    class="row q-col-gutter-md"
+    class="row"
     padding
   >
-    <products-add-edit-form
-      @done="$router.push('/products')"
-    />
+    <cash-flow-table :customer-id="$route.params.id" />
+    <fast-action />
   </q-page>
 </template>
 
 <script>
 
 import { defineComponent } from 'vue'
+
 export default defineComponent({
-  name: 'ProductsAddEdit'
+  name: 'PageCashFlow'
 })
 </script>
