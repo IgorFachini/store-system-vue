@@ -590,6 +590,7 @@ export default defineComponent({
           cancel: true,
           persistent: true
         }).onOk(() => {
+          this.reset()
         })
       } else {
         this.tab = 'products'
