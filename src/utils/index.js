@@ -30,7 +30,7 @@ export function toBRLCurrency (int) {
  */
 export function covertDateFieldName (data, fieldName, customFormat) {
   if (Array.isArray(data)) return data.map(d => covertDateFieldName(d))
-  if (typeof data === 'object') {
+  if (typeof data === 'object' && !data.firestore) {
     for (const key in data) {
       data[key] = covertDateFieldName(data[key], key, customFormat)
     }

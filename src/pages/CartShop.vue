@@ -680,7 +680,7 @@ export default defineComponent({
             ...(item.discountObject?.type) && { discountObject: item.discountObject }
           }))
         }
-        this.firebaseMixin('cashFlow').add(sale)
+        this.firebaseMixin('cashFlow').add({ ...sale })
         this.cartShopGroupedArray.forEach(item => {
           if (item.decreaseStock) {
             const productRef = this.firebaseMixin('products').id(item.product.id).doc()
