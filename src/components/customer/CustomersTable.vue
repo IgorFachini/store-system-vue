@@ -8,7 +8,16 @@
     @edit="edit"
     @delete="deleteAction"
     @choose="val => $emit('choose', val)"
-  />
+  >
+    <template #action-more="props">
+      <q-btn
+        :label="$t('cashFlow')"
+        dense
+        color="blue"
+        :to="`/customers/cash-flow/${props.row.id}`"
+      />
+    </template>
+  </v-table-crud>
 </template>
 
 <script>

@@ -307,7 +307,6 @@
                 <v-input
                   v-model="date"
                   :label="$t('date')"
-                  :rules="['date']"
                   date
                 />
               </q-item-section>
@@ -479,7 +478,7 @@ export default defineComponent({
       saveDialogOpen: false,
       chooseCustomerModalOpen: false,
       addCustomerModalOpen: false,
-      date: ''
+      date: null
     }
   },
 
@@ -522,7 +521,7 @@ export default defineComponent({
   },
 
   created () {
-    this.date = formatDate(Date.now(), 'DD/MM/YY')
+    this.date = formatDate(Date.now(), 'DD/MM/YY HH:mm')
   },
 
   mounted () {
@@ -720,7 +719,7 @@ export default defineComponent({
       })
     },
     reset () {
-      this.date = formatDate(Date.now(), 'DD/MM/YY')
+      this.date = formatDate(Date.now(), 'DD/MM/YY HH:mm')
       this.cartShopProducts = {}
       this.subtotalDiscountObject = {}
       this.tab = 'products'

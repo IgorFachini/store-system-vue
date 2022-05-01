@@ -12,7 +12,7 @@
     :filled="filled"
     :disable="disable"
     :readonly="readonly || range"
-    :mask="date && !range ? '##/##/##' : mask"
+    :mask="date && !range ? '##/##/## ##:##' : mask"
     :reverse-fill-mask="reverseFillMask"
     :style="qStyle"
     :autofocus="autofocus"
@@ -30,6 +30,39 @@
     @change="$emit('change', $event)"
     @blur="$emit('blur')"
   >
+    <template #prepend>
+      <q-icon
+        v-if="date"
+        name="event"
+        class="cursor-pointer"
+      >
+        <q-popup-proxy
+          cover
+          transition-show="scale"
+          transition-hide="scale"
+        >
+          <q-date
+            :model-value="cValue"
+            mask="DD/MM/YY HH:mm"
+            today-btn
+            @update:model-value="onInput"
+            @change="$emit('change', $event)"
+            @blur="$emit('blur')"
+            @range-start="$emit('range-start', $event)"
+            @range-end="$emit('range-end', $event)"
+          >
+            <div class="row items-center justify-end">
+              <q-btn
+                v-close-popup
+                :label="$q.lang.label.close"
+                color="primary"
+                flat
+              />
+            </div>
+          </q-date>
+        </q-popup-proxy>
+      </q-icon>
+    </template>
     <template
       #append
     >
@@ -47,29 +80,25 @@
       />
 
       <q-icon
-        v-if="date"
-        name="event"
+        v-if="date && !range"
+        name="access_time"
         class="cursor-pointer"
       >
         <q-popup-proxy
+          cover
           transition-show="scale"
           transition-hide="scale"
         >
-          <q-date
+          <q-time
             :model-value="cValue"
-            mask="DD/MM/YY"
-            :disable="disable"
-            :readonly="readonly"
-            :range="range"
+            mask="DD/MM/YY HH:mm"
+            format24h
+            now-btn
             @update:model-value="onInput"
             @change="$emit('change', $event)"
             @blur="$emit('blur')"
-            @range-start="$emit('range-start', $event)"
-            @range-end="$emit('range-end', $event)"
           >
-            <div
-              class="row items-center justify-end"
-            >
+            <div class="row items-center justify-end">
               <q-btn
                 v-close-popup
                 :label="$q.lang.label.close"
@@ -77,7 +106,7 @@
                 flat
               />
             </div>
-          </q-date>
+          </q-time>
         </q-popup-proxy>
       </q-icon>
     </template>

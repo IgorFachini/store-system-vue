@@ -13,7 +13,6 @@
           <v-input
             v-model="form.date"
             :label="$t('date')"
-            :rules="['date']"
             date
           />
 
@@ -309,7 +308,7 @@ export default defineComponent({
   },
 
   created () {
-    this.modelForm.date = formatDate(Date.now(), 'DD/MM/YY')
+    this.modelForm.date = formatDate(Date.now(), 'DD/MM/YY HH:mm')
     this.form = { ...this.modelForm }
     this.productForm = { ...this.modelProductForm }
   },
