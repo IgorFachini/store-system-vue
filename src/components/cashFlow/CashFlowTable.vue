@@ -119,20 +119,23 @@ export default defineComponent({
   },
 
   mounted () {
-    this.loading = true
-    this.firebaseMixinInstance = this.firebaseMixin('cashFlow')
-    if (this.customerId) {
-      this.$bind('cashFlow', this.firebaseMixin('cashFlow').ref().where('customer.id', '==', this.customerId).orderBy('date')).finally(() => {
-        this.loading = false
-      })
-    } else {
-      this.firebaseMixinInstance.bindField('cashFlow').finally(() => {
-        this.loading = false
-      })
-    }
+    this.setup()
   },
 
   methods: {
+    setup () {
+      this.loading = true
+      this.firebaseMixinInstance = this.firebaseMixin('cashFlow')
+      if (this.customerId) {
+        this.$bind('cashFlow', this.firebaseMixin('cashFlow').ref().where('customer.id', '==', this.customerId).orderBy('date')).finally(() => {
+          this.loading = false
+        })
+      } else {
+        this.firebaseMixinInstance.bindField('cashFlow').finally(() => {
+          this.loading = false
+        })
+      }
+    },
     getClassColor (type) {
       const colorMapType = {
         payment: 'text-green',
@@ -155,6 +158,7 @@ export default defineComponent({
             color: 'positive',
             closeBtn: true
           })
+          this.setup()
         })
       })
     }

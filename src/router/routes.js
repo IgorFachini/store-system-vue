@@ -118,7 +118,15 @@ const routes = [
       {
         path: '/customers/cash-flow/:id',
         name: 'customer.cashFlow',
-        component: () => import('src/pages/CashFlow.vue'),
+        component: () => import('src/pages/CashFlowCustomer.vue'),
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/customers/cart-shop/:customerId',
+        name: 'customer.cartShop',
+        component: () => import('src/pages/CartShop.vue'),
         meta: {
           requiresAuth: true
         }

@@ -358,6 +358,10 @@ const labels = {
   debt: {
     enUS: 'debt',
     pt: 'Débito'
+  },
+  buildCart: {
+    enUS: 'Build Cart',
+    pt: 'Construir Carrinho'
   }
 }
 

@@ -4,6 +4,7 @@
     padding
   >
     <cash-flow-table :customer-id="$route.params.id" />
+    <fast-action />
   </q-page>
 </template>
 
