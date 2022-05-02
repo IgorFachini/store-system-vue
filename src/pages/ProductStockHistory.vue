@@ -112,23 +112,9 @@ export default defineComponent({
   methods: {
     load () {
       this.loading = true
-      const id = this.$route.params.id
-      this.productRef = this.firebaseMixin('products').id(id).doc()
-      this.productRef.get().then(product => {
-        if (product.exists) {
-          this.firebaseMixinInstance = this.firebaseMixin('stockHistory')
-          this.$bind('stockHistory', this.firebaseMixin('stockHistory').ref().where('product', '==', this.productRef).orderBy('createdAt')).finally(() => {
-            this.loading = false
-          })
-        } else {
-          Notify.create({
-            message: this.$t('notExist'),
-            color: 'negative',
-            closeBtn: true
-          })
-          this.$router.push('/products')
-          this.loading = false
-        }
+      this.firebaseMixinInstance = this.firebaseMixin('stockHistory')
+      this.$bind('stockHistory', this.firebaseMixinInstance.ref().where('productId', '==', this.$route.params.id).orderBy('createdAt')).finally(() => {
+        this.loading = false
       })
     },
     reset () {
@@ -143,7 +129,7 @@ export default defineComponent({
         ? ref.id(this.form.id).update : ref.add
       const form = {
         ...this.form,
-        product: this.productRef
+        productId: this.$route.params.id
       }
       action(form).catch((err) => {
         console.log('err', err)
@@ -169,6 +155,7 @@ export default defineComponent({
         row.loading = true
         this.firebaseMixinInstance.id(row.id).delete().finally(() => {
           row.loading = false
+          this.load()
           Notify.create({
             message: this.$t('savedOperation'),
             color: 'positive',
