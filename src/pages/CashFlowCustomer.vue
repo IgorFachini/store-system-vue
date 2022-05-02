@@ -128,10 +128,10 @@ export default defineComponent({
           Dialog.create({
             title: this.$t('buyPayed') + '?',
             cancel: {
-              text: this.$t('no')
+              label: this.$t('no')
             },
             ok: {
-              text: this.$t('yes')
+              label: this.$t('yes')
             },
             persistent: true
           }).onOk(() => {
