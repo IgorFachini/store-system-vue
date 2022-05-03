@@ -47,14 +47,9 @@ export default defineComponent({
     load () {
       this.loading = true
       const id = this.product.id
-      this.productRef = this.firebaseMixin('products').id(id).doc()
-      this.productRef.get().then(product => {
-        if (product.exists) {
-          this.firebaseMixinInstance = this.firebaseMixin('stockHistory')
-          this.$bind('stockHistory', this.firebaseMixin('stockHistory').ref().where('product', '==', this.productRef).orderBy('createdAt')).finally(() => {
-            this.loading = false
-          })
-        }
+      this.firebaseMixinInstance = this.firebaseMixin('stockHistory')
+      this.$bind('stockHistory', this.firebaseMixinInstance.ref().where('productId', '==', id).orderBy('createdAt')).finally(() => {
+        this.loading = false
       })
     }
   }
