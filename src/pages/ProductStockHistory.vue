@@ -5,7 +5,7 @@
   >
     <div class="col-xs-12 col-sm-12 col-md-8">
       <v-table-crud
-        :title="`${$t('stockHistory', 2)}.
+        :title="`${$t('stockHistory', 2)}: ${product.name} -
         ${$t('inStock')}: ${quantity}`"
         :rows="stockHistory"
         :columns="columns"
@@ -73,8 +73,8 @@ export default defineComponent({
       loading: false,
       saving: false,
       firebaseMixinInstance: null,
-      productRef: null,
-      stockHistory: []
+      stockHistory: [],
+      product: {}
     }
   },
 
@@ -113,6 +113,9 @@ export default defineComponent({
     load () {
       this.loading = true
       this.firebaseMixinInstance = this.firebaseMixin('stockHistory')
+      this.firebaseMixin('products').id(this.$route.params.id).doc().get().then(doc => {
+        this.product = doc.data()
+      })
       this.$bind('stockHistory', this.firebaseMixinInstance.ref().where('productId', '==', this.$route.params.id).orderBy('createdAt')).finally(() => {
         this.loading = false
       })
