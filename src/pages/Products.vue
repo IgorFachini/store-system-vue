@@ -12,7 +12,6 @@
       style="z-index: 1"
       @edit="edit"
       @delete="deleteAction"
-      @view="view"
     >
       <template #expand="props">
         <q-list
@@ -26,6 +25,14 @@
             hide-remove
           />
         </q-list>
+      </template>
+      <template #action-more="props">
+        <q-btn
+          :label="$t('stockHistory')"
+          dense
+          color="blue"
+          @click="stockHistory(props.row)"
+        />
       </template>
     </v-table-crud>
     <div class="row full-width justify-center">
@@ -66,12 +73,11 @@ export default defineComponent({
   computed: {
     columns () {
       return [
-        { name: 'actionView', label: this.$t('view'), align: 'left' },
         { name: 'expand', label: this.$t('recipe'), align: 'left' },
         { name: 'name', label: this.$t('name'), field: 'name', sortable: true },
         { name: 'saleValue', label: this.$t('saleValue'), field: 'saleValue', sortable: true },
         { name: 'purchasePrice', label: this.$t('purchasePrice'), field: 'purchasePrice', sortable: true },
-        { name: 'productStockHistoryCount', label: this.$t('currentInventory'), sortable: true },
+        { name: 'currentInventory', label: this.$t('currentInventory'), field: 'currentInventory', sortable: true },
         { name: 'description', label: this.$t('description'), field: 'description' },
         {
           name: 'category',
@@ -99,6 +105,16 @@ export default defineComponent({
     }
   },
 
+  watch: {
+    products (val) {
+      val.forEach((product, index) => {
+        this.stockHistoryCount(product).then(count => {
+          this.products[index].currentInventory = count
+        })
+      })
+    }
+  },
+
   created () {
     this.form = { ...this.modelForm }
   },
@@ -106,16 +122,24 @@ export default defineComponent({
   mounted () {
     this.loading = true
     this.firebaseMixinInstance = this.firebaseMixin('products')
-    Promise.all([
-      this.firebaseMixinInstance.bindField('products')
-    ])
-      .finally(() => {
-        this.loading = false
+    this.firebaseMixinInstance.bindField('products').then(products => {
+      products.forEach((product, index) => {
+        this.stockHistoryCount(product).then(count => {
+          this.products[index].currentInventory = count
+        })
       })
+    }).finally(() => {
+      this.loading = false
+    })
   },
 
   methods: {
-    view (row) {
+    stockHistoryCount (row) {
+      return this.firebaseMixin('stockHistory').ref().where('productId', '==', row.id).get().then(snapshot => snapshot.docs.map(doc => doc.data()).reduce((acc, item) => {
+        return acc + item.quantity
+      }, 0))
+    },
+    stockHistory (row) {
       this.$router.push({
         name: 'products.stockHistory',
         params: { id: row.id }

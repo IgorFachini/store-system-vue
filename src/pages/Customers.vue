@@ -1,11 +1,9 @@
 <template>
   <q-page
-    class="row q-col-gutter-md"
+    class="row q-gutter-y-md"
     padding
   >
-    <div class="row">
-      <customers-table />
-    </div>
+    <customers-table />
     <div class="row full-width justify-center">
       <q-btn
         class="q-ma-md"

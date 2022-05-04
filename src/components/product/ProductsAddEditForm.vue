@@ -1,7 +1,7 @@
 <template>
   <q-form
     ref="form"
-    class="q-gutter-sm"
+    class="q-gutter-sm full-width"
     @submit="save"
   >
     <v-input
