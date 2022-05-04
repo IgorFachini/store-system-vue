@@ -40,15 +40,9 @@
               v-for="col in props.cols"
               :key="col.name"
               :props="props"
+              :class="col.classes"
             >
               {{ col.value }}
-              <template
-                v-if="col.name === 'productStockHistoryCount'"
-              >
-                <product-stock-history-count
-                  :product="props.row"
-                />
-              </template>
               <q-btn
                 v-if="col.name === 'expand'"
                 size="sm"

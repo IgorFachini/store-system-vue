@@ -12,7 +12,16 @@
         :loading="loading"
         @edit="edit"
         @delete="deleteAction"
-      />
+      >
+        <template #top-left>
+          <div class="q-table__title">
+            {{ $t('stockHistory', 2) }}: {{ product.name }}
+          </div>
+          <div class="row">
+            {{ $t('inStock') }}: {{ quantity }}
+          </div>
+        </template>
+      </v-table-crud>
     </div>
     <div class="col-xs-12 col-sm-12 col-md-4">
       <q-form
@@ -87,7 +96,7 @@ export default defineComponent({
     columns () {
       return [
         { name: 'description', label: this.$t('description'), field: 'description', sortable: true },
-        { name: 'quantity', label: this.$t('quantity'), field: 'quantity', sortable: true },
+        { name: 'quantity', label: this.$t('quantity'), field: 'quantity', sortable: true, classes: (row) => row.quantity < 0 ? 'text-red' : 'text-green' },
         {
           name: 'createdAt',
           label: this.$t('createdAt'),

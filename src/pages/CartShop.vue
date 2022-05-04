@@ -81,10 +81,6 @@
                     {{ col.label }}
                   </div><div class="q-table__grid-item-value">
                     {{ col.format ? col.format(props.row[col.field]) : props.row[col.field] }}
-                    <product-stock-history-count
-                      v-if="col.name === 'productStockHistoryCount'"
-                      :product="props.row"
-                    />
                   </div>
                 </div>
               </div>
@@ -490,7 +486,7 @@ export default defineComponent({
       return [
         { name: 'name', label: this.$t('name'), field: 'name', sortable: true },
         { name: 'saleValue', label: this.$t('saleValue'), field: 'saleValue', sortable: true },
-        { name: 'productStockHistoryCount', label: this.$t('currentInventory') },
+        { name: 'currentInventory', label: this.$t('currentInventory'), field: 'currentInventory', sortable: true },
         {
           name: 'createdAt',
           label: this.$t('createdAt'),
@@ -527,15 +523,23 @@ export default defineComponent({
   mounted () {
     this.loading = true
     this.firebaseMixinInstance = this.firebaseMixin('products')
-    Promise.all([
-      this.firebaseMixinInstance.bindField('products')
-    ])
-      .finally(() => {
-        this.loading = false
+    this.firebaseMixinInstance.bindField('products').then(products => {
+      products.forEach((product, index) => {
+        this.stockHistoryCount(product).then(count => {
+          this.products[index].currentInventory = count
+        })
       })
+    }).finally(() => {
+      this.loading = false
+    })
   },
 
   methods: {
+    stockHistoryCount (row) {
+      return this.firebaseMixin('stockHistory').ref().where('productId', '==', row.id).get().then(snapshot => snapshot.docs.map(doc => doc.data()).reduce((acc, item) => {
+        return acc + item.quantity
+      }, 0))
+    },
     calcDiscountResult (discountObject, value) {
       if (!discountObject?.type) {
         return 0
