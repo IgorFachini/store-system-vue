@@ -12,7 +12,7 @@
         />
 
         <q-toolbar-title>
-          Quasar App {{ deploy }}
+          {{ deploy }}
         </q-toolbar-title>
 
         <div>
