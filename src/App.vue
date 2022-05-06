@@ -17,7 +17,6 @@ export default defineComponent({
 
   data () {
     return {
-      refreshing: false,
       newWorker: null
     }
   },
@@ -45,12 +44,6 @@ export default defineComponent({
           })
         })
       })
-
-      navigator.serviceWorker.addEventListener('controllerchange', function () {
-        if (this.refreshing) return
-        window.location.reload()
-        this.refreshing = true
-      })
     }
   },
 
@@ -65,7 +58,7 @@ export default defineComponent({
         persistent: true,
         position: 'bottom'
       }).onOk(() => {
-        this.newWorker.postMessage({ action: 'skipWaiting' })
+        window.location.reload()
       })
     }
   }
