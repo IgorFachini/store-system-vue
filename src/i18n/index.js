@@ -378,6 +378,14 @@ const labels = {
   sold: {
     enUS: 'Sold',
     pt: 'Vendido'
+  },
+  newUpdateAvailable: {
+    enUS: 'New Update Available',
+    pt: 'Nova Atualização Disponível'
+  },
+  update: {
+    enUS: 'Update',
+    pt: 'Atualizar'
   }
 }
 
