@@ -58,7 +58,7 @@ export default defineComponent({
         persistent: true,
         position: 'bottom'
       }).onOk(() => {
-        window.location.reload()
+        window.location.reload(true)
       })
     }
   }

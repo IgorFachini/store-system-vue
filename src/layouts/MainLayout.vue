@@ -12,7 +12,7 @@
         />
 
         <q-toolbar-title>
-          {{ deploy }}
+          1{{ deploy }}
         </q-toolbar-title>
 
         <div>
