@@ -12,7 +12,7 @@
         />
 
         <q-toolbar-title>
-          Quasar App {{ deploy }}
+          {{ deploy }}
         </q-toolbar-title>
 
         <div>
@@ -133,7 +133,7 @@
             :key="link.title"
             v-bind="link"
           />
-          <div>Quasar v{{ $q.version }}</div>
+          <div>Quasar framework v{{ $q.version }}</div>
         </q-btn-dropdown>
       </q-list>
     </q-drawer>
