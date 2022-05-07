@@ -5,6 +5,7 @@
 import { defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useQuasar, Dialog } from 'quasar'
+
 export default defineComponent({
   name: 'App',
 
@@ -24,27 +25,27 @@ export default defineComponent({
   mounted () {
     this.$q = useQuasar()
     this.locale = this.$q.lang.getLocale()
-    // if ('serviceWorker' in navigator) {
-    //   navigator.serviceWorker.getRegistration('/service-worker.js').then(reg => {
-    //     reg.addEventListener('updatefound', () => {
-    //     // A wild service worker has appeared in reg.installing!
-    //       this.newWorker = reg.installing
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistration('/service-worker.js').then(reg => {
+        reg.addEventListener('updatefound', () => {
+        // A wild service worker has appeared in reg.installing!
+          this.newWorker = reg.installing
 
-    //       this.newWorker.addEventListener('statechange', () => {
-    //       // Has network.state changed?
-    //         switch (this.newWorker.state) {
-    //           case 'installed':
-    //             if (navigator.serviceWorker.controller) {
-    //             // new update available
-    //               this.showHasUpdate()
-    //             }
-    //             // No update available
-    //             break
-    //         }
-    //       })
-    //     })
-    //   })
-    // }
+          this.newWorker.addEventListener('statechange', () => {
+          // Has network.state changed?
+            switch (this.newWorker.state) {
+              case 'installed':
+                if (navigator.serviceWorker.controller) {
+                // new update available
+                  this.showHasUpdate()
+                }
+                // No update available
+                break
+            }
+          })
+        })
+      })
+    }
   },
 
   methods: {
@@ -58,7 +59,7 @@ export default defineComponent({
         persistent: true,
         position: 'bottom'
       }).onOk(() => {
-        window.location.reload(true)
+        window.location.reload()
       })
     }
   }

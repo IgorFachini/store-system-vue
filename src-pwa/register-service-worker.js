@@ -1,6 +1,4 @@
 import { register } from 'register-service-worker'
-import { i18n } from 'boot/i18n.js'
-import { Dialog } from 'quasar'
 
 // The ready(), registered(), cached(), updatefound() and updated()
 // events passes a ServiceWorkerRegistration instance in their arguments.
@@ -25,23 +23,12 @@ register(process.env.SERVICE_WORKER_FILE, {
     // console.log('Content has been cached for offline use.')
   },
 
-  updatefound (registration) {
-    console.log('New content is downloading.', registration)
+  updatefound (/* registration */) {
+    // console.log('New content is downloading.')
   },
 
-  updated (registration) {
-    console.log('New content is available; please refresh.', registration)
-    Dialog.create({
-      title: i18n.$t('newUpdateAvailable'),
-      cancel: true,
-      ok: {
-        label: i18n.$t('update')
-      },
-      persistent: true,
-      position: 'bottom'
-    }).onOk(() => {
-      location.reload(true)
-    })
+  updated (/* registration */) {
+    // console.log('New content is available; please refresh.')
   },
 
   offline () {
