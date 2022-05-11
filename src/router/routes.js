@@ -88,8 +88,32 @@ const routes = [
         }
       },
       {
-        path: '/expenseProducts',
+        path: '/expense-products',
         component: () => import('src/pages/ExpenseProducts.vue'),
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/expense-products/add',
+        name: 'expenseProducts.add',
+        component: () => import('src/pages/ExpenseProductsForm.vue'),
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/expense-products/edit/:id',
+        name: 'expenseProducts.edit',
+        component: () => import('src/pages/ExpenseProductsForm.vue'),
+        meta: {
+          requiresAuth: true
+        }
+      },
+      {
+        path: '/expense-products/view/:id',
+        name: 'expenseProducts.view',
+        component: () => import('src/pages/ExpenseProductsForm.vue'),
         meta: {
           requiresAuth: true
         }
