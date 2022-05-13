@@ -27,7 +27,7 @@ export default defineComponent({
     this.locale = this.$q.lang.getLocale()
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.getRegistration('/service-worker.js').then(reg => {
-        reg.addEventListener('updatefound', () => {
+        reg?.addEventListener('updatefound', () => {
         // A wild service worker has appeared in reg.installing!
           this.newWorker = reg.installing
 

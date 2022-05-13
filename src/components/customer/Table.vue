@@ -89,13 +89,13 @@ export default defineComponent({
     view (row) {
       this.$router.push({
         name: 'customers.view',
-        params: { idCustomerView: row.id }
+        params: { id: row.id }
       })
     },
     edit (row) {
       this.$router.push({
         name: 'customers.edit',
-        params: { idCustomerEdit: row.id }
+        params: { id: row.id }
       })
     },
     deleteAction (row) {

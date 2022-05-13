@@ -4,10 +4,15 @@ import VSelect from '../components/common/VSelect.vue'
 import VTableCrud from '../components/common/VTableCrud.vue'
 import ProductStockHistoryCount from '../components/product/ProductStockHistoryCount.vue'
 import DiscountModal from '../components/product/DiscountModal.vue'
-import ProductsAddEditForm from '../components/product/ProductsAddEditForm.vue'
+import ProductsForm from '../components/product/Form.vue'
+import ProductsTable from '../components/product/Table.vue'
 import Screen from 'mixins/Screen'
-import CustomersForm from '../components/customer/CustomersForm.vue'
-import CustomersTable from '../components/customer/CustomersTable.vue'
+import CustomersForm from '../components/customer/Form.vue'
+import CustomersTable from '../components/customer/Table.vue'
+import CategoriesForm from '../components/categorie/Form.vue'
+import CategoriesTable from '../components/categorie/Table.vue'
+import ExpenseProductsForm from '../components/expenseProduct/Form.vue'
+import ExpenseProductsTable from '../components/expenseProduct/Table.vue'
 import CashFlowTable from '../components/cashFlow/CashFlowTable.vue'
 import FastAction from '../components/cashFlow/FastAction.vue'
 
@@ -17,11 +22,16 @@ export default boot(({ app }) => {
   app.component('VTableCrud', VTableCrud)
   app.component('ProductStockHistoryCount', ProductStockHistoryCount)
   app.component('DiscountModal', DiscountModal)
-  app.component('ProductsAddEditForm', ProductsAddEditForm)
+  app.component('ProductsForm', ProductsForm)
+  app.component('ProductsTable', ProductsTable)
   app.component('CustomersForm', CustomersForm)
   app.component('CustomersTable', CustomersTable)
   app.component('CashFlowTable', CashFlowTable)
+  app.component('CategoriesForm', CategoriesForm)
+  app.component('CategoriesTable', CategoriesTable)
   app.component('FastAction', FastAction)
+  app.component('ExpenseProductsForm', ExpenseProductsForm)
+  app.component('ExpenseProductsTable', ExpenseProductsTable)
   app.mixin(Screen)
 })
 
