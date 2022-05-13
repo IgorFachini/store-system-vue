@@ -1,11 +1,11 @@
 <template>
   <q-page
-    class="row q-gutter-y-md"
+    class="q-gutter-y-md"
     padding
   >
     <div
       v-if="isViewMode"
-      class="row full-width"
+      class="full-width"
     >
       <q-btn
         :label="$t('edit')"

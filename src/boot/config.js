@@ -9,6 +9,8 @@ import ProductsTable from '../components/product/Table.vue'
 import Screen from 'mixins/Screen'
 import CustomersForm from '../components/customer/Form.vue'
 import CustomersTable from '../components/customer/Table.vue'
+import CategoriesForm from '../components/categorie/Form.vue'
+import CategoriesTable from '../components/categorie/Table.vue'
 import ExpenseProductsForm from '../components/expenseProduct/Form.vue'
 import ExpenseProductsTable from '../components/expenseProduct/Table.vue'
 import CashFlowTable from '../components/cashFlow/CashFlowTable.vue'
@@ -25,6 +27,8 @@ export default boot(({ app }) => {
   app.component('CustomersForm', CustomersForm)
   app.component('CustomersTable', CustomersTable)
   app.component('CashFlowTable', CashFlowTable)
+  app.component('CategoriesForm', CategoriesForm)
+  app.component('CategoriesTable', CategoriesTable)
   app.component('FastAction', FastAction)
   app.component('ExpenseProductsForm', ExpenseProductsForm)
   app.component('ExpenseProductsTable', ExpenseProductsTable)
