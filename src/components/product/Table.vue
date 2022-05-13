@@ -1,49 +1,34 @@
 <template>
-  <q-page
-    class="row"
-    padding
+  <v-table-crud
+    :title="$t('product', 2)"
+    :rows="products"
+    :columns="columns"
+    :loading="loading"
+    @edit="edit"
+    @delete="deleteAction"
   >
-    <v-table-crud
-      :title="$t('product', 2)"
-      :rows="products"
-      :columns="columns"
-      :loading="loading"
-      class="full-width"
-      style="z-index: 1"
-      @edit="edit"
-      @delete="deleteAction"
-    >
-      <template #expand="props">
-        <q-list
-          bordered
-          separator
-        >
-          <product-recipe-info
-            v-for="recipe in props.row.recipes"
-            :key="recipe.id"
-            :product="recipe"
-            hide-remove
-          />
-        </q-list>
-      </template>
-      <template #action-more="props">
-        <q-btn
-          :label="$t('stockHistory')"
-          dense
-          color="blue"
-          @click="stockHistory(props.row)"
+    <template #expand="props">
+      <q-list
+        bordered
+        separator
+      >
+        <product-recipe-info
+          v-for="recipe in props.row.recipes"
+          :key="recipe.id"
+          :product="recipe"
+          hide-remove
         />
-      </template>
-    </v-table-crud>
-    <div class="row full-width justify-center">
+      </q-list>
+    </template>
+    <template #action-more="props">
       <q-btn
-        class="q-ma-md"
-        color="accent"
-        :label="$t('add')"
-        @click="$router.push('/products/add')"
+        :label="$t('stockHistory')"
+        dense
+        color="blue"
+        @click="stockHistory(props.row)"
       />
-    </div>
-  </q-page>
+    </template>
+  </v-table-crud>
 </template>
 
 <script>
@@ -54,7 +39,7 @@ const { formatDate } = date
 import ProductRecipeInfo from 'components/product/ProductRecipeInfo.vue'
 
 export default defineComponent({
-  name: 'PageProducts',
+  name: 'ProductsTable',
 
   components: {
     ProductRecipeInfo
@@ -62,10 +47,8 @@ export default defineComponent({
 
   data () {
     return {
-      form: {},
-      loading: false,
-      saving: false,
       firebaseMixinInstance: null,
+      loading: false,
       products: []
     }
   },
@@ -113,10 +96,6 @@ export default defineComponent({
         })
       })
     }
-  },
-
-  created () {
-    this.form = { ...this.modelForm }
   },
 
   mounted () {

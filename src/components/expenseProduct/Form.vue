@@ -88,11 +88,8 @@ export default defineComponent({
 
     this.firebaseMixinInstance.bindField('expenseProducts').finally(() => {
       this.loading = false
-      if (this.$route.name === 'expenseProducts.edit') {
-        this.edit(null, this.$route.params.id)
-      }
-      if (this.$route.name === 'expenseProducts.view') {
-        this.view(null, this.$route.params.id)
+      if (this.$route.params.id) {
+        this.checkExists(this.$route.params.id)
       }
     })
   },
@@ -120,37 +117,28 @@ export default defineComponent({
       this.reset()
       this.$emit('done')
     },
-    edit (row, id) {
-      if (id) {
-        row = this.expenseProducts.find(p => p.id === id)
-      }
+    checkExists (id) {
+      const row = this.expenseProducts.find(p => p.id === id)
+
       if (!row) {
         Notify.create({
           message: this.$t('notExist'),
           color: 'negative',
           closeBtn: true
         })
-        this.$router.push('/expenseProducts/add')
+        this.$router.push('/expense-products')
         return
       }
+      const isView = this.$route.name === 'expense-products.view'
+      this[isView ? 'view' : 'edit'](row)
+    },
+    edit (row) {
       this.viewMode = false
       this.nameBefore = row.name
       this.form = { ...row, id: row.id }
     },
 
-    view (row, id) {
-      if (id) {
-        row = this.expenseProducts.find(p => p.id === id)
-      }
-      if (!row) {
-        Notify.create({
-          message: this.$t('notExist'),
-          color: 'negative',
-          closeBtn: true
-        })
-        this.$router.push('/expenseProducts')
-        return
-      }
+    view (row) {
       this.viewMode = true
       this.nameBefore = row.name
       this.form = { ...row, id: row.id }

@@ -109,7 +109,7 @@ import { defineComponent } from 'vue'
 import VInputCep from 'src/components/common/VInputCep.vue'
 
 export default defineComponent({
-  name: 'CustomerAddEditForm',
+  name: 'CustomersForm',
 
   components: {
     VInputCep
@@ -156,11 +156,8 @@ export default defineComponent({
 
     this.firebaseMixinInstance.bindField('customers').finally(() => {
       this.loading = false
-      if (this.$route.params.idCustomerEdit) {
-        this.edit(null, this.$route.params.idCustomerEdit)
-      }
-      if (this.$route.params.idCustomerView) {
-        this.view(null, this.$route.params.idCustomerView)
+      if (this.$route.params.id) {
+        this.checkExists(this.$route.params.id)
       }
     })
   },
@@ -194,29 +191,9 @@ export default defineComponent({
       this.reset()
       this.$emit('done')
     },
-    edit (row, id) {
-      if (id) {
-        row = this.customers.find(p => p.id === id)
-      }
-      if (!row) {
-        Notify.create({
-          message: this.$t('notExist'),
-          color: 'negative',
-          closeBtn: true
-        })
-        this.$router.push('/customers/add')
-        return
-      }
-      this.viewMode = false
-      this.nameBefore = row.name
-      this.form = { ...row, id: row.id }
-    },
+    checkExists (id) {
+      const row = this.customers.find(p => p.id === id)
 
-    view (row, id) {
-      console.log('id', id)
-      if (id) {
-        row = this.customers.find(p => p.id === id)
-      }
       if (!row) {
         Notify.create({
           message: this.$t('notExist'),
@@ -226,6 +203,16 @@ export default defineComponent({
         this.$router.push('/customers')
         return
       }
+      const isView = this.$route.name === 'customers.view'
+      this[isView ? 'view' : 'edit'](row)
+    },
+    edit (row) {
+      this.viewMode = false
+      this.nameBefore = row.name
+      this.form = { ...row, id: row.id }
+    },
+
+    view (row) {
       this.viewMode = true
       this.nameBefore = row.name
       this.form = { ...row, id: row.id }

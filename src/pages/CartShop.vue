@@ -341,7 +341,7 @@
     >
       <q-card>
         <q-card-section>
-          <products-add-edit-form
+          <products-form
             @done="addProductModalOpen = false"
           />
         </q-card-section>

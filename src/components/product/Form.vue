@@ -9,19 +9,23 @@
       :label="$t('name')"
       :rules="[
         val => val && val.length || $t('fillTheField', { field: $t('name') }),
-        val => !!form.id && nameBefore === val || (!products.map(c => c.name.toLowerCase()).includes(val.toLowerCase()) || $t('alredyExist'))]"
+        val => !!form.id && nameBefore === val || (!products.map(c => c.name.toLowerCase()).includes(val.toLowerCase()) || $t('alredyExist'))
+      ]"
+      :disable="viewMode"
     />
 
     <v-input
       v-model="form.description"
       type="textarea"
       :label="$t('description')"
+      :disable="viewMode"
     />
 
     <v-input
       v-model="form.saleValue"
       :label="$t('saleValue')"
       currency
+      :disable="viewMode"
     />
 
     <v-select
@@ -31,9 +35,13 @@
       sorted
       :label="$t('category')"
       :options="categories.map(c => c.name)"
+      :disable="viewMode"
     />
 
-    <div class="row">
+    <div
+      v-if="!viewMode"
+      class="row"
+    >
       <q-btn
         color="primary"
         :label="$t('readBarcode')"
@@ -45,19 +53,34 @@
     <v-input
       v-model="form.code"
       :label="$t('code')"
+      :disable="viewMode"
     />
 
     <v-input
-      v-if="!form.id"
       v-model="currentInventory"
       type="number"
       :label="$t('currentInventory')"
+      :disable="!!form.id"
     />
+
+    <div
+      v-if="form.id"
+      class="row"
+    >
+      <q-btn
+        :label="$t('stockHistory')"
+        dense
+        color="blue"
+        class="full-width"
+        @click="stockHistory()"
+      />
+    </div>
 
     <v-input
       v-model="form.purchasePrice"
       :label="$t('purchasePrice')"
       currency
+      :disable="viewMode"
     />
 
     <q-card>
@@ -68,7 +91,9 @@
       </q-card-section>
       <q-separator />
 
-      <q-card-section>
+      <q-card-section
+        v-if="!viewMode"
+      >
         <q-form
           ref="recipeForm"
           class="row"
@@ -133,6 +158,7 @@
               v-for="recipe in form.recipes"
               :key="recipe.id"
               :product="recipe"
+              :hide-remove="viewMode"
               @remove="val => form.recipes = form.recipes.filter(p => p.id !== val.id)"
             />
           </transition-group>
@@ -151,11 +177,11 @@
         color="positive"
       />
     </div>
+    <barcode-reader-modal
+      ref="barcodeReaderModal"
+      @success="setProductCode"
+    />
   </q-form>
-  <barcode-reader-modal
-    ref="barcodeReaderModal"
-    @success="setProductCode"
-  />
 </template>
 
 <script>
@@ -166,7 +192,7 @@ import ProductRecipeInfo from 'components/product/ProductRecipeInfo.vue'
 import BarcodeReaderModal from 'components/common/BarcodeReaderModal.vue'
 
 export default defineComponent({
-  name: 'ProductsAddEditForm',
+  name: 'ProductsForm',
 
   components: {
     ProductRecipeInfo,
@@ -205,7 +231,8 @@ export default defineComponent({
       categories: [],
       expenseProducts: [],
       nameBefore: '',
-      currentInventory: 0
+      currentInventory: 0,
+      viewMode: false
     }
   },
 
@@ -232,12 +259,11 @@ export default defineComponent({
       this.firebaseMixin('expenseProducts').bindField('expenseProducts')
     ]).then(() => {
       if (this.$route.params.id) {
-        this.edit(this.$route.params.id)
+        this.checkExists(this.$route.params.id)
       }
+    }).finally(() => {
+      this.loading = false
     })
-      .finally(() => {
-        this.loading = false
-      })
   },
 
   methods: {
@@ -302,17 +328,31 @@ export default defineComponent({
       this.reset()
       this.$emit('done')
     },
-    edit (id) {
+    checkExists (id) {
       const row = this.products.find(p => p.id === id)
+
       if (!row) {
         Notify.create({
           message: this.$t('notExist'),
           color: 'negative',
           closeBtn: true
         })
-        this.$router.push('/products/add')
+        this.$router.push('/products')
         return
       }
+      this.stockHistoryCount(row).then(count => {
+        this.currentInventory = count
+      })
+      const isView = this.$route.name === 'products.view'
+      this[isView ? 'view' : 'edit'](row)
+    },
+    view (row) {
+      this.viewMode = true
+      this.nameBefore = row.name
+      this.form = { ...row, id: row.id }
+    },
+    edit (row, id) {
+      this.viewMode = false
       this.form = {
         ...row,
         id: row.id,
@@ -323,6 +363,19 @@ export default defineComponent({
       this.$nextTick(() => {
         this.$refs.form?.resetValidation()
       })
+    },
+
+    stockHistory () {
+      this.$router.push({
+        name: 'products.stockHistory',
+        params: { id: this.form.id }
+      })
+    },
+
+    stockHistoryCount (row) {
+      return this.firebaseMixin('stockHistory').ref().where('productId', '==', row.id).get().then(snapshot => snapshot.docs.map(doc => doc.data()).reduce((acc, item) => {
+        return acc + item.quantity
+      }, 0))
     },
 
     deleteAction (row) {

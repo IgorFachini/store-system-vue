@@ -1,159 +1,77 @@
 
+const simpleCrudRoutersPath = [
+  'customers',
+  'expense-products',
+  'products'
+]
+
+const crudRouterNames = [
+  '',
+  'add',
+  'view',
+  'edit'
+]
+const crudRoutersObjects = simpleCrudRoutersPath.reduce((acc, path) => {
+  return [
+    ...acc,
+    ...crudRouterNames.map(name => {
+      return {
+        path: `/${path}/${(!name || name === 'add') ? name : `${name}/:id`}`,
+        name: `${path}${(!name) ? '' : `.${name}`}`,
+        component: () => import('src/pages/CRUDPages.vue')
+      }
+    })
+  ]
+}, [])
+
 const routes = [
   {
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
+    meta: {
+      requiresAuth: true
+    },
     children: [
+      ...crudRoutersObjects,
       {
         path: '',
-        component: () => import('pages/Index.vue'),
-        meta: {
-          requiresAuth: true
-        }
-      },
-      {
-        path: '/customers',
-        component: () => import('src/pages/Customers.vue'),
-        meta: {
-          requiresAuth: true
-        }
-      },
-      {
-        path: '/customers/add',
-        name: 'customers.add',
-        component: () => import('src/pages/CustomersForm.vue'),
-        meta: {
-          requiresAuth: true
-        }
-      },
-      {
-        path: '/customers/edit/:idCustomerEdit',
-        name: 'customers.edit',
-        component: () => import('src/pages/CustomersForm.vue'),
-        meta: {
-          requiresAuth: true
-        }
-      },
-      {
-        path: '/customers/view/:idCustomerView',
-        name: 'customers.view',
-        component: () => import('src/pages/CustomersForm.vue'),
-        meta: {
-          requiresAuth: true
-        }
+        component: () => import('pages/Index.vue')
       },
       {
         path: '/categories',
-        component: () => import('src/pages/Categories.vue'),
-        meta: {
-          requiresAuth: true
-        }
-      },
-      {
-        path: '/products',
-        component: () => import('src/pages/Products.vue'),
-        meta: {
-          requiresAuth: true
-        }
-      },
-      {
-        path: '/products/add',
-        name: 'products.add',
-        component: () => import('src/pages/ProductsAddEdit.vue'),
-        meta: {
-          requiresAuth: true
-        }
-      },
-      {
-        path: '/products/edit/:id',
-        name: 'products.edit',
-        component: () => import('src/pages/ProductsAddEdit.vue'),
-        meta: {
-          requiresAuth: true
-        }
+        component: () => import('src/pages/Categories.vue')
       },
       {
         path: '/products/stock-history/:id',
         name: 'products.stockHistory',
-        component: () => import('src/pages/ProductStockHistory.vue'),
-        meta: {
-          requiresAuth: true
-        }
+        component: () => import('src/pages/ProductStockHistory.vue')
       },
       {
         path: '/sales',
-        component: () => import('src/pages/Sales.vue'),
-        meta: {
-          requiresAuth: true
-        }
-      },
-      {
-        path: '/expense-products',
-        component: () => import('src/pages/ExpenseProducts.vue'),
-        meta: {
-          requiresAuth: true
-        }
-      },
-      {
-        path: '/expense-products/add',
-        name: 'expenseProducts.add',
-        component: () => import('src/pages/ExpenseProductsForm.vue'),
-        meta: {
-          requiresAuth: true
-        }
-      },
-      {
-        path: '/expense-products/edit/:id',
-        name: 'expenseProducts.edit',
-        component: () => import('src/pages/ExpenseProductsForm.vue'),
-        meta: {
-          requiresAuth: true
-        }
-      },
-      {
-        path: '/expense-products/view/:id',
-        name: 'expenseProducts.view',
-        component: () => import('src/pages/ExpenseProductsForm.vue'),
-        meta: {
-          requiresAuth: true
-        }
+        component: () => import('src/pages/Sales.vue')
       },
       {
         path: '/expenses',
-        component: () => import('src/pages/Expenses.vue'),
-        meta: {
-          requiresAuth: true
-        }
+        name: 'expenses',
+        component: () => import('src/pages/Expenses.vue')
       },
       {
         path: '/cart-shop',
-        component: () => import('src/pages/CartShop.vue'),
-        meta: {
-          requiresAuth: true
-        }
+        component: () => import('src/pages/CartShop.vue')
       },
       {
         path: '/cash-flow',
-        component: () => import('src/pages/CashFlow.vue'),
-        meta: {
-          requiresAuth: true
-        }
+        component: () => import('src/pages/CashFlow.vue')
       },
       {
         path: '/customers/cash-flow/:id',
         name: 'customer.cashFlow',
-        component: () => import('src/pages/CashFlowCustomer.vue'),
-        meta: {
-          requiresAuth: true
-        }
+        component: () => import('src/pages/CashFlowCustomer.vue')
       },
       {
         path: '/customers/cart-shop/:customerId',
         name: 'customer.cartShop',
-        component: () => import('src/pages/CartShop.vue'),
-        meta: {
-          requiresAuth: true
-        }
+        component: () => import('src/pages/CartShop.vue')
       }
     ]
   },
