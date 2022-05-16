@@ -16,6 +16,14 @@ import ExpenseProductsTable from '../components/expenseProduct/Table.vue'
 import CashFlowTable from '../components/cashFlow/CashFlowTable.vue'
 import FastAction from '../components/cashFlow/FastAction.vue'
 
+const utils = {
+  methods: {
+    showConsole (...params) {
+      console.log('showConsole', params)
+    }
+  }
+}
+
 export default boot(({ app }) => {
   app.component('VInput', VInput)
   app.component('VSelect', VSelect)
@@ -33,6 +41,7 @@ export default boot(({ app }) => {
   app.component('ExpenseProductsForm', ExpenseProductsForm)
   app.component('ExpenseProductsTable', ExpenseProductsTable)
   app.mixin(Screen)
+  app.mixin(utils)
 })
 
 export { }

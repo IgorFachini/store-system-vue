@@ -312,7 +312,7 @@ export default defineComponent({
       action(form).then((res) => {
         if (!form.id && currentInventory !== 0) {
           this.firebaseMixin('stockHistory').add({
-            product: res,
+            productId: res.id,
             quantity: currentInventory,
             description
           })

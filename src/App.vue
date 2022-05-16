@@ -5,12 +5,16 @@
 import { defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useQuasar, Dialog } from 'quasar'
+import { useFirebaseStore } from 'stores/firebase'
 
 export default defineComponent({
   name: 'App',
 
   setup () {
     const { locale } = useI18n({ useScope: 'global' })
+    const storeFirebase = useFirebaseStore()
+    storeFirebase.setup()
+
     return {
       locale
     }

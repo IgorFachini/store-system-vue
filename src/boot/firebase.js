@@ -48,10 +48,35 @@ const firebaseDateFn = (date) => {
 const dateGetTimeFn = (date) => {
   return new Date(date).getTime()
 }
+import { Dialog, Notify } from 'quasar'
 
 export default boot(({ app }) => {
   const firebaseMixin = {
     methods: {
+      firebaseDeleteItem (refName, refData, extraFunction) {
+        Dialog.create({
+          title: `${this.$q.lang.label.remove} ${this.$t('history')}`,
+          cancel: true,
+          persistent: true
+        }).onOk(() => {
+          if (typeof refData === 'object') {
+            refData.loading = true
+          }
+          this.firebaseMixin(refName).id(refData?.id || refData).delete().finally(() => {
+            if (typeof refData === 'object') {
+              refData.loading = false
+            }
+            if (typeof extraFunction === 'function') {
+              extraFunction()
+            }
+            Notify.create({
+              message: this.$t('savedOperation'),
+              color: 'positive',
+              closeBtn: true
+            })
+          })
+        })
+      },
       firebaseMixin (refName, rtdb) {
         const refThis = this
         const ref = rtdb ? db.ref(refName) : fr.collection(refName)

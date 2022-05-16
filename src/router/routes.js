@@ -41,7 +41,12 @@ const routes = [
       {
         path: '/products/stock-history/:id',
         name: 'products.stockHistory',
-        component: () => import('src/pages/ProductStockHistory.vue')
+        component: () => import('src/pages/StockHistory.vue')
+      },
+      {
+        path: '/expense-products/stock-history/:id',
+        name: 'expenseProducts.stockHistory',
+        component: () => import('src/pages/StockHistory.vue')
       },
       {
         path: '/sales',

@@ -7,7 +7,16 @@
     @edit="edit"
     @delete="deleteAction"
     @view="view"
-  />
+  >
+    <template #action-more="props">
+      <q-btn
+        :label="$t('stockHistory')"
+        dense
+        color="blue"
+        @click="stockHistory(props.row)"
+      />
+    </template>
+  </v-table-crud>
 </template>
 
 <script>
@@ -16,23 +25,32 @@ import { date, Dialog, Notify } from 'quasar'
 import { defineComponent } from 'vue'
 const { formatDate } = date
 
+import { useFirebaseStore } from 'stores/firebase'
+import { mapState, mapActions } from 'pinia'
+
 export default defineComponent({
   name: 'ExpenseProductsTable',
 
   data () {
     return {
       firebaseMixinInstance: null,
-      loading: false,
-      expenseProducts: []
+      loading: false
     }
   },
 
   computed: {
+    ...mapState(useFirebaseStore, ['expenseProducts']),
     columns () {
       return [
         { name: 'name', label: this.$t('name'), field: 'name', sortable: true },
-        { name: 'weightType', label: this.$t('weightType'), field: 'weightType', sortable: true },
         { name: 'description', label: this.$t('description'), field: 'description' },
+        { name: 'weightType', label: this.$t('weightType'), field: 'weightType', sortable: true },
+        {
+          name: 'currentInventory',
+          label: this.$t('currentInventory'),
+          field: row => this.countExpenseProductsStockHistoryById(row.id),
+          sortable: true
+        },
         {
           name: 'createdAt',
           label: this.$t('createdAt'),
@@ -51,15 +69,14 @@ export default defineComponent({
     }
   },
 
-  mounted () {
-    this.loading = true
-    this.firebaseMixinInstance = this.firebaseMixin('expenseProducts')
-    this.firebaseMixinInstance.bindField('expenseProducts').finally(() => {
-      this.loading = false
-    })
-  },
-
   methods: {
+    ...mapActions(useFirebaseStore, ['countExpenseProductsStockHistoryById']),
+    stockHistory (row) {
+      this.$router.push({
+        name: 'expenseProducts.stockHistory',
+        params: { id: row.id }
+      })
+    },
     view (row) {
       this.$router.push({
         name: 'expenseProducts.view',
