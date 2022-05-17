@@ -70,6 +70,8 @@
 
 import { Notify } from 'quasar'
 import { defineComponent } from 'vue'
+import { useFirebaseStore } from 'stores/firebase'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'ExpenseProductsForm',
@@ -77,7 +79,13 @@ export default defineComponent({
   emits: ['done'],
 
   setup () {
+    const storeFirebase = useFirebaseStore()
+    const { expenseProducts, countExpenseProductsStockHistoryById, loadingDatabase } = storeToRefs(storeFirebase)
+
     return {
+      expenseProducts,
+      countExpenseProductsStockHistoryById,
+      loadingDatabase,
       modelForm: {
         name: '',
         description: '',
@@ -91,27 +99,44 @@ export default defineComponent({
       firebaseMixinInstance: null,
       form: {},
       loading: false,
-      expenseProducts: [],
       nameBefore: '',
       viewMode: false,
       currentInventory: 0
     }
   },
 
+  watch: {
+    loadingDatabase (val) {
+      if (this.$route.params.id && !val) {
+        this.globalLoading = false
+        this.checkExists(this.$route.params.id)
+      }
+    }
+  },
+
   created () {
     this.form = { ...this.modelForm }
+    if (this.$route.params.id && !this.loadingDatabase) {
+      this.checkExists(this.$route.params.id)
+    }
+    if (this.loadingDatabase) {
+      this.globalLoading = true
+    }
   },
 
   mounted () {
-    this.loading = true
+    // this.loading = true
     this.firebaseMixinInstance = this.firebaseMixin('expenseProducts')
+    // if (this.$route.params.id) {
+    //   this.checkExists(this.$route.params.id)
+    // }
 
-    this.firebaseMixinInstance.bindField('expenseProducts').finally(() => {
-      this.loading = false
-      if (this.$route.params.id) {
-        this.checkExists(this.$route.params.id)
-      }
-    })
+    // this.firebaseMixinInstance.bindField('expenseProducts').finally(() => {
+    //   this.loading = false
+    //   if (this.$route.params.id) {
+    //     this.checkExists(this.$route.params.id)
+    //   }
+    // })
   },
 
   methods: {
@@ -161,9 +186,10 @@ export default defineComponent({
         this.$router.push('/expense-products')
         return
       }
-      this.stockHistoryCount(row).then(count => {
-        this.currentInventory = count
-      })
+      this.currentInventory = this.countExpenseProductsStockHistoryById(row.id)
+      // this.stockHistoryCount(row).then(count => {
+      //   this.currentInventory = count
+      // })
       const isView = this.$route.name === 'expense-products.view'
       this[isView ? 'view' : 'edit'](row)
     },

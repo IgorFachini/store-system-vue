@@ -186,10 +186,12 @@
 
 <script>
 
-import { Dialog, Notify } from 'quasar'
+import { Notify } from 'quasar'
 import { defineComponent } from 'vue'
 import ProductRecipeInfo from 'components/product/ProductRecipeInfo.vue'
 import BarcodeReaderModal from 'components/common/BarcodeReaderModal.vue'
+import { useFirebaseStore } from 'stores/firebase'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'ProductsForm',
@@ -202,7 +204,21 @@ export default defineComponent({
   emits: ['done'],
 
   setup () {
+    const storeFirebase = useFirebaseStore()
+    const {
+      products,
+      countProductsStockHistoryById,
+      categories,
+      expenseProducts,
+      loadingDatabase
+    } = storeToRefs(storeFirebase)
+
     return {
+      products,
+      countProductsStockHistoryById,
+      categories,
+      expenseProducts,
+      loadingDatabase,
       modelForm: {
         name: '',
         description: '',
@@ -227,9 +243,9 @@ export default defineComponent({
       loading: false,
       saving: false,
       firebaseMixinInstance: null,
-      products: [],
-      categories: [],
-      expenseProducts: [],
+      // products: [],
+      // categories: [],
+      // expenseProducts: [],
       nameBefore: '',
       currentInventory: 0,
       viewMode: false
@@ -245,26 +261,42 @@ export default defineComponent({
     }
   },
 
+  watch: {
+    loadingDatabase (val) {
+      if (this.$route.params.id && !val) {
+        this.globalLoading = false
+        this.checkExists(this.$route.params.id)
+      }
+    }
+  },
+
   created () {
     this.form = { ...this.modelForm }
     this.recipeForm = { ...this.modelRecipeForm }
+    this.firebaseMixinInstance = this.firebaseMixin('products')
+    if (this.$route.params.id && !this.loadingDatabase) {
+      this.checkExists(this.$route.params.id)
+    }
+    if (this.loadingDatabase) {
+      this.globalLoading = true
+    }
   },
 
-  mounted () {
-    this.loading = true
-    this.firebaseMixinInstance = this.firebaseMixin('products')
-    Promise.all([
-      this.firebaseMixinInstance.bindField('products'),
-      this.firebaseMixin('categories').bindField('categories'),
-      this.firebaseMixin('expenseProducts').bindField('expenseProducts')
-    ]).then(() => {
-      if (this.$route.params.id) {
-        this.checkExists(this.$route.params.id)
-      }
-    }).finally(() => {
-      this.loading = false
-    })
-  },
+  // mounted () {
+  // this.loading = true
+  // this.firebaseMixinInstance = this.firebaseMixin('products')
+  // Promise.all([
+  //   this.firebaseMixinInstance.bindField('products'),
+  //   this.firebaseMixin('categories').bindField('categories'),
+  //   this.firebaseMixin('expenseProducts').bindField('expenseProducts')
+  // ]).then(() => {
+  // if (this.$route.params.id) {
+  //   this.checkExists(this.$route.params.id)
+  // }
+  // }).finally(() => {
+  //   this.loading = false
+  // })
+  // },
 
   methods: {
     openBarcodeReader () {
@@ -340,9 +372,10 @@ export default defineComponent({
         this.$router.push('/products')
         return
       }
-      this.stockHistoryCount(row).then(count => {
-        this.currentInventory = count
-      })
+      this.currentInventory = this.countProductsStockHistoryById(row.id)
+      // this.stockHistoryCount(row).then(count => {
+      //   this.currentInventory = count
+      // })
       const isView = this.$route.name === 'products.view'
       this[isView ? 'view' : 'edit'](row)
     },
@@ -370,31 +403,13 @@ export default defineComponent({
         name: 'products.stockHistory',
         params: { id: this.form.id }
       })
-    },
-
-    stockHistoryCount (row) {
-      return this.firebaseMixin('stockHistory').ref().where('productId', '==', row.id).get().then(snapshot => snapshot.docs.map(doc => doc.data()).reduce((acc, item) => {
-        return acc + item.quantity
-      }, 0))
-    },
-
-    deleteAction (row) {
-      Dialog.create({
-        title: `${this.$q.lang.label.remove} ${this.$t('product')}`,
-        cancel: true,
-        persistent: true
-      }).onOk(() => {
-        row.loading = true
-        this.firebaseMixinInstance.id(row.id).delete().finally(() => {
-          row.loading = false
-          Notify.create({
-            message: this.$t('savedOperation'),
-            color: 'positive',
-            closeBtn: true
-          })
-        })
-      })
     }
+
+    // stockHistoryCount (row) {
+    //   return this.firebaseMixin('stockHistory').ref().where('productId', '==', row.id).get().then(snapshot => snapshot.docs.map(doc => doc.data()).reduce((acc, item) => {
+    //     return acc + item.quantity
+    //   }, 0))
+    // }
   }
 })
 </script>

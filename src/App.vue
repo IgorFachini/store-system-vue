@@ -1,11 +1,16 @@
 <template>
   <router-view />
+  <q-inner-loading
+    :showing="globalLoading"
+  />
 </template>
 <script>
 import { defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useQuasar, Dialog } from 'quasar'
 import { useFirebaseStore } from 'stores/firebase'
+import { useMainStore } from 'stores/main'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'App',
@@ -14,9 +19,10 @@ export default defineComponent({
     const { locale } = useI18n({ useScope: 'global' })
     const storeFirebase = useFirebaseStore()
     storeFirebase.setup()
-
+    const { globalLoading } = storeToRefs(useMainStore())
     return {
-      locale
+      locale,
+      globalLoading
     }
   },
 

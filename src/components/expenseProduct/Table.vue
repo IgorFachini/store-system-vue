@@ -3,10 +3,9 @@
     :title="$t('expenseProduct', 2)"
     :rows="expenseProducts"
     :columns="columns"
-    :loading="loading"
+    :loading="loadingDatabase"
     @edit="edit"
-    @delete="deleteAction"
-    @view="view"
+    @delete="row => firebaseDeleteItem('expenseProducts', 'expenseProduct', row.id)"
   >
     <template #action-more="props">
       <q-btn
@@ -21,25 +20,34 @@
 
 <script>
 
-import { date, Dialog, Notify } from 'quasar'
+import { date } from 'quasar'
 import { defineComponent } from 'vue'
 const { formatDate } = date
 
 import { useFirebaseStore } from 'stores/firebase'
-import { mapState, mapActions } from 'pinia'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'ExpenseProductsTable',
 
+  setup () {
+    const storeFirebase = useFirebaseStore()
+    const { expenseProducts, countExpenseProductsStockHistoryById, loadingDatabase } = storeToRefs(storeFirebase)
+
+    return {
+      expenseProducts,
+      countExpenseProductsStockHistoryById,
+      loadingDatabase
+    }
+  },
+
   data () {
     return {
-      firebaseMixinInstance: null,
       loading: false
     }
   },
 
   computed: {
-    ...mapState(useFirebaseStore, ['expenseProducts']),
     columns () {
       return [
         { name: 'name', label: this.$t('name'), field: 'name', sortable: true },
@@ -70,40 +78,16 @@ export default defineComponent({
   },
 
   methods: {
-    ...mapActions(useFirebaseStore, ['countExpenseProductsStockHistoryById']),
     stockHistory (row) {
       this.$router.push({
-        name: 'expenseProducts.stockHistory',
-        params: { id: row.id }
-      })
-    },
-    view (row) {
-      this.$router.push({
-        name: 'expenseProducts.view',
+        name: 'expense-products.stockHistory',
         params: { id: row.id }
       })
     },
     edit (row) {
       this.$router.push({
-        name: 'expenseProducts.edit',
+        name: 'expense-products.edit',
         params: { id: row.id }
-      })
-    },
-    deleteAction (row) {
-      Dialog.create({
-        title: `${this.$q.lang.label.remove} ${this.$t('expenseProduct')}?`,
-        cancel: true,
-        persistent: true
-      }).onOk(() => {
-        row.loading = true
-        this.firebaseMixinInstance.id(row.id).delete().finally(() => {
-          row.loading = false
-          Notify.create({
-            message: this.$t('savedOperation'),
-            color: 'positive',
-            closeBtn: true
-          })
-        })
       })
     }
   }

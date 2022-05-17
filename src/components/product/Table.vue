@@ -3,9 +3,9 @@
     :title="$t('product', 2)"
     :rows="products"
     :columns="columns"
-    :loading="loading"
+    :loading="loadingDatabase"
     @edit="edit"
-    @delete="row => firebaseDeleteItem('products', row, deleteStockHistory(row))"
+    @delete="row => firebaseDeleteItem('products', 'product', row).then(() => deleteStockHistory(row.id))"
   >
     <template #expand="props">
       <q-list
@@ -37,9 +37,8 @@ import { date } from 'quasar'
 import { defineComponent } from 'vue'
 const { formatDate } = date
 import ProductRecipeInfo from 'components/product/ProductRecipeInfo.vue'
-
 import { useFirebaseStore } from 'stores/firebase'
-// import { mapState, mapActions } from 'pinia'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'ProductsTable',
@@ -50,9 +49,12 @@ export default defineComponent({
 
   setup () {
     const storeFirebase = useFirebaseStore()
+    const { products, countProductsStockHistoryById, loadingDatabase } = storeToRefs(storeFirebase)
 
     return {
-      storeFirebase
+      products,
+      countProductsStockHistoryById,
+      loadingDatabase
     }
   },
 
@@ -63,11 +65,6 @@ export default defineComponent({
   },
 
   computed: {
-    // ...mapState(useFirebaseStore, ['products']),
-    products () {
-      return this.storeFirebase.products
-    },
-
     columns () {
       return [
         { name: 'expand', label: this.$t('recipe'), align: 'left' },
@@ -77,7 +74,7 @@ export default defineComponent({
         {
           name: 'currentInventory',
           label: this.$t('currentInventory'),
-          field: row => this.storeFirebase.countProductsStockHistoryById(row.id),
+          field: row => this.countProductsStockHistoryById(row.id),
           sortable: true
         }, { name: 'description', label: this.$t('description'), field: 'description' },
         {
@@ -107,7 +104,6 @@ export default defineComponent({
   },
 
   methods: {
-    // ...mapActions(useFirebaseStore, ['countProductsStockHistoryById']),
     stockHistory (row) {
       this.$router.push({
         name: 'products.stockHistory',
@@ -121,8 +117,8 @@ export default defineComponent({
       })
     },
 
-    deleteStockHistory (row) {
-      this.firebaseMixin('productsStockHistory').ref().where('productId', '==', row.id).get().then(snapshot => {
+    deleteStockHistory (id) {
+      this.firebaseMixin('productsStockHistory').ref().where('productId', '==', id).get().then(snapshot => {
         snapshot.docs.forEach(doc => {
           doc.ref.delete()
         })

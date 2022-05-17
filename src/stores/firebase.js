@@ -13,6 +13,7 @@ const collectionsName = [
 
 export const useFirebaseStore = defineStore('firebase', {
   state: () => ({
+    loadingDatabase: false,
     ...collectionsName.reduce((prev, curr) => {
       prev[curr] = []
       return prev
@@ -20,24 +21,27 @@ export const useFirebaseStore = defineStore('firebase', {
   }),
 
   getters: {
+    countProductsStockHistoryById (state) {
+      return (id) => state.productsStockHistory.filter(item => item.productId === id).reduce((acc, item) => {
+        return acc + item.quantity
+      }, 0)
+    },
+    countExpenseProductsStockHistoryById (state) {
+      return (id) => state.expenseProductsStockHistory.filter(item => item.expenseProductId === id).reduce((acc, item) => {
+        return acc + item.quantity
+      }, 0)
+    }
   },
 
   actions: {
-    countProductsStockHistoryById (id) {
-      return this.productsStockHistory.filter(item => item.productId === id).reduce((acc, item) => {
-        return acc + item.quantity
-      }, 0)
-    },
-    countExpenseProductsStockHistoryById (id) {
-      return this.expenseProductsStockHistory.filter(item => item.expenseProductId === id).reduce((acc, item) => {
-        return acc + item.quantity
-      }, 0)
-    },
-    setup () {
+    async setup () {
       const store = getFirestore()
-      collectionsName.forEach(name => {
-        this.sync(name, collection(store, name))
-      })
+      this.loadingDatabase = true
+      for (let index = 0; index < collectionsName.length; index++) {
+        const name = collectionsName[index]
+        await this.syncCollection(name, collection(store, name))
+      }
+      this.loadingDatabase = false
     }
   }
 })

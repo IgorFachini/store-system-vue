@@ -53,28 +53,28 @@ import { Dialog, Notify } from 'quasar'
 export default boot(({ app }) => {
   const firebaseMixin = {
     methods: {
-      firebaseDeleteItem (refName, refData, extraFunction) {
-        Dialog.create({
-          title: `${this.$q.lang.label.remove} ${this.$t('history')}`,
-          cancel: true,
-          persistent: true
-        }).onOk(() => {
-          if (typeof refData === 'object') {
-            refData.loading = true
-          }
-          this.firebaseMixin(refName).id(refData?.id || refData).delete().finally(() => {
+      firebaseDeleteItem (refName, i18nLabelName, refData) {
+        return new Promise((resolve, reject) => {
+          Dialog.create({
+            title: `${this.$q.lang.label.remove} ${this.$t(i18nLabelName)}`,
+            cancel: true,
+            persistent: true
+          }).onOk(() => {
             if (typeof refData === 'object') {
-              refData.loading = false
+              refData.loading = true
             }
-            if (typeof extraFunction === 'function') {
-              extraFunction()
-            }
-            Notify.create({
-              message: this.$t('savedOperation'),
-              color: 'positive',
-              closeBtn: true
+            this.firebaseMixin(refName).id(refData?.id || refData).delete().finally(() => {
+              if (typeof refData === 'object') {
+                refData.loading = false
+              }
+              Notify.create({
+                message: this.$t('savedOperation'),
+                color: 'positive',
+                closeBtn: true
+              })
             })
-          })
+            resolve()
+          }).onCancel(() => reject())
         })
       },
       firebaseMixin (refName, rtdb) {

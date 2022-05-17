@@ -1,6 +1,30 @@
 import { store } from 'quasar/wrappers'
 import { createPinia } from 'pinia'
-import { PiniaFirestoreSync } from 'pinia-plugin-firestore-sync'
+import { onSnapshot } from 'firebase/firestore'
+
+export const PiniaFirestoreSync = ({ store }) => {
+  store.syncCollection = (key, ref) => {
+    return new Promise((resolve, reject) => {
+      let notified = false
+
+      onSnapshot(ref, (qs) => {
+        const datum = qs.docs.map(d => ({ id: d.id, ...d.data() }))
+        store.$patch((state) => {
+          state[key] = datum
+        })
+        if (!notified) {
+          notified = true
+          resolve()
+        }
+      }, (error) => {
+        if (!notified) {
+          notified = true
+          reject(error)
+        }
+      })
+    })
+  }
+}
 
 /*
  * If not building with SSR mode, you can
