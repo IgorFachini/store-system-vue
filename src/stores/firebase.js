@@ -8,7 +8,8 @@ const collectionsName = [
   'expenseProducts',
   'categories',
   'productsStockHistory',
-  'expenseProductsStockHistory'
+  'expenseProductsStockHistory',
+  'cashFlow'
 ]
 
 export const useFirebaseStore = defineStore('firebase', {
@@ -21,6 +22,8 @@ export const useFirebaseStore = defineStore('firebase', {
   }),
 
   getters: {
+    cashFlowByCustomerIdOrAll: state => customerId => customerId ? state.cashFlow.filter(cashFlow => cashFlow.customer?.id === customerId) : state.cashFlow,
+    customerById: state => customerId => state.customers.find(customer => customer.id === customerId),
     countProductsStockHistoryById (state) {
       return (id) => state.productsStockHistory.filter(item => item.productId === id).reduce((acc, item) => {
         return acc + item.quantity

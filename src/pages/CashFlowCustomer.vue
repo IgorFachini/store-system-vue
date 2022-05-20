@@ -73,8 +73,21 @@ import { defineComponent } from 'vue'
 import { date, Dialog, Notify } from 'quasar'
 const { formatDate } = date
 
+import { useFirebaseStore } from 'stores/firebase'
+import { storeToRefs } from 'pinia'
+
 export default defineComponent({
   name: 'CashFlowCustomer',
+
+  setup () {
+    const storeFirebase = useFirebaseStore()
+    const { loadingDatabase, customerById } = storeToRefs(storeFirebase)
+
+    return {
+      customerById,
+      loadingDatabase
+    }
+  },
   data () {
     return {
       total: 0,
@@ -83,29 +96,49 @@ export default defineComponent({
     }
   },
 
+  computed: {
+    customer () {
+      return this.customerById(this.$route.params.id)
+    }
+  },
+
+  watch: {
+    loadingDatabase (val) {
+      if (this.$route.params.id && !val) {
+        this.globalLoading = false
+        this.checkExists(this.$route.params.id)
+      }
+    }
+  },
+
   created () {
     this.date = formatDate(Date.now(), 'YYYY/MM/DD HH:mm')
+    if (this.loadingDatabase) {
+      this.globalLoading = true
+    }
   },
 
   mounted () {
     this.firebaseMixinInstance = this.firebaseMixin('cashFlow')
+    if (this.$route.params.id && !this.loadingDatabase) {
+      this.checkExists(this.$route.params.id)
+    }
   },
 
   methods: {
-    async save (purchase) {
-      let customer = {}
-      const id = this.$route.params.id
-      const customerRes = await this.firebaseMixin('customers').id(id).doc().get()
-      if (customerRes.exists) {
-        customer = customerRes.data()
-      } else {
+    checkExists (id) {
+      if (!this.customer) {
         Notify.create({
-          message: `${this.$t('customer')} ${this.$t('notExist')}`,
+          message: this.$t('notExist'),
           color: 'negative',
           closeBtn: true
         })
-        return
+        this.$router.push('/customers')
       }
+    },
+    save (purchase) {
+      const customer = this.customer
+      const id = this.$route.params.id
       const customerName = `${this.$t('customer')}: ${customer.name}`
       Dialog.create({
         title: this.$t('confirm') + '?',
@@ -123,7 +156,7 @@ export default defineComponent({
             name: customer.name
           }
         }
-        this.firebaseMixin('cashFlow').add(sale)
+        this.firebaseMixin('cashFlow').add({ ...sale })
         if (purchase) {
           Dialog.create({
             title: this.$t('buyPayed') + '?',

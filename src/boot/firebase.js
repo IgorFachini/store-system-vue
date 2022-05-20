@@ -56,7 +56,7 @@ export default boot(({ app }) => {
       firebaseDeleteItem (refName, i18nLabelName, refData) {
         return new Promise((resolve, reject) => {
           Dialog.create({
-            title: `${this.$q.lang.label.remove} ${this.$t(i18nLabelName)}`,
+            title: `${this.$q.lang.label.remove} ${this.$t(i18nLabelName)} ?`,
             cancel: true,
             persistent: true
           }).onOk(() => {

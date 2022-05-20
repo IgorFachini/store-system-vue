@@ -9,7 +9,6 @@
       date
       range
       clearable
-      @range-end="loadCashFlow"
     />
 
     <div class="row q-col-gutter-md">
@@ -79,13 +78,25 @@
 import { date } from 'quasar'
 import { defineComponent } from 'vue'
 const { formatDate } = date
+
+import { useFirebaseStore } from 'stores/firebase'
+import { storeToRefs } from 'pinia'
+
 export default defineComponent({
   name: 'PageIndex',
 
+  setup () {
+    const storeFirebase = useFirebaseStore()
+    const { cashFlow, expenses } = storeToRefs(storeFirebase)
+
+    return {
+      cashFlow,
+      expenses
+    }
+  },
+
   data () {
     return {
-      cashFlow: [],
-      expenses: [],
       modelData: {
         from: '',
         to: ''
@@ -164,11 +175,6 @@ export default defineComponent({
       const lastDay = new Date(y, m + 1, 0)
       this.modelData.from = formatDate(firstDay, 'YYYY/MM/DD')
       this.modelData.to = formatDate(lastDay, 'YYYY/MM/DD')
-      this.loadCashFlow()
-    },
-    loadCashFlow () {
-      this.firebaseMixin('cashFlow').bindField('cashFlow')
-      this.firebaseMixin('expenses').bindField('expenses')
     }
   }
 })

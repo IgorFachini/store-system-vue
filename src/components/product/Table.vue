@@ -76,7 +76,8 @@ export default defineComponent({
           label: this.$t('currentInventory'),
           field: row => this.countProductsStockHistoryById(row.id),
           sortable: true
-        }, { name: 'description', label: this.$t('description'), field: 'description' },
+        },
+        { name: 'description', label: this.$t('description'), field: 'description' },
         {
           name: 'category',
           label: this.$t('category'),

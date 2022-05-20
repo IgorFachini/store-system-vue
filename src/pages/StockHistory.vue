@@ -9,7 +9,7 @@
         :columns="columns"
         :loading="loading"
         @edit="edit"
-        @delete="row => firebaseDeleteItem(nameHistory, row)"
+        @delete="row => firebaseDeleteItem(nameHistory, 'stockHistory', row.id)"
       >
         <template #top-left>
           <div class="q-table__title">

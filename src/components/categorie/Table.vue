@@ -3,9 +3,9 @@
     :title="$t('category', 2)"
     :rows="categories"
     :columns="columns"
-    :loading="loading"
+    :loading="loadingDatabase"
     @edit="edit"
-    @delete="deleteAction"
+    @delete="row => firebaseDeleteItem('categories', 'category', row.id)"
   />
 </template>
 
@@ -15,16 +15,29 @@ import { date, Dialog, Notify } from 'quasar'
 import { defineComponent } from 'vue'
 const { formatDate } = date
 
+import { useFirebaseStore } from 'stores/firebase'
+import { storeToRefs } from 'pinia'
+
 export default defineComponent({
   name: 'CategoriesTable',
 
-  data () {
+  setup () {
+    const storeFirebase = useFirebaseStore()
+    const { categories, loadingDatabase } = storeToRefs(storeFirebase)
+
     return {
-      firebaseMixinInstance: null,
-      loading: false,
-      categories: []
+      categories,
+      loadingDatabase
     }
   },
+
+  // data () {
+  //   return {
+  //     firebaseMixinInstance: null,
+  //     loading: false,
+  //     categories: []
+  //   }
+  // },
 
   computed: {
     columns () {
@@ -49,14 +62,14 @@ export default defineComponent({
     }
   },
 
-  mounted () {
-    this.loading = true
-    this.firebaseMixinInstance = this.firebaseMixin('categories')
+  // mounted () {
+  //   this.loading = true
+  //   this.firebaseMixinInstance = this.firebaseMixin('categories')
 
-    this.firebaseMixinInstance.bindField('categories').finally(() => {
-      this.loading = false
-    })
-  },
+  //   this.firebaseMixinInstance.bindField('categories').finally(() => {
+  //     this.loading = false
+  //   })
+  // },
 
   methods: {
     edit (row) {
