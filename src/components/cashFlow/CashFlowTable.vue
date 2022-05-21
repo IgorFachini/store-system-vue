@@ -3,7 +3,7 @@
     v-model:pagination="paginationInside"
     :rows="cashFlow"
     :columns="columnsCashFlow"
-    :loading="loading"
+    :loading="loadingDatabase"
     class="full-width"
   >
     <template #top-left>
@@ -47,7 +47,7 @@
           dense
           color="negative"
           :loading="row.loading"
-          @click="deleteAction(row)"
+          @click="firebaseDeleteItem('cashFlow', 'cashFlow', row.id)"
         />
       </q-td>
     </template>
@@ -56,9 +56,12 @@
 
 <script>
 
-import { date, Dialog, Notify } from 'quasar'
+import { date } from 'quasar'
 import { defineComponent } from 'vue'
 const { formatDate } = date
+
+import { useFirebaseStore } from 'stores/firebase'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'CashFlowTable',
@@ -70,12 +73,22 @@ export default defineComponent({
     }
   },
 
+  setup () {
+    const storeFirebase = useFirebaseStore()
+    const { cashFlowByCustomerIdOrAll, loadingDatabase } = storeToRefs(storeFirebase)
+
+    return {
+      cashFlowByCustomerIdOrAll,
+      loadingDatabase
+    }
+  },
+
   data () {
     return {
       search: '',
-      firebaseMixinInstance: null,
-      loading: false,
-      cashFlow: [],
+      // firebaseMixinInstance: null,
+      // loading: false,
+      // cashFlow: [],
       paginationInside: {
         page: 1,
         rowsPerPage: 25,
@@ -86,6 +99,9 @@ export default defineComponent({
   },
 
   computed: {
+    cashFlow () {
+      return this.cashFlowByCustomerIdOrAll(this.customerId)
+    },
     debt () {
       return this.cashFlow.reduce((acc, row) => {
         if (row.type === 'fastSale' || row.type === 'payment') {
@@ -118,24 +134,24 @@ export default defineComponent({
     }
   },
 
-  mounted () {
-    this.setup()
-  },
+  // mounted () {
+  //   this.setup()
+  // },
 
   methods: {
-    setup () {
-      this.loading = true
-      this.firebaseMixinInstance = this.firebaseMixin('cashFlow')
-      if (this.customerId) {
-        this.$bind('cashFlow', this.firebaseMixin('cashFlow').ref().where('customer.id', '==', this.customerId).orderBy('date')).finally(() => {
-          this.loading = false
-        })
-      } else {
-        this.firebaseMixinInstance.bindField('cashFlow').finally(() => {
-          this.loading = false
-        })
-      }
-    },
+    // setup () {
+    //   this.loading = true
+    //   this.firebaseMixinInstance = this.firebaseMixin('cashFlow')
+    //   if (this.customerId) {
+    //     this.$bind('cashFlow', this.firebaseMixin('cashFlow').ref().where('customer.id', '==', this.customerId).orderBy('date')).finally(() => {
+    //       this.loading = false
+    //     })
+    //   } else {
+    //     this.firebaseMixinInstance.bindField('cashFlow').finally(() => {
+    //       this.loading = false
+    //     })
+    //   }
+    // },
     getClassColor (type) {
       const colorMapType = {
         quickExit: 'text-red',
@@ -144,24 +160,6 @@ export default defineComponent({
         purchase: 'text-blue'
       }
       return colorMapType[type]
-    },
-    deleteAction (row) {
-      Dialog.create({
-        title: `${this.$q.lang.label.remove} ${this.$t('cashFlow')}`,
-        cancel: true,
-        persistent: true
-      }).onOk(() => {
-        row.loading = true
-        this.firebaseMixinInstance.id(row.id).delete().finally(() => {
-          row.loading = false
-          Notify.create({
-            message: this.$t('savedOperation'),
-            color: 'positive',
-            closeBtn: true
-          })
-          this.setup()
-        })
-      })
     }
   }
 })

@@ -108,6 +108,9 @@ import { Notify } from 'quasar'
 import { defineComponent } from 'vue'
 import VInputCep from 'src/components/common/VInputCep.vue'
 
+import { useFirebaseStore } from 'stores/firebase'
+import { storeToRefs } from 'pinia'
+
 export default defineComponent({
   name: 'CustomersForm',
 
@@ -118,7 +121,11 @@ export default defineComponent({
   emits: ['done'],
 
   setup () {
+    const storeFirebase = useFirebaseStore()
+    const { customers, loadingDatabase } = storeToRefs(storeFirebase)
     return {
+      customers,
+      loadingDatabase,
       modelForm: {
         name: '',
         cellphone: '',
@@ -137,29 +144,44 @@ export default defineComponent({
 
   data () {
     return {
+      // customers: [],
       firebaseMixinInstance: null,
       form: {},
       loading: false,
-      customers: [],
       nameBefore: '',
       viewMode: false
     }
   },
 
+  watch: {
+    loadingDatabase (val) {
+      if (this.$route.params.id && !val) {
+        this.globalLoading = false
+        this.checkExists(this.$route.params.id)
+      }
+    }
+  },
+
   created () {
     this.form = { ...this.modelForm }
+    if (this.$route.params.id && !this.loadingDatabase) {
+      this.checkExists(this.$route.params.id)
+    }
+    if (this.loadingDatabase) {
+      this.globalLoading = true
+    }
   },
 
   mounted () {
-    this.loading = true
+    // this.loading = true
     this.firebaseMixinInstance = this.firebaseMixin('customers')
 
-    this.firebaseMixinInstance.bindField('customers').finally(() => {
-      this.loading = false
-      if (this.$route.params.id) {
-        this.checkExists(this.$route.params.id)
-      }
-    })
+    // this.firebaseMixinInstance.bindField('customers').finally(() => {
+    //   this.loading = false
+    //   if (this.$route.params.id) {
+    //     this.checkExists(this.$route.params.id)
+    //   }
+    // })
   },
 
   methods: {

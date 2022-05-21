@@ -42,6 +42,7 @@
         />
         <q-table
           v-model:pagination="pagination"
+          :loading="loadingDatabase"
           class="full-width table-cart-shop"
           grid
           grid-header
@@ -80,7 +81,7 @@
                   <div class="q-table__grid-item-title">
                     {{ col.label }}
                   </div><div class="q-table__grid-item-value">
-                    {{ col.format ? col.format(props.row[col.field]) : props.row[col.field] }}
+                    {{ getCollRowValue(col, props.row) }}
                   </div>
                 </div>
               </div>
@@ -451,18 +452,32 @@
 import { date, Dialog, Notify } from 'quasar'
 const { formatDate } = date
 import { defineComponent } from 'vue'
+import { useFirebaseStore } from 'stores/firebase'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'PageCartShop',
 
+  setup () {
+    const storeFirebase = useFirebaseStore()
+    const { products, countProductsStockHistoryById, loadingDatabase, customerById } = storeToRefs(storeFirebase)
+
+    return {
+      products,
+      countProductsStockHistoryById,
+      loadingDatabase,
+      customerById
+    }
+  },
+
   data () {
     return {
       tab: 'products',
-      loading: false,
-      saving: false,
+      // loading: false,
+      // saving: false,
       filter: '',
       firebaseMixinInstance: null,
-      products: [],
+      // products: [],
       pagination: {
         rowsPerPage: 0,
         sortBy: 'createdAt',
@@ -486,7 +501,12 @@ export default defineComponent({
       return [
         { name: 'name', label: this.$t('name'), field: 'name', sortable: true },
         { name: 'saleValue', label: this.$t('saleValue'), field: 'saleValue', sortable: true },
-        { name: 'currentInventory', label: this.$t('currentInventory'), field: 'currentInventory', sortable: true },
+        {
+          name: 'currentInventory',
+          label: this.$t('currentInventory'),
+          field: row => this.countProductsStockHistoryById(row.id),
+          sortable: true
+        },
         {
           name: 'createdAt',
           label: this.$t('createdAt'),
@@ -516,29 +536,55 @@ export default defineComponent({
     }
   },
 
+  watch: {
+    loadingDatabase (val) {
+      if (!val) {
+        this.globalLoading = false
+      }
+      if (this.$route.params.customerId) {
+        this.checkCustomerExists(this.$route.params.customerId)
+      }
+    }
+  },
+
   created () {
     this.date = formatDate(Date.now(), 'YYYY/MM/DD HH:mm')
+    if (this.loadingDatabase) {
+      this.globalLoading = true
+    }
   },
 
   mounted () {
-    this.loading = true
-    this.firebaseMixinInstance = this.firebaseMixin('products')
-    this.firebaseMixinInstance.bindField('products').then(products => {
-      products.forEach((product, index) => {
-        this.stockHistoryCount(product).then(count => {
-          this.products[index].currentInventory = count
-        })
-      })
-    }).finally(() => {
-      this.loading = false
-    })
+    if (this.$route.params.customerId && !this.loadingDatabase) {
+      this.checkCustomerExists(this.$route.params.customerId)
+    }
   },
 
+  // mounted () {
+  //   this.loading = true
+  //   this.firebaseMixinInstance = this.firebaseMixin('products')
+  //   this.firebaseMixinInstance.bindField('products').then(products => {
+  //     products.forEach((product, index) => {
+  //       this.stockHistoryCount(product).then(count => {
+  //         this.products[index].currentInventory = count
+  //       })
+  //     })
+  //   }).finally(() => {
+  //     this.loading = false
+  //   })
+  // },
+
   methods: {
-    stockHistoryCount (row) {
-      return this.firebaseMixin('stockHistory').ref().where('productId', '==', row.id).get().then(snapshot => snapshot.docs.map(doc => doc.data()).reduce((acc, item) => {
-        return acc + item.quantity
-      }, 0))
+    // stockHistoryCount (row) {
+    //   return this.firebaseMixin('stockHistory').ref().where('productId', '==', row.id).get().then(snapshot => snapshot.docs.map(doc => doc.data()).reduce((acc, item) => {
+    //     return acc + item.quantity
+    //   }, 0))
+    // },
+    getCollRowValue (col, row) {
+      if (typeof col.field === 'function') {
+        return col.field(row)
+      }
+      return col.format ? col.format(row[col.field]) : row[col.field]
     },
     calcDiscountResult (discountObject, value) {
       if (!discountObject?.type) {
@@ -642,23 +688,24 @@ export default defineComponent({
         }
       }
     },
-    async save (customerId) {
+    checkCustomerExists (id) {
+      const customer = this.customerById(id)
+      if (!customer) {
+        Notify.create({
+          message: `${this.$t('customer')} ${this.$t('notExist')}`,
+          color: 'negative',
+          closeBtn: true
+        })
+        this.$router.push('/customers')
+      }
+    },
+    save (customerId) {
       this.chooseCustomerModalOpen = false
       this.saveDialogOpen = false
-      let customer = {}
-      if (this.$route.params.customerId || customerId) {
-        const customerRes = await this.firebaseMixin('customers').id(customerId).doc().get()
-        if (customerRes.exists) {
-          customer = customerRes.data()
-        } else {
-          Notify.create({
-            message: `${this.$t('customer')} ${this.$t('notExist')}`,
-            color: 'negative',
-            closeBtn: true
-          })
-          return
-        }
+      if (customerId) {
+        this.checkCustomerExists(customerId)
       }
+      const customer = this.customerById(customerId)
       Dialog.create({
         title: this.$t('confirmPurchase') + '?',
         message: customerId ? `${this.$t('customer')}: ${customer.name}` : this.$t('fastSale'),
@@ -666,7 +713,7 @@ export default defineComponent({
         cancel: true
       }).onOk(async () => {
         const sale = {
-          type: customer.name ? 'purchase' : 'fastSale',
+          type: customer?.name ? 'purchase' : 'fastSale',
           ...(this.subtotalDiscountObject?.type) && { subtotalDiscountObject: this.subtotalDiscountObject },
           date: this.date,
           total: this.total,
@@ -687,16 +734,15 @@ export default defineComponent({
         this.firebaseMixin('cashFlow').add({ ...sale })
         this.cartShopGroupedArray.forEach(item => {
           if (item.decreaseStock) {
-            const productRef = this.firebaseMixin('products').id(item.product.id).doc()
-            this.firebaseMixin('stockHistory').add({
-              product: productRef,
+            this.firebaseMixin('productsStockHistory').add({
+              productId: item.product.id,
               quantity: -Math.abs(item.quantity),
-              description: `${this.$t('boughtBy')} ` + customerId ? `${this.$t('customer')}: ${customer.name}` : this.$t('fastSale')
+              description: `${this.$t('boughtBy')} ` + (customerId ? `${this.$t('customer')}: ${customer?.name}` : this.$t('fastSale'))
             })
           }
         })
 
-        if (customer.name) {
+        if (customer?.name) {
           Dialog.create({
             title: this.$t('buyPayed') + '?',
             cancel: {

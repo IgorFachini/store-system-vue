@@ -203,6 +203,10 @@ const labels = {
     enUS: 'Decrease Stock',
     pt: 'Diminuir Estoque'
   },
+  increaseStock: {
+    enUS: 'Increase Stock',
+    pt: 'Aumentar Estoque'
+  },
   savedOperation: {
     enUS: 'Saved Operation',
     pt: 'Operação Salva'

@@ -3,27 +3,47 @@
     :title="$t('expenseProduct', 2)"
     :rows="expenseProducts"
     :columns="columns"
-    :loading="loading"
+    :loading="loadingDatabase"
     @edit="edit"
-    @delete="deleteAction"
-    @view="view"
-  />
+    @delete="row => firebaseDeleteItem('expenseProducts', 'expenseProduct', row.id)"
+  >
+    <template #action-more="props">
+      <q-btn
+        :label="$t('stockHistory')"
+        dense
+        color="blue"
+        @click="stockHistory(props.row)"
+      />
+    </template>
+  </v-table-crud>
 </template>
 
 <script>
 
-import { date, Dialog, Notify } from 'quasar'
+import { date } from 'quasar'
 import { defineComponent } from 'vue'
 const { formatDate } = date
+
+import { useFirebaseStore } from 'stores/firebase'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'ExpenseProductsTable',
 
+  setup () {
+    const storeFirebase = useFirebaseStore()
+    const { expenseProducts, countExpenseProductsStockHistoryById, loadingDatabase } = storeToRefs(storeFirebase)
+
+    return {
+      expenseProducts,
+      countExpenseProductsStockHistoryById,
+      loadingDatabase
+    }
+  },
+
   data () {
     return {
-      firebaseMixinInstance: null,
-      loading: false,
-      expenseProducts: []
+      loading: false
     }
   },
 
@@ -31,8 +51,14 @@ export default defineComponent({
     columns () {
       return [
         { name: 'name', label: this.$t('name'), field: 'name', sortable: true },
-        { name: 'weightType', label: this.$t('weightType'), field: 'weightType', sortable: true },
         { name: 'description', label: this.$t('description'), field: 'description' },
+        { name: 'weightType', label: this.$t('weightType'), field: 'weightType', sortable: true },
+        {
+          name: 'currentInventory',
+          label: this.$t('currentInventory'),
+          field: row => this.countExpenseProductsStockHistoryById(row.id),
+          sortable: true
+        },
         {
           name: 'createdAt',
           label: this.$t('createdAt'),
@@ -51,42 +77,17 @@ export default defineComponent({
     }
   },
 
-  mounted () {
-    this.loading = true
-    this.firebaseMixinInstance = this.firebaseMixin('expenseProducts')
-    this.firebaseMixinInstance.bindField('expenseProducts').finally(() => {
-      this.loading = false
-    })
-  },
-
   methods: {
-    view (row) {
+    stockHistory (row) {
       this.$router.push({
-        name: 'expenseProducts.view',
+        name: 'expense-products.stockHistory',
         params: { id: row.id }
       })
     },
     edit (row) {
       this.$router.push({
-        name: 'expenseProducts.edit',
+        name: 'expense-products.edit',
         params: { id: row.id }
-      })
-    },
-    deleteAction (row) {
-      Dialog.create({
-        title: `${this.$q.lang.label.remove} ${this.$t('expenseProduct')}?`,
-        cancel: true,
-        persistent: true
-      }).onOk(() => {
-        row.loading = true
-        this.firebaseMixinInstance.id(row.id).delete().finally(() => {
-          row.loading = false
-          Notify.create({
-            message: this.$t('savedOperation'),
-            color: 'positive',
-            closeBtn: true
-          })
-        })
       })
     }
   }

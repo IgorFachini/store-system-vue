@@ -3,11 +3,11 @@
     :title="$t('customer', 2)"
     :rows="customers"
     :columns="columns"
-    :loading="loading"
+    :loading="loadingDatabase"
     @view="view"
     @edit="edit"
-    @delete="deleteAction"
-    @choose="val => $emit('choose', val)"
+    @delete="row => firebaseDeleteItem('customers', 'customer', row.id)"
+    @choose="row => $emit('choose', row)"
   >
     <template #action-more="props">
       <q-btn
@@ -22,9 +22,12 @@
 
 <script>
 
-import { date, Dialog, Notify } from 'quasar'
+import { date } from 'quasar'
 import { defineComponent } from 'vue'
 const { formatDate } = date
+
+import { useFirebaseStore } from 'stores/firebase'
+import { storeToRefs } from 'pinia'
 
 export default defineComponent({
   name: 'CustomersTable',
@@ -35,13 +38,22 @@ export default defineComponent({
 
   emits: ['choose'],
 
-  data () {
+  setup () {
+    const storeFirebase = useFirebaseStore()
+    const { customers, loadingDatabase } = storeToRefs(storeFirebase)
+
     return {
-      firebaseMixinInstance: null,
-      loading: false,
-      customers: []
+      customers,
+      loadingDatabase
     }
   },
+
+  // data () {
+  //   return {
+  //     firebaseMixinInstance: null,
+  //     loading: false
+  //   }
+  // },
 
   computed: {
     columns () {
@@ -76,14 +88,14 @@ export default defineComponent({
     }
   },
 
-  mounted () {
-    this.loading = true
-    this.firebaseMixinInstance = this.firebaseMixin('customers')
+  // mounted () {
+  //   this.loading = true
+  //   this.firebaseMixinInstance = this.firebaseMixin('customers')
 
-    this.firebaseMixinInstance.bindField('customers').finally(() => {
-      this.loading = false
-    })
-  },
+  //   this.firebaseMixinInstance.bindField('customers').finally(() => {
+  //     this.loading = false
+  //   })
+  // },
 
   methods: {
     view (row) {
@@ -96,23 +108,6 @@ export default defineComponent({
       this.$router.push({
         name: 'customers.edit',
         params: { id: row.id }
-      })
-    },
-    deleteAction (row) {
-      Dialog.create({
-        title: `${this.$q.lang.label.remove} ${this.$t('customer')}`,
-        cancel: true,
-        persistent: true
-      }).onOk(() => {
-        row.loading = true
-        this.firebaseMixinInstance.id(row.id).delete().finally(() => {
-          row.loading = false
-          Notify.create({
-            message: this.$t('savedOperation'),
-            color: 'positive',
-            closeBtn: true
-          })
-        })
       })
     }
   }

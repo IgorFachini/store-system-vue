@@ -1,3 +1,6 @@
+import { mapWritableState } from 'pinia'
+import { useMainStore } from 'stores/main'
+
 export default {
   data () {
     return {
@@ -5,6 +8,7 @@ export default {
     }
   },
   computed: {
+    ...mapWritableState(useMainStore, ['globalLoading']),
     isMobile () {
       return this.$q.screen.lt.sm
     },
