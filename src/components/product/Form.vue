@@ -263,8 +263,10 @@ export default defineComponent({
 
   watch: {
     loadingDatabase (val) {
-      if (this.$route.params.id && !val) {
+      if (!val) {
         this.globalLoading = false
+      }
+      if (this.$route.params.id) {
         this.checkExists(this.$route.params.id)
       }
     }

@@ -15,6 +15,8 @@ import ExpenseProductsForm from '../components/expenseProduct/Form.vue'
 import ExpenseProductsTable from '../components/expenseProduct/Table.vue'
 import CashFlowTable from '../components/cashFlow/CashFlowTable.vue'
 import FastAction from '../components/cashFlow/FastAction.vue'
+import ExpensesForm from '../components/expense/Form.vue'
+import ExpensesTable from '../components/expense/Table.vue'
 
 const utils = {
   methods: {
@@ -40,6 +42,8 @@ export default boot(({ app }) => {
   app.component('FastAction', FastAction)
   app.component('ExpenseProductsForm', ExpenseProductsForm)
   app.component('ExpenseProductsTable', ExpenseProductsTable)
+  app.component('ExpensesForm', ExpensesForm)
+  app.component('ExpensesTable', ExpensesTable)
   app.mixin(Screen)
   app.mixin(utils)
 })

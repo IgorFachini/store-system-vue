@@ -84,11 +84,11 @@
           </q-item-label>
         </q-item>
 
-        <q-item to="/sales">
+        <!-- <q-item to="/sales">
           <q-item-label>
             {{ $t('sale', 2) }}
           </q-item-label>
-        </q-item>
+        </q-item> -->
 
         <q-item to="/expense-products">
           <q-item-label>

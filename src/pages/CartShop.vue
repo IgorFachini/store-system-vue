@@ -734,8 +734,6 @@ export default defineComponent({
         this.firebaseMixin('cashFlow').add({ ...sale })
         this.cartShopGroupedArray.forEach(item => {
           if (item.decreaseStock) {
-            console.log('customer', !!customerId)
-            console.log('l', `${this.$t('boughtBy')} ` + (customerId ? `${this.$t('customer')}: ${customer?.name}` : this.$t('fastSale')))
             this.firebaseMixin('productsStockHistory').add({
               productId: item.product.id,
               quantity: -Math.abs(item.quantity),
