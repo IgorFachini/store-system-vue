@@ -5,17 +5,15 @@
   >
     <div class="col-xs-12 col-sm-12 col-md-8">
       <v-table-crud
-        :title="`${$t('stockHistory', 2)}: ${product.name} -
-        ${$t('inStock')}: ${quantity}`"
         :rows="stockHistory"
         :columns="columns"
         :loading="loading"
         @edit="edit"
-        @delete="deleteAction"
+        @delete="row => firebaseDeleteItem(nameHistory, 'stockHistory', row.id)"
       >
         <template #top-left>
           <div class="q-table__title">
-            {{ $t('stockHistory', 2) }}: {{ product.name }}
+            {{ $t('stockHistory', 2) }}: {{ item.name }}
           </div>
           <div class="row">
             {{ $t('inStock') }}: {{ quantity }}
@@ -60,15 +58,21 @@
 
 <script>
 
-import { date, Dialog, Notify } from 'quasar'
+import { date, Notify } from 'quasar'
 import { defineComponent } from 'vue'
 const { formatDate } = date
+import { useFirebaseStore } from 'stores/firebase'
+import { mapState } from 'pinia'
 
 export default defineComponent({
-  name: 'ProductStockHistory',
+  name: 'StockHistory',
 
   setup () {
     return {
+      referenceIdName: {
+        expenseProducts: 'expenseProductId',
+        products: 'productId'
+      },
       modelForm: {
         description: '',
         quantity: 0
@@ -82,16 +86,29 @@ export default defineComponent({
       loading: false,
       saving: false,
       firebaseMixinInstance: null,
-      stockHistory: [],
-      product: {}
+      item: {}
     }
   },
 
   computed: {
+    ...mapState(useFirebaseStore, {
+      stockHistory (store) {
+        return store[this.nameHistory].filter(item => item[this.referenceIdName[this.collectionName]] === this.itemId)
+      }
+    }),
+    nameHistory () {
+      return `${this.collectionName}StockHistory`
+    },
+    collectionName () {
+      return this.$route.name.split('.')[0]
+    },
     quantity () {
       return this.stockHistory.reduce((acc, item) => {
         return acc + item.quantity
       }, 0)
+    },
+    itemId () {
+      return this.$route.params.id
     },
     columns () {
       return [
@@ -120,13 +137,12 @@ export default defineComponent({
 
   methods: {
     load () {
-      this.loading = true
-      this.firebaseMixinInstance = this.firebaseMixin('stockHistory')
-      this.firebaseMixin('products').id(this.$route.params.id).doc().get().then(doc => {
-        this.product = doc.data()
-      })
-      this.$bind('stockHistory', this.firebaseMixinInstance.ref().where('productId', '==', this.$route.params.id).orderBy('createdAt')).finally(() => {
-        this.loading = false
+      this.firebaseMixin(this.collectionName).id(this.itemId).doc().get().then(doc => {
+        if (!doc.exists) {
+          this.$router.back()
+          return
+        }
+        this.item = doc.data()
       })
     },
     reset () {
@@ -136,12 +152,12 @@ export default defineComponent({
       })
     },
     save () {
-      const ref = this.firebaseMixinInstance
+      const ref = this.firebaseMixin(this.nameHistory)
       const action = this.form.id
         ? ref.id(this.form.id).update : ref.add
       const form = {
         ...this.form,
-        productId: this.$route.params.id
+        [this.referenceIdName[this.collectionName]]: this.$route.params.id
       }
       action(form).catch((err) => {
         console.log('err', err)
@@ -156,25 +172,6 @@ export default defineComponent({
     },
     edit (row) {
       this.form = { ...row, id: row.id }
-    },
-
-    deleteAction (row) {
-      Dialog.create({
-        title: `${this.$q.lang.label.remove} ${this.$t('history')}`,
-        cancel: true,
-        persistent: true
-      }).onOk(() => {
-        row.loading = true
-        this.firebaseMixinInstance.id(row.id).delete().finally(() => {
-          row.loading = false
-          this.load()
-          Notify.create({
-            message: this.$t('savedOperation'),
-            color: 'positive',
-            closeBtn: true
-          })
-        })
-      })
     }
   }
 })

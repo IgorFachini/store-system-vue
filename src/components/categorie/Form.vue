@@ -40,13 +40,21 @@
 import { Notify } from 'quasar'
 import { defineComponent } from 'vue'
 
+import { useFirebaseStore } from 'stores/firebase'
+import { storeToRefs } from 'pinia'
+
 export default defineComponent({
   name: 'CategoriesForm',
 
   emits: ['done'],
 
   setup () {
+    const storeFirebase = useFirebaseStore()
+    const { categories, loadingDatabase } = storeToRefs(storeFirebase)
+
     return {
+      categories,
+      loadingDatabase,
       modelForm: {
         name: '',
         description: ''
@@ -56,29 +64,44 @@ export default defineComponent({
 
   data () {
     return {
-      firebaseMixinInstance: null,
+      // firebaseMixinInstance: null,
+      // categories: [],
+      // loading: false,
       form: {},
-      loading: false,
-      categories: [],
       nameBefore: '',
       viewMode: false
     }
   },
 
+  watch: {
+    loadingDatabase (val) {
+      if (this.$route.params.id && !val) {
+        this.globalLoading = false
+        this.checkExists(this.$route.params.id)
+      }
+    }
+  },
+
   created () {
     this.form = { ...this.modelForm }
+    if (this.$route.params.id && !this.loadingDatabase) {
+      this.checkExists(this.$route.params.id)
+    }
+    if (this.loadingDatabase) {
+      this.globalLoading = true
+    }
   },
 
   mounted () {
-    this.loading = true
+    // this.loading = true
     this.firebaseMixinInstance = this.firebaseMixin('categories')
 
-    this.firebaseMixinInstance.bindField('categories').finally(() => {
-      this.loading = false
-      if (this.$route.params.id) {
-        this.checkExists(this.$route.params.id)
-      }
-    })
+    // this.firebaseMixinInstance.bindField('categories').finally(() => {
+    //   this.loading = false
+    //   if (this.$route.params.id) {
+    //     this.checkExists(this.$route.params.id)
+    //   }
+    // })
   },
 
   methods: {

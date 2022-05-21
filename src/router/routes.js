@@ -3,7 +3,8 @@ const simpleCrudRoutersPath = [
   'customers',
   'expense-products',
   'products',
-  'categories'
+  'categories',
+  'expenses'
 ]
 
 const crudRouterNames = [
@@ -41,17 +42,17 @@ const routes = [
       {
         path: '/products/stock-history/:id',
         name: 'products.stockHistory',
-        component: () => import('src/pages/ProductStockHistory.vue')
+        component: () => import('src/pages/StockHistory.vue')
       },
       {
-        path: '/sales',
-        component: () => import('src/pages/Sales.vue')
+        path: '/expense-products/stock-history/:id',
+        name: 'expenseProducts.stockHistory',
+        component: () => import('src/pages/StockHistory.vue')
       },
-      {
-        path: '/expenses',
-        name: 'expenses',
-        component: () => import('src/pages/Expenses.vue')
-      },
+      // {
+      //   path: '/sales',
+      //   component: () => import('src/pages/Sales.vue')
+      // },
       {
         path: '/cart-shop',
         component: () => import('src/pages/CartShop.vue')
