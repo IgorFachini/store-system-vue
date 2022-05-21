@@ -268,13 +268,14 @@ export default defineComponent({
     save () {
       const ref = this.firebaseMixinInstance
       const form = { ...this.form, expenseProducts: this.form.expenseProducts.map(({ id, value, quantity, name, weightType }) => ({ id, value, quantity, name, weightType })) }
+      const expenseProducts = this.form.expenseProducts
       const action = form.id
         ? ref.id(form.id).update : ref.add
       action(form).then(() => {
-        form.expenseProducts.forEach(item => {
+        expenseProducts.forEach(item => {
           if (item.increaseStock) {
             this.firebaseMixin('expenseProductsStockHistory').add({
-              productId: item.id,
+              expenseProductId: item.id,
               quantity: item.quantity,
               description: form.description
             })
