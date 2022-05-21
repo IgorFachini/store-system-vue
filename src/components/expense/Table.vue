@@ -14,7 +14,7 @@
           v-for="expenseProduct in row.expenseProducts"
           :key="expenseProduct.name"
         >
-          {{ expenseProduct.name }} "{{ expenseProduct.weightType }}": {{ expenseProduct.value }}
+          {{ expenseProduct.name }} "{{ expenseProduct.weightType }}": {{ expenseProduct.quantity }} - {{ expenseProduct.value }}
         </div>
       </q-td>
     </template>

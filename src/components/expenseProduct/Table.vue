@@ -80,7 +80,7 @@ export default defineComponent({
   methods: {
     stockHistory (row) {
       this.$router.push({
-        name: 'expense-products.stockHistory',
+        name: 'expenseProducts.stockHistory',
         params: { id: row.id }
       })
     },
