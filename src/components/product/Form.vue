@@ -111,7 +111,7 @@
             :loading="loading"
             autocomplete
             sorted
-            :label="$t('product')"
+            :label="$t('expenseProduct')"
             :options="expenseProductsOptions"
             :rules="[
               val => !recipeForm.quantity || !!val.length,
