@@ -88,6 +88,11 @@
         <div class="text-h6">
           {{ $t('recipe') }}
         </div>
+        <q-checkbox
+          v-model="decreaseStockRecipes"
+          :label="`${$t('decreaseStock')} (${$t('recipe', 2)})`"
+          left-label
+        />
       </q-card-section>
       <q-separator />
 
@@ -238,6 +243,7 @@ export default defineComponent({
 
   data () {
     return {
+      decreaseStockRecipes: true,
       form: {},
       recipeForm: {},
       loading: false,
@@ -328,6 +334,7 @@ export default defineComponent({
       this.resetRecipe()
       this.form = { ...this.modelForm, recipes: [] }
       this.currentInventory = 0
+      this.decreaseStockRecipes = true
       this.$nextTick(() => {
         this.$refs.form?.resetValidation()
       })
@@ -337,6 +344,7 @@ export default defineComponent({
       const ref = this.firebaseMixinInstance
       const form = { ...this.form }
       const currentInventory = this.currentInventory
+      const decreaseStockRecipes = this.decreaseStockRecipes
       if (this.form.category) {
         const idCategory = this.categories.find(c => c.name === this.form.category).id
         this.form.category = this.firebaseMixin('categories').id(idCategory).doc()
@@ -345,11 +353,20 @@ export default defineComponent({
         ? ref.id(form.id).update : ref.add
       action(form).then((res) => {
         if (!form.id && currentInventory !== 0) {
-          this.firebaseMixin('stockHistory').add({
+          this.firebaseMixin('productsStockHistory').add({
             productId: res.id,
             quantity: currentInventory,
             description
           })
+          if (decreaseStockRecipes) {
+            form.recipes.forEach(item => {
+              this.firebaseMixin('expenseProductsStockHistory').add({
+                expenseProductId: item.id,
+                quantity: -Math.abs(item.quantity * currentInventory),
+                description: `${this.$t('increaseStock')}: ${form.name}`
+              })
+            })
+          }
         }
       }).catch((err) => {
         console.log('err', err)

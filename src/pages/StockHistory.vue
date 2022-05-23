@@ -40,6 +40,13 @@
           :rules="[val => val != 0]"
         />
 
+        <q-checkbox
+          v-if="nameHistory === 'productsStockHistory' && form.quantity > 0"
+          v-model="decreaseStockRecipes"
+          :label="`${$t('decreaseStock')} (${$t('recipe', 2)})`"
+          left-label
+        />
+
         <div class="row q-gutter-md q-mt-md justify-between">
           <q-btn
             label="Reset"
@@ -86,6 +93,7 @@ export default defineComponent({
       loading: false,
       saving: false,
       firebaseMixinInstance: null,
+      decreaseStockRecipes: true,
       item: {}
     }
   },
@@ -142,11 +150,12 @@ export default defineComponent({
           this.$router.back()
           return
         }
-        this.item = doc.data()
+        this.item = { ...doc.data(), id: doc.id }
       })
     },
     reset () {
       this.form = { ...this.modelForm }
+      this.decreaseStockRecipes = true
       this.$nextTick(() => {
         this.$refs.form.resetValidation()
       })
@@ -162,6 +171,17 @@ export default defineComponent({
       action(form).catch((err) => {
         console.log('err', err)
       })
+      if (this.nameHistory === 'productsStockHistory') {
+        if (this.decreaseStockRecipes && form.quantity > 0 && this.item.recipes.length) {
+          this.item.recipes.forEach(item => {
+            this.firebaseMixin('expenseProductsStockHistory').add({
+              expenseProductId: item.id,
+              quantity: -Math.abs(item.quantity * form.quantity),
+              description: `${this.$t('increaseStock')}: ${this.item.name}`
+            })
+          })
+        }
+      }
       Notify.create({
         message: this.$t('savedOperation'),
         color: 'positive',
