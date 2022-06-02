@@ -2,7 +2,51 @@
 
 A Quasar Framework app, made for simple stores.
 
+Focused on salespeople who sell products to customers.
+
 Database: Firestore Database Only
+
+## Functionalities
+
++ All pages protected
++ Authentication by email registered in firebase, multi users support
++ PWA support
++ All data is saved offline when pwa is installed, and updated in real time when connected to the “internet”
+
++ Langue support (i18n)
+    + English
+    + Portuguese
+<br>
+<br>
++ Home Dashboard
++ CRUD (Create, Read, Update, Delete)
+    + Customers
+    + Products
+    + Categories
+    + Expenses Products
+    + Expenses
+<br>
+<br>
++ Stock history
+    + Expense Products
+    + Products
+<br>
+<br>
++ Cash Flow (Fast Sales, Purchases, Payments, Quick Exit)
+    + All Cash Flow
+    + Customer cash flow
+<br>
+<br>
++ Shopping cart (List products)
+    + Discounts in % porcentage and $ value
+    + Custom Sale Value
+    + Option to reduce product stock
+<br>
+<br>
++ Recipe for product (Materials from the expense product list that make up the product.)
+    + Option for when product inventory increases, decrease inventory of expense products used in the product.
+
+
 ## User to testing in live preview (fake)
 
 Email: staging@staging.com
@@ -25,11 +69,6 @@ FIREBASE_APP_ID=variable
 FIREBASE_MEASUREMENT_ID=variable
 ```
 
-# Firebase Query Search
-
-In home, have a search by date, to it works, need configure a [index](https://console.cloud.google.com/firestore/indexes/composite), for 
-- sales: type, date.
-- expenses:  createdAt, date
 ## Install the dependencies
 ```bash
 yarn
