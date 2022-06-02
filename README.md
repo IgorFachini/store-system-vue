@@ -63,10 +63,10 @@ Password: staging
 ```
 FIREBASE_API_KEY=variable
 FIREBASE_PROJECT_ID=variable
-FIREBASE_DATABASE_URL=variable
 ```
 ### Optional
 ```
+FIREBASE_DATABASE_URL=variable
 FIREBASE_AUTH_DOMAIN=variable
 FIREBASE_STORAGE_BUCKET=variable
 FIREBASE_MESSAGING_SENDER_ID=variable
