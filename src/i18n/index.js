@@ -348,8 +348,8 @@ const labels = {
     pt: 'Confirmar Compra'
   },
   purchase: {
-    enUS: 'Purchase',
-    pt: 'Compra'
+    enUS: 'Purchase | purchases',
+    pt: 'Compra | Compras'
   },
   payment: {
     enUS: 'Payment',

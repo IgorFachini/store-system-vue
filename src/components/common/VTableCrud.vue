@@ -49,6 +49,7 @@
                 color="accent"
                 round
                 dense
+                :disable="col.disable ? col.disable(props.row) : false"
                 :icon="props.expand ? 'remove' : 'add'"
                 @click="props.expand = !props.expand"
               />
