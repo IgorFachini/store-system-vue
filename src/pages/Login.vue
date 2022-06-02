@@ -71,6 +71,8 @@
 
 import Screen from 'mixins/Screen'
 import Logo from 'assets/quasar-logo-vertical.svg'
+import { useFirebaseStore } from 'stores/firebase'
+import { mapActions } from 'pinia'
 
 export default {
   name: 'PageLogin',
@@ -95,16 +97,14 @@ export default {
     }
   },
 
-  mounted () {
-    console.log('pei', this.$t, this.t)
-  },
-
   methods: {
+    ...mapActions(useFirebaseStore, ['setup']),
     onSubmit () {
       this.loading = true
       this.$firebaseAuth.signInWithEmailAndPassword(this.form.email, this.form.password)
         .then((userCredential) => {
           this.$router.push('/')
+          this.setup()
         }).catch((e) => {
           this.loginValid = false
           throw e
