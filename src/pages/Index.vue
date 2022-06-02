@@ -71,6 +71,29 @@
         </q-field>
       </div>
     </div>
+    <div>
+      <v-table-crud
+        :title="$t('purchase', 2) + ' - ' + $t('customer', 2)"
+        :rows="customersCashFlowGrouped"
+        :columns="customersCashFlowGroupedColumns"
+      >
+        <template #expand="propsCashFlow">
+          <v-table-crud
+            :title="$t('cashFlow') + ': ' + propsCashFlow.row.name"
+            :rows="propsCashFlow.row.cashFlow"
+            :columns=" customersCashFlowGroupedCashFlowColumns"
+          >
+            <template #expand="propsProducs">
+              <v-table-crud
+                :title="$t('product', 2) + ': ' + propsCashFlow.row.name"
+                :rows="propsProducs.row.products"
+                :columns=" customersCashFlowGroupedProductColumns"
+              />
+            </template>
+          </v-table-crud>
+        </template>
+      </v-table-crud>
+    </div>
   </q-page>
 </template>
 
@@ -161,6 +184,54 @@ export default defineComponent({
 
     totalExpenses () {
       return this.expensesFilterDateRange.reduce((a, b) => a + (b.total || 0), 0)
+    },
+
+    customersCashFlowGrouped () {
+      return this.cashFlowFilterDateRange.filter(c => c.customer && c.type === 'purchase')
+        .reduce((acc, item) => {
+          const customerIndex = acc.findIndex(c => c.id === item.customer.id)
+          if (customerIndex < 0) {
+            acc.push({
+              ...item.customer,
+              cashFlow: [item],
+              total: item.total
+            })
+          } else {
+            const customer = acc[customerIndex]
+            customer.total += item.total
+            customer.cashFlow.push(item)
+          }
+          return acc
+        }, [])
+    },
+    customersCashFlowGroupedColumns () {
+      return [
+        { name: 'name', label: this.$t('name'), field: 'name' },
+        { name: 'total', label: 'Total', field: 'total', format: value => value.toFixed(2), sortable: true },
+        { name: 'expand', label: this.$t('cashFlow') }
+      ]
+    },
+    customersCashFlowGroupedCashFlowColumns () {
+      return [
+        { name: 'total', label: 'Total', field: 'total', format: value => value.toFixed(2), sortable: true },
+        { name: 'description', label: this.$t('description'), field: 'description' },
+        {
+          name: 'date',
+          label: this.$t('date'),
+          field: 'date',
+          format: val => formatDate(val ? val.toDate() : '', 'DD/MM/YYYY'),
+          sortable: true
+        },
+        { name: 'expand', label: this.$t('product', 2), disable: (row) => !row.products || !row.products.length }
+      ]
+    },
+    customersCashFlowGroupedProductColumns () {
+      return [
+        { name: 'name', label: this.$t('name'), field: 'name' },
+        { name: 'quantity', label: this.$t('quantity'), field: 'quantity', sortable: true },
+        { name: 'unitaryValue', label: this.$t('unitaryValue'), field: 'unitaryValue', sortable: true },
+        { name: 'total', label: 'Total', field: (row) => row.quantity * row.unitaryValue, sortable: true }
+      ]
     }
   },
 
