@@ -16,8 +16,9 @@ Database: Firestore Database Only
 + Langue support (i18n)
     + English
     + Portuguese
+
 <br>
-<br>
+
 + Home Dashboard
 + CRUD (Create, Read, Update, Delete)
     + Customers
@@ -25,24 +26,28 @@ Database: Firestore Database Only
     + Categories
     + Expenses Products
     + Expenses
+
 <br>
-<br>
+
 + Stock history
     + Expense Products
     + Products
+
 <br>
-<br>
+
 + Cash Flow (Fast Sales, Purchases, Payments, Quick Exit)
     + All Cash Flow
     + Customer cash flow
+
 <br>
-<br>
+
 + Shopping cart (List products)
     + Discounts in % porcentage and $ value
     + Custom Sale Value
     + Option to reduce product stock
+
 <br>
-<br>
+
 + Recipe for product (Materials from the expense product list that make up the product.)
     + Option for when product inventory increases, decrease inventory of expense products used in the product.
 
