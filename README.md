@@ -13,7 +13,7 @@ Database: Firestore Database Only
 + PWA support
 + All data is saved offline when pwa is installed, and updated in real time when connected to the “internet”
 
-+ Langue support (i18n)
++ Language support (i18n)
     + English
     + Portuguese
 
