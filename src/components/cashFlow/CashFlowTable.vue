@@ -36,12 +36,20 @@
           v-for="product in row.products"
           :key="product.name"
         >
-          {{ product.name }}: {{ product.unitaryValue }} x {{ product.quantity }} = {{ (product.unitaryValue * product.quantity) }}
+          <div v-if="product.discountObject">
+            {{ product.name }}: {{ product.unitaryValue }} {{ $t('by') }} {{ calcDiscountResult(product.discountObject, product.unitaryValue).toFixed(2) }} x  {{ product.quantity }} = {{ (calcDiscountResult(product.discountObject, product.unitaryValue) * product.quantity).toFixed(2) }}
+          </div>
+          <div v-else>
+            {{ product.name }}: {{ product.unitaryValue }} x {{ product.quantity }} = {{ (product.unitaryValue * product.quantity) }}
+          </div>
+        </div>
+        <div v-if="row.subTotalDiscountObject">
+          {{ $t('discount') }}: {{ getDiscountValue(row.subTotalDiscountObject, sumProductsWithDiscountValue(row.products)) }}
         </div>
       </q-td>
     </template>
     <template #body-cell-date="{ row }">
-      <q-td class="row justify-around">
+      <q-td>
         {{ row.date }}
         <q-popup-edit
           v-slot="scope"
@@ -142,7 +150,7 @@ export default defineComponent({
           align: 'left'
         },
         { name: 'total', label: 'Total', field: 'total', classes: row => this.getClassColor(row.type), sortable: true },
-        { name: 'date', label: this.$t('date'), field: 'date', sortable: true, align: 'middle' },
+        { name: 'date', label: this.$t('date'), field: 'date', sortable: true, align: 'left' },
         {
           name: 'createdAt',
           label: this.$t('createdAt'),
@@ -160,6 +168,27 @@ export default defineComponent({
   // },
 
   methods: {
+    sumProductsWithDiscountValue (products) {
+      return products.reduce((acc, item) => acc + (item.discountObject
+        ? this.calcDiscountResult(item.discountObject, item.unitaryValue) * item.quantity
+        : item.unitaryValue * item.quantity) || 0, 0)
+    },
+    calcDiscountResult (discountObject, value) {
+      if (!discountObject?.type) {
+        return 0
+      }
+      return discountObject.type === 'value'
+        ? (value - discountObject.discount)
+        : value - (value * discountObject.discount / 100)
+    },
+    getDiscountValue (discountObject, value) {
+      if (!discountObject?.type) {
+        return 0
+      }
+      return discountObject.type === 'value'
+        ? discountObject.discount
+        : (value * discountObject.discount / 100)
+    },
     update (row) {
       this.firebaseMixin('cashFlow').id(row.id).update(row)
     },
