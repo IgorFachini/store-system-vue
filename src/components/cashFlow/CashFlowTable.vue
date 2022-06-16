@@ -40,6 +40,23 @@
         </div>
       </q-td>
     </template>
+    <template #body-cell-date="{ row }">
+      <q-td class="row justify-around">
+        {{ row.date }}
+        <q-popup-edit
+          v-slot="scope"
+          v-model="row.date"
+          buttons
+          @save="(date) => update({...row, date})"
+        >
+          <v-input
+            v-model="scope.value"
+            :label="$t('date')"
+            date
+          />
+        </q-popup-edit>
+      </q-td>
+    </template>
     <template #body-cell-action="{ row }">
       <q-td>
         <q-btn
@@ -100,7 +117,10 @@ export default defineComponent({
 
   computed: {
     cashFlow () {
-      return this.cashFlowByCustomerIdOrAll(this.customerId)
+      return this.cashFlowByCustomerIdOrAll(this.customerId).map(item => {
+        item.date = this.getDate(item.date)
+        return item
+      })
     },
     debt () {
       return this.cashFlow.reduce((acc, row) => {
@@ -118,10 +138,11 @@ export default defineComponent({
       return [
         {
           name: 'description',
-          label: this.$t('description')
+          label: this.$t('description'),
+          align: 'left'
         },
         { name: 'total', label: 'Total', field: 'total', classes: row => this.getClassColor(row.type), sortable: true },
-        { name: 'date', label: this.$t('date'), field: 'date', sortable: true, format: val => typeof val === 'object' ? formatDate(val.toDate(), 'DD/MM/YYYY HH:mm') : val },
+        { name: 'date', label: this.$t('date'), field: 'date', sortable: true, align: 'middle' },
         {
           name: 'createdAt',
           label: this.$t('createdAt'),
@@ -139,6 +160,12 @@ export default defineComponent({
   // },
 
   methods: {
+    update (row) {
+      this.firebaseMixin('cashFlow').id(row.id).update(row)
+    },
+    getDate (val) {
+      return typeof val === 'object' ? formatDate(val.toDate(), 'YYYY/MM/DD HH:mm') : val
+    },
     // setup () {
     //   this.loading = true
     //   this.firebaseMixinInstance = this.firebaseMixin('cashFlow')
