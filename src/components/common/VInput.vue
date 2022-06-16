@@ -34,7 +34,7 @@
       <q-icon
         v-if="date"
         name="event"
-        class="cursor-pointer"
+        class="cursor-pointer text-blue"
       >
         <q-popup-proxy
           cover
@@ -85,7 +85,7 @@
       <q-icon
         v-if="date && !range"
         name="access_time"
-        class="cursor-pointer"
+        class="cursor-pointer text-blue"
       >
         <q-popup-proxy
           cover

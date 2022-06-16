@@ -98,91 +98,95 @@
           <q-card
             v-for="item of cartShopGroupedArray"
             :key="item.product.id"
-            class="q-table__card col-xs-12 col-sm-12 col-md-6 col-lg-6"
+            class="q-table__card col-xs-12 col-sm-12 col-md-6 col-lg-6 row q-pa-md"
           >
-            <q-item class="full-width justify-between">
-              <q-item-section>
-                <q-item-label> {{ item.product.name }}</q-item-label>
-              </q-item-section>
-
-              <q-item-section
-                side
+            <q-field
+              :label="$t('name')"
+              readonly
+              stack-label
+              class="col-12"
+            >
+              <div class="text-black">
+                {{ item.product.name }}
+              </div>
+            </q-field>
+            <q-field
+              :label="$t('originalSellValue')"
+              readonly
+              stack-label
+              class="col-6"
+            >
+              <div :class="item.discountObject ? 'text-grey' : 'text-blue'">
+                {{ item.product.saleValue }}
+              </div>
+            </q-field>
+            <v-input
+              v-model="cartShopProducts[item.product.id].unitaryValue"
+              class="col-6"
+              :label="$t('saleValue')"
+              currency
+            />
+            <div
+              v-if="item.discountObject"
+              class="row full-width"
+            >
+              <q-field
+                :label="$t('discount')"
+                readonly
+                stack-label
+                class="col-12"
               >
-                <q-item-label
-                  caption
-                  :class="item.discountObject ? 'text-grey' : 'text-blue'"
-                >
-                  {{ item.product.saleValue }}
-                  <v-input
-                    v-model="cartShopProducts[item.product.id].unitaryValue"
-                    class="full-width"
-                    :label="$t('saleValue')"
-                    currency
-                  />
-                </q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item v-if="item.discountObject">
-              <q-item-section>
-                <q-item-label class="text-red">
-                  -{{ item.discountObject.type === 'value' ? '$' : '%' }} {{ item.discountObject.discount }}
-                </q-item-label>
-              </q-item-section>
-
-              <q-item-section
-                side
-              >
-                <q-item-label
-                  caption
-                  class="text-blue"
-                >
-                  {{ calcDiscountResult(item.discountObject, item.unitaryValue).toFixed(2) }}
-                </q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item>
-              <q-item-section>
-                <div class="row">
-                  <v-input
-                    v-model="cartShopProducts[item.product.id].quantity"
-                    type="number"
-                    class="col-3"
-                    :label="$t('quantity')"
-                    @update:model-value="val => updateCartShopItemQuantity(item.product.id, val)"
-                  />
-                  <q-btn
-                    icon="local_offer"
-                    color="green"
-                    class="col-2"
-                    flat
-                    @click="openDiscountModal(item.product.id)"
-                  />
-                  <q-btn
-                    icon="delete"
-                    color="red"
-                    class="col-2"
-                    flat
-                    @click="removeItem(item.product.id)"
-                  />
-                  <q-checkbox
-                    v-model="item.decreaseStock"
-                    :label="$t('decreaseStock')"
-                    left-label
-                  />
+                <div class="row full-width justify-between">
+                  <div class="text-red">
+                    -{{ item.discountObject.type === 'value' ? '$' : '%' }} {{ item.discountObject.discount }}/{{ $t('item') }}
+                  </div>
+                  <div class="text-blue">
+                    {{ calcDiscountResult(item.discountObject, item.unitaryValue).toFixed(2) }}
+                  </div>
                 </div>
-              </q-item-section>
-
-              <q-item-section
-                side
-              >
-                <q-item-label
-                  caption
-                  class="text-blue"
-                >
-                  {{ item.product.saleValue }}
-                </q-item-label>
-              </q-item-section>
-            </q-item>
+              </q-field>
+            </div>
+            <div class="row full-width">
+              <v-input
+                v-model="cartShopProducts[item.product.id].quantity"
+                type="number"
+                class="col-3"
+                :label="$t('quantity')"
+                @blur="updateCartShopItemQuantity(item.product.id, cartShopProducts[item.product.id].quantity)"
+              />
+              <q-btn
+                icon="local_offer"
+                color="green"
+                class="col-2"
+                flat
+                @click="openDiscountModal(item.product.id)"
+              />
+              <q-btn
+                icon="delete"
+                color="red"
+                class="col-2"
+                flat
+                @click="removeItem(item.product.id)"
+              />
+              <q-checkbox
+                v-model="item.decreaseStock"
+                :label="$t('decreaseStock')"
+                class="col-5"
+              />
+            </div>
+            <q-field
+              label="Total"
+              readonly
+              stack-label
+              class="col-12"
+            >
+              <div class="text-blue">
+                {{ item.discountObject
+                  ? (calcDiscountResult(item.discountObject, item.unitaryValue) * item.quantity).toFixed(2)
+                  : (item.unitaryValue * item.quantity).toFixed(2)
+                }}
+              </div>
+            </q-field>
           </q-card>
         </div>
         <div class="row justify-around">
@@ -244,7 +248,7 @@
               </q-item-section>
             </q-item>
             <q-item
-              v-if="subtotalDiscountObject?.type"
+              v-if="subTotalDiscountObject?.type"
               class="full-width justify-between"
             >
               <q-item-section>
@@ -258,7 +262,7 @@
                   caption
                   class="text-red"
                 >
-                  -{{ subtotalDiscountObject.type === 'value' ? '$' : '%' }} {{ subtotalDiscountObject.discount }}
+                  -{{ subTotalDiscountObject.type === 'value' ? '$' : '%' }} {{ subTotalDiscountObject.discount }}
                 </q-item-label>
               </q-item-section>
             </q-item>
@@ -484,7 +488,7 @@ export default defineComponent({
         descending: true
       },
       cartShopProducts: {},
-      subtotalDiscountObject: {},
+      subTotalDiscountObject: {},
       addProductModalOpen: false,
       saveDialogOpen: false,
       chooseCustomerModalOpen: false,
@@ -495,7 +499,9 @@ export default defineComponent({
 
   computed: {
     cartShopGroupedArray () {
-      return Object.keys(this.cartShopProducts).map(key => this.cartShopProducts[key])
+      return Object.keys(this.cartShopProducts).map(key => this.cartShopProducts[key]).sort((a, b) =>
+        a.product.name > b.product.name ? 1 : ((b.product.name > a.product.name) ? -1 : 0)
+      )
     },
     columnsProduct () {
       return [
@@ -517,7 +523,7 @@ export default defineComponent({
       ]
     },
     cartShopGroupedArrayDiscountSum () {
-      return this.cartShopGroupedArray.reduce((acc, item) => acc + this.getDiscountValue(item.discountObject, item.unitaryValue) || 0, 0)
+      return this.cartShopGroupedArray.reduce((acc, item) => acc + (this.getDiscountValue(item.discountObject, item.unitaryValue) * item.quantity) || 0, 0)
     },
     subtotal () {
       return this.cartShopGroupedArray.reduce((acc, item) => acc + item.unitaryValue * item.quantity, 0)
@@ -526,13 +532,13 @@ export default defineComponent({
       return this.cartShopGroupedArrayDiscountSum ? this.cartShopGroupedArray.reduce((acc, item) => acc + item.unitaryValue * item.quantity, 0) - this.cartShopGroupedArrayDiscountSum : 0
     },
     discountSubTotalValue () {
-      return this.calcDiscountResult(this.subtotalDiscountObject.discount, this.totalProductsWithDiscount)
+      return this.calcDiscountResult(this.subTotalDiscountObject, this.totalProductsWithDiscount)
     },
     totalDiscount () {
       return (this.cartShopGroupedArrayDiscountSum + this.discountSubTotalValue)
     },
     total () {
-      return this.cartShopGroupedArrayDiscountSum ? this.totalProductsWithDiscount - this.getDiscountValue(this.subtotalDiscountObject, this.totalProductsWithDiscount) : this.subtotal
+      return this.cartShopGroupedArrayDiscountSum ? this.totalProductsWithDiscount - this.getDiscountValue(this.subTotalDiscountObject, this.totalProductsWithDiscount) : this.subtotal
     }
   },
 
@@ -607,12 +613,12 @@ export default defineComponent({
         delete this.cartShopProducts[result.options.id].discountObject
         return
       }
-      if (result.options.id === 'subtotalDiscountObject') {
+      if (result.options.id === 'subTotalDiscountObject') {
         if (cancel) {
-          this.subtotalDiscountObject = {}
+          this.subTotalDiscountObject = {}
           return
         }
-        this.subtotalDiscountObject = result.discountObject
+        this.subTotalDiscountObject = result.discountObject
         return
       }
       this.cartShopProducts[result.options.id].discountObject = result.discountObject
@@ -625,6 +631,7 @@ export default defineComponent({
     removeItem (id) {
       Dialog.create({
         title: `${this.$t('removeItem')}?`,
+        message: this.cartShopProducts[id].product.name,
         cancel: true,
         persistent: true
       }).onOk(() => {
@@ -661,9 +668,9 @@ export default defineComponent({
       const options = {
         title: this.$t('discountInSubtotal'),
         value: this.total,
-        id: 'subtotalDiscountObject'
+        id: 'subTotalDiscountObject'
       }
-      let discountObject = this.subtotalDiscountObject
+      let discountObject = this.subTotalDiscountObject
       if (itemId) {
         const cartShopProduct = this.cartShopProducts[itemId]
         options.title = cartShopProduct.product.name
@@ -714,7 +721,7 @@ export default defineComponent({
       }).onOk(async () => {
         const sale = {
           type: customer?.name ? 'purchase' : 'fastSale',
-          ...(this.subtotalDiscountObject?.type) && { subtotalDiscountObject: this.subtotalDiscountObject },
+          ...(this.subTotalDiscountObject?.type) && { subTotalDiscountObject: this.subTotalDiscountObject },
           date: this.date,
           total: this.total,
           ...customerId && {
@@ -772,7 +779,7 @@ export default defineComponent({
     reset () {
       this.date = formatDate(Date.now(), 'YYYY/MM/DD HH:mm')
       this.cartShopProducts = {}
-      this.subtotalDiscountObject = {}
+      this.subTotalDiscountObject = {}
       this.tab = 'products'
     }
   }

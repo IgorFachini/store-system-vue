@@ -390,6 +390,14 @@ const labels = {
   update: {
     enUS: 'Update',
     pt: 'Atualizar'
+  },
+  originalSellValue: {
+    enUS: 'Original Sell Value',
+    pt: 'Valor de Venda Original'
+  },
+  item: {
+    enUS: 'Item | Items',
+    pt: 'Item | Itens'
   }
 }
 
