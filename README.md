@@ -96,3 +96,35 @@ quasar build
 
 ### Customize the configuration
 See [Configuring quasar.conf.js](https://v2.quasar.dev/quasar-cli/quasar-conf-js).
+
+
+### Backup model JSON file example to import
+- backup.json
+
+### Database model example
+- database.model.json
+
+## Utils Firebase commands
+### Exporting data from Firestore
+
+1. Open the [Firebase Console](https://console.firebase.google.com/u/0/).
+2. Navigate to your project and click the gear icon next to the “Project Overview” heading.
+3. Click the “Project Settings” button.
+4. In the “Service accounts” tab, click the “Generate new private key” button. This will download a JSON file with your Firebase project’s configuration.
+5. Rename the downloaded file to appConfig.json.
+6. Open a terminal and navigate to the directory where you want to save the exported JSON file. Make sure the above file you just renamed exists in the same directory as well.
+7. Run the following command to export data from your Firestore database:
+
+### Delete all data from Firestore
+1. [Firebase CLI](https://firebase.google.com/docs/cli?hl=pt-br)
+2. Login on CLI
+3. Run command
+```bash
+firebase firestore:delete --all-collections --project [PROJECT_ID]
+```
+
+### Import data from JSON file to Firestore
+1. Run command
+```bash
+ npx -p node-firestore-import-export firestore-import -a appConfig.json -b backup.json
+```
