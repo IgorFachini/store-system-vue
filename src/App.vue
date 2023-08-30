@@ -44,13 +44,13 @@ export default defineComponent({
           this.newWorker.addEventListener('statechange', () => {
           // Has network.state changed?
             switch (this.newWorker.state) {
-              case 'installed':
-                if (navigator.serviceWorker.controller) {
+            case 'installed':
+              if (navigator.serviceWorker.controller) {
                 // new update available
-                  this.showHasUpdate()
-                }
-                // No update available
-                break
+                this.showHasUpdate()
+              }
+              // No update available
+              break
             }
           })
         })

@@ -1,18 +1,17 @@
-
 const simpleCrudRoutersPath = [
   'customers',
   'expense-products',
   'products',
   'categories',
   'expenses'
-]
+];
 
 const crudRouterNames = [
   '',
   'add',
   'view',
   'edit'
-]
+];
 const crudRoutersObjects = simpleCrudRoutersPath.reduce((acc, path) => {
   return [
     ...acc,
@@ -21,10 +20,10 @@ const crudRoutersObjects = simpleCrudRoutersPath.reduce((acc, path) => {
         path: `/${path}/${(!name || name === 'add') ? name : `${name}/:id`}`,
         name: `${path}${(!name) ? '' : `.${name}`}`,
         component: () => import('src/pages/CRUDPages.vue')
-      }
+      };
     })
-  ]
-}, [])
+  ];
+}, []);
 
 const routes = [
   {
@@ -96,6 +95,6 @@ const routes = [
     path: '/:catchAll(.*)*',
     component: () => import('pages/Error404.vue')
   }
-]
+];
 
-export default routes
+export default routes;

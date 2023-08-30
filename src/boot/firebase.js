@@ -7,8 +7,8 @@ import 'firebase/compat/database'
 import 'firebase/compat/auth'
 
 const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY,
-  projectId: process.env.FIREBASE_PROJECT_ID,
+  apiKey: process.env.FIREBASE_API_KEY || 'AIzaSyDpWl0EN7ZPYs92Fbo1mcKKcIYTDOInlNI',
+  projectId: process.env.FIREBASE_PROJECT_ID || 'store-system-54b7a',
   databaseURL: process.env.FIREBASE_DATABASE_URL,
   authDomain: process.env.FIREBASE_AUTH_DOMAIN,
   storageBucket: process.env.FIREBASE_STORAGE_BUCKET,

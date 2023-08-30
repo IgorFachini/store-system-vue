@@ -5,74 +5,98 @@ module.exports = {
   root: true,
 
   parserOptions: {
-    ecmaVersion: '2021', // Allows for the parsing of modern ECMAScript features
+    ecmaVersion: "2021", // Allows for the parsing of modern ECMAScript features
   },
 
   env: {
     node: true,
     browser: true,
-    'vue/setup-compiler-macros': true
+    "vue/setup-compiler-macros": true
   },
 
   // Rules order is important, please avoid shuffling them
   extends: [
     // Base ESLint recommended rules
-    // 'eslint:recommended',
+    // "eslint:recommended",
 
     // Uncomment any of the lines below to choose desired strictness,
     // but leave only one uncommented!
     // See https://eslint.vuejs.org/rules/#available-rules
-    'plugin:vue/vue3-essential', // Priority A: Essential (Error Prevention)
-    'plugin:vue/vue3-strongly-recommended', // Priority B: Strongly Recommended (Improving Readability)
-    'plugin:vue/vue3-recommended', // Priority C: Recommended (Minimizing Arbitrary Choices and Cognitive Overhead)
+    "plugin:vue-pug/vue3-recommended",
+    "plugin:vue/vue3-essential", // Priority A: Essential (Error Prevention)
+    // "plugin:vue/vue3-strongly-recommended", // Priority B: Strongly Recommended (Improving Readability)
+    // "plugin:vue/vue3-recommended", // Priority C: Recommended (Minimizing Arbitrary Choices and Cognitive Overhead)
 
-    'standard'
+    "standard"
 
   ],
 
   plugins: [
     // https://eslint.vuejs.org/user-guide/#why-doesn-t-it-work-on-vue-files
     // required to lint *.vue files
-    'vue',
+    "vue",
 
   ],
 
   globals: {
-    ga: 'readonly', // Google Analytics
-    cordova: 'readonly',
-    __statics: 'readonly',
-    __QUASAR_SSR__: 'readonly',
-    __QUASAR_SSR_SERVER__: 'readonly',
-    __QUASAR_SSR_CLIENT__: 'readonly',
-    __QUASAR_SSR_PWA__: 'readonly',
-    process: 'readonly',
-    Capacitor: 'readonly',
-    chrome: 'readonly'
+    ga: "readonly", // Google Analytics
+    cordova: "readonly",
+    __statics: "readonly",
+    __QUASAR_SSR__: "readonly",
+    __QUASAR_SSR_SERVER__: "readonly",
+    __QUASAR_SSR_CLIENT__: "readonly",
+    __QUASAR_SSR_PWA__: "readonly",
+    process: "readonly",
+    Capacitor: "readonly",
+    chrome: "readonly"
   },
 
   // add your custom rules here
-  rules: {
+  "rules": {
+    "no-unused-vars": 1,
+    "comma-dangle": [
+      "error",
+      "never"
+    ],
+    "quotes": [
+      "error",
+      "single"
+    ],
+    "semi": "off",
+    "indent": [
+      "error",
+      2
+    ],
+    "vue/no-v-text-v-html-on-component": 0,
+    "vue/v-on-event-hyphenation": 0,
+    "vue/attribute-hyphenation": 0,
+    "vue/multi-word-component-names": 0,
+    "no-multi-spaces": "error",
+    "space-before-function-paren": [
+      "error"
+    ],
+    "no-undef": "error",
+    "object-curly-spacing": [
+      "error",
+      "always"
+    ],
+    "generator-star-spacing": "off",
+    "arrow-parens": "off",
+    "one-var": "off",
+    "no-void": "off",
+    "multiline-ternary": "off",
+    "import/first": "off",
+    "import/named": "error",
+    "import/namespace": "error",
+    "import/default": "error",
+    "import/export": "error",
+    "import/extensions": "off",
+    "import/no-unresolved": "off",
+    "import/no-extraneous-dependencies": "off",
 
-    // allow async-await
-    'generator-star-spacing': 'off',
-    // allow paren-less arrow functions
-    'arrow-parens': 'off',
-    'one-var': 'off',
-    'no-void': 'off',
-    'multiline-ternary': 'off',
-
-    'import/first': 'off',
-    'import/named': 'error',
-    'import/namespace': 'error',
-    'import/default': 'error',
-    'import/export': 'error',
-    'import/extensions': 'off',
-    'import/no-unresolved': 'off',
-    'import/no-extraneous-dependencies': 'off',
-
-    'prefer-promise-reject-errors': 'off',
+    "prefer-promise-reject-errors": "off",
 
     // allow debugger during development only
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
+    "no-debugger": process.env.NODE_ENV === "production" ? "error" : "off"
   }
 }
