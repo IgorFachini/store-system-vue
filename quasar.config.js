@@ -67,7 +67,7 @@ module.exports = configure(function (ctx) {
         FIREBASE_MESSAGING_SENDER_ID: env.FIREBASE_MESSAGING_SENDER_ID,
         FIREBASE_APP_ID: env.FIREBASE_APP_ID,
         FIREBASE_MEASUREMENT_ID: env.FIREBASE_MEASUREMENT_ID,
-        DEPLOY: env.DEPLOY || ''
+        DEPLOY: env.DEPLOY || 'development'
       },
       target: {
         browser: ['es2019', 'edge88', 'firefox78', 'chrome87', 'safari13.1'],
