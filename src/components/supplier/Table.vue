@@ -1,10 +1,10 @@
 <script setup>
 
 import { useFirebaseStore } from 'stores/firebase'
-import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { date } from 'quasar'
 import { useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
 
 const props = defineProps({
   chooseMode: Boolean
@@ -17,17 +17,17 @@ const { formatDate } = date
 const { t } = useI18n({ useScope: 'global' })
 const storeFirebase = useFirebaseStore()
 
-const { customers, loadingDatabase } = storeToRefs(storeFirebase)
+const { suppliers, loadingDatabase } = storeToRefs(storeFirebase)
 
 function view (row) {
   router.push({
-    name: 'customers.view',
+    name: 'suppliers.view',
     params: { id: row.id }
   })
 }
 function edit (row) {
   router.push({
-    name: 'customers.edit',
+    name: 'suppliers.edit',
     params: { id: row.id }
   })
 }
@@ -63,20 +63,20 @@ const columns = [
 
 <template lang="pug">
 v-table-crud(
-  :title="$t('customer', 2)"
-  :rows="customers"
+  :title="$t('supplier', 2)"
+  :rows="suppliers"
   :columns="columns"
   :loading="loadingDatabase"
   @view="view"
   @edit="edit"
-  @delete="row => firebaseDeleteItem('customers', 'customer', row.id)"
+  @delete="row => firebaseDeleteItem('suppliers', 'supplier', row.id)"
   @choose="row => $emit('choose', row)"
 )
-  template(#action-more="props")
-    q-btn(
-      :label="$t('cashFlow')"
-      dense
-      color="blue"
-      :to="`/customers/cash-flow/${props.row.id}`"
-    )
+  //- template(#action-more="props")
+  //-   q-btn(
+  //-     :label="$t('cashFlow')"
+  //-     dense
+  //-     color="blue"
+  //-     :to="`/suppliers/cash-flow/${props.row.id}`"
+  //-   )
 </template>

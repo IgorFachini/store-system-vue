@@ -10,6 +10,16 @@
       date
     />
 
+    <v-select
+      v-model="form.supplier"
+      :loading="loading"
+      autocomplete
+      sorted
+      :label="$t('supplier')"
+      :options="suppliers.map(c => c.name)"
+      :disable="viewMode"
+    />
+
     <v-input
       v-model="form.description"
       type="textarea"
@@ -174,18 +184,21 @@ export default defineComponent({
     const {
       expenses,
       expenseProducts,
-      loadingDatabase
+      loadingDatabase,
+      suppliers
     } = storeToRefs(storeFirebase)
 
     return {
       expenses,
       expenseProducts,
       loadingDatabase,
+      suppliers,
       modelForm: {
         date: '',
         description: '',
         quantity: 0,
         expenseProducts: [],
+        supplier: '',
         total: 0
       },
 
@@ -271,6 +284,11 @@ export default defineComponent({
       const expenseProducts = this.form.expenseProducts
       const action = form.id
         ? ref.id(form.id).update : ref.add
+
+      if (this.form.supplier) {
+        const idSupplier = this.suppliers.find(c => c.name === this.form.supplier).id
+        this.form.supplier = this.firebaseMixin('suppliers').id(idSupplier).doc()
+      }
       action(form).then(() => {
         expenseProducts.forEach(item => {
           if (item.increaseStock) {

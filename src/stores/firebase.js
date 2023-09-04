@@ -9,7 +9,8 @@ const collectionsName = [
   'categories',
   'productsStockHistory',
   'expenseProductsStockHistory',
-  'cashFlow'
+  'cashFlow',
+  'suppliers'
 ]
 
 export const useFirebaseStore = defineStore('firebase', {

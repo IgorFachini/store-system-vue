@@ -21,17 +21,6 @@
       :block="componentName"
       @done="$router.push(`/${parentName}`)"
     />
-    <div
-      v-if="isTable"
-      class="row full-width justify-center"
-    >
-      <q-btn
-        class="q-ma-md"
-        color="accent"
-        :label="$t('add')"
-        @click="$router.push(`/${parentName}/add`)"
-      />
-    </div>
   </q-page>
 </template>
 
@@ -50,7 +39,7 @@ export default defineComponent({
       return this.$route.params.id
     },
     routerName () {
-      return this.$route.name
+      return this.$route.meta
     },
     parentName () {
       return this.$route.name.split('.')[0]

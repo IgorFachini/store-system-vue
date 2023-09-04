@@ -135,6 +135,7 @@ export default boot(({ app }) => {
   app.use(rtdbPlugin)
   app.config.globalProperties.$firestore = firebase.firestore()
   app.config.globalProperties.$firebaseAuth = firebaseAuth
+  return firebaseMixin
 })
 
 export { firebaseApp, firebaseAuth, fr, Timestamp }

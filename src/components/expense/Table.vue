@@ -1,45 +1,23 @@
-<template>
-  <q-table
-    :title="$t('expense', 2)"
-    :rows="expenses"
-    :columns="columns"
-    :loading="loadingDatabase"
-    @edit="edit"
-    @delete="row => firebaseDeleteItem('expenses', 'expense', row)"
-  >
-    <template #body-cell-description="{ row }">
-      <q-td>
-        <div>{{ row.description }}</div>
-        <div
-          v-for="expenseProduct in row.expenseProducts"
-          :key="expenseProduct.name"
-        >
-          {{ expenseProduct.name }} "{{ expenseProduct.weightType }}": {{ expenseProduct.quantity }} - {{ expenseProduct.value }}
-        </div>
-      </q-td>
-    </template>
-    <template #body-cell-action="{ row }">
-      <q-td>
-        <div
-          class="row no-wrap q-gutter-md"
-        >
-          <q-btn
-            :label="$t('edit')"
-            dense
-            color="primary"
-            @click="edit(row)"
-          />
-          <q-btn
-            :label="$t('delete')"
-            dense
-            color="negative"
-            :loading="row.loading"
-            @click="firebaseDeleteItem('expenses', 'expense', row.id)"
-          />
-        </div>
-      </q-td>
-    </template>
-  </q-table>
+<template lang="pug">
+v-table-crud(
+  :title="$t('expense', 2)"
+  :rows="expenses"
+  :columns="columns"
+  :loading="loadingDatabase"
+  @view="view"
+  @edit="edit"
+  @delete="row => firebaseDeleteItem('expenses', 'expense', row.id)"
+  @choose="row => $emit('choose', row)"
+)
+  //- template(#body-cell-description="{ row }")
+  //-   q-td
+  //-     div {{ row.description }}
+  //-     div(
+  //-       v-for="expenseProduct in row.expenseProducts"
+  //-       :key="expenseProduct.name"
+  //-     )
+  //-       | {{ expenseProduct.name }} "{{ expenseProduct.weightType }}": {{ expenseProduct.quantity }} - {{ expenseProduct.value }}
+
 </template>
 
 <script>
@@ -65,15 +43,26 @@ export default defineComponent({
 
   data () {
     return {
-      loading: false
+      loading: false,
+      search: ''
     }
   },
 
   computed: {
     columns () {
       return [
+        { name: 'action', label: this.$t('action'), align: 'left' },
         { name: 'date', label: this.$t('date'), field: 'date', sortable: true, format: val => typeof val === 'object' ? formatDate(val.toDate(), 'DD/MM/YYYY HH:mm') : val },
-        { name: 'description', label: this.$t('description') },
+        {
+          name: 'description',
+          label: this.$t('description'),
+          field: (row) => row.description
+        },
+        // {
+        //   name: 'product',
+        //   label: this.$t('product'),
+        //   field: (row) => row.expenseProducts
+        // },
         { name: 'total', label: 'Total', field: 'total', sortable: true },
         {
           name: 'createdAt',
@@ -87,8 +76,7 @@ export default defineComponent({
           label: this.$t('updatedAt'),
           field: ({ updatedAt = null }) => updatedAt ? formatDate(updatedAt.toDate(), 'DD/MM/YYYY HH:mm') : '',
           sortable: true
-        },
-        { name: 'action', label: this.$t('action'), align: 'left' }
+        }
       ]
     }
   },

@@ -1,16 +1,21 @@
 <script setup>
 
 import { useI18n } from 'vue-i18n'
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useQuasar } from 'quasar'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { firebaseAuth } from 'boot/firebase'
 import { version } from '../../package.json'
 const { locale } = useI18n({ useScope: 'global' })
 locale.value = 'pt-BR'
 
 const router = useRouter()
+const route = useRoute()
 const $q = useQuasar()
+
+const pageTitle = computed(() => {
+  return route.meta?.title || ''
+})
 
 const leftDrawerOpen = ref(false)
 const deploy = process.env.DEPLOY
@@ -41,7 +46,7 @@ q-layout(:view="`lHh Lpr lFf`")
   q-header(elevated)
     q-toolbar
       q-btn(flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer")
-      q-toolbar-title {{ deploy }}
+      q-toolbar-title {{ pageTitle }}
       div
         q-btn-dropdown(class="ellipsis" split flat no-caps="no-caps" label="User")
           q-list
@@ -67,6 +72,7 @@ q-layout(:view="`lHh Lpr lFf`")
       q-item(to="/categories") {{ $t('category', 2) }}
 
       q-separator
+      q-item(to="/suppliers") {{ $t('supplier', 2) }}
       q-item(to="/expenses") {{ $t('expense', 2) }}
       q-item(to="/expense-products") {{ $t('expenseProduct', 2) }}
 

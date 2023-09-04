@@ -15,6 +15,10 @@ const labels = {
     enUS: 'Customer | Customers',
     pt: 'Cliente | Clientes'
   },
+  supplier: {
+    enUS: 'Supplier | Suppliers',
+    pt: 'Fornecedor | Fornecedores'
+  },
   save: {
     enUS: 'Save',
     pt: 'Salvar'
