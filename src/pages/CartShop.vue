@@ -309,7 +309,7 @@
               <q-item-section>
                 <v-input
                   v-model="date"
-                  :label="$t('purchaseDath')"
+                  :label="$t('purchaseDate')"
                   date
                 />
               </q-item-section>

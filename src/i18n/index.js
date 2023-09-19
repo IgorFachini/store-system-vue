@@ -415,7 +415,7 @@ const labels = {
     enUS: 'Adress',
     pt: 'Endereço'
   },
-  purchaseDath: {
+  purchaseDate: {
     enUS: 'Purchase Dath',
     pt: 'Data da Compra'
   },

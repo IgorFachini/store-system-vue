@@ -159,7 +159,7 @@ export default defineComponent({
           align: 'left'
         },
         { name: 'total', label: 'Total', field: 'total', classes: row => this.getClassColor(row.type), sortable: true },
-        { name: 'date', label: this.$t('purchaseDath'), field: 'date', sortable: true, align: 'left' },
+        { name: 'date', label: this.$t('purchaseDate'), field: 'date', sortable: true, align: 'left' },
         {
           name: 'createdAt',
           label: this.$t('createdAt'),
