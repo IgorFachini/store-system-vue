@@ -13,8 +13,7 @@ const { formatDate } = date
 const router = useRouter()
 
 const storeFirebase = useFirebaseStore()
-// TODO countProductsStockHistoryById not working
-const { products, loadingDatabase, countProductsStockHistoryById } = storeToRefs(storeFirebase);
+const { products, loadingDatabase } = storeToRefs(storeFirebase);
 
 const columns = computed(() => [
   // { name: 'expand', label: t('recipe'), align: 'left' },
@@ -25,17 +24,17 @@ const columns = computed(() => [
   {
     name: 'currentInventory',
     label: t('currentInventory'),
-    field: row => countProductsStockHistoryById(row.id),
+    field: row => storeFirebase.countProductsStockHistoryById(row.id),
     sortable: true
   },
   { name: 'description', label: t('description'), field: 'description' },
-  {
-    name: 'category',
-    label: t('category'),
-    field: 'category',
-    format: category => category ? category.name : '',
-    sortable: true
-  },
+  // {
+  //   name: 'category',
+  //   label: t('category'),
+  //   field: 'category',
+  //   format: category => category ? category.name : '',
+  //   sortable: true
+  // },
   { name: 'code', label: t('code'), field: 'code' },
   {
     name: 'createdAt',

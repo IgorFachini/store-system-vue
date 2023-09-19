@@ -158,17 +158,20 @@ q-page(class="q-col-gutter-md" padding)
       :title="t('purchase', 2) + ' - ' + t('customer', 2)"
       :rows="customersCashFlowGrouped"
       :columns="customersCashFlowGroupedColumns"
+      hide-add
     )
       template(v-slot:expand="propsCashFlow")
         v-table-crud(
           :title="t('cashFlow') + ': ' + propsCashFlow.row.name"
           :rows="propsCashFlow.row.cashFlow"
           :columns="customersCashFlowGroupedCashFlowColumns"
+          hide-add
         )
           template(v-slot:expand="propsProducs")
             v-table-crud(
               :title="t('product', 2) + ': ' + propsCashFlow.row.name"
               :rows="propsProducs.row.products"
               :columns="customersCashFlowGroupedProductColumns"
+              hide-add
             )
 </template>

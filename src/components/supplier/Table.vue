@@ -39,6 +39,8 @@ const columns = [
   { name: 'phone', label: t('phone'), field: 'phone' },
   { name: 'observation', label: t('observation'), field: 'observation' },
   { name: 'document', label: t('document'), field: 'document' },
+  { name: 'cnpj', label: 'CNPJ', field: 'cnpj' },
+  { name: 'stateRegistration', label: t('stateRegistration'), field: 'stateRegistration' },
   { name: 'cep', label: 'CEP', field: 'cep' },
   { name: 'publicPlace', label: t('publicPlace'), field: 'publicPlace' },
   { name: 'number', label: t('number'), field: 'number' },

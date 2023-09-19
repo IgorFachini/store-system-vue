@@ -43,49 +43,66 @@
       :disable="viewMode"
     />
 
-    <v-input-cep
-      v-model="form.cep"
-      label="CEP"
-      :disable="viewMode"
-      @response="setAdress"
-    />
-
-    <v-input
-      v-model="form.publicPlace"
-      :label="$t('publicPlace')"
+    <q-input
+      v-model="form.cnpj"
+      label="CNPJ"
       :disable="viewMode"
     />
 
-    <v-input
-      v-model="form.number"
-      :label="$t('number')"
-      :disable="viewMode"
-      type="number"
-    />
-
-    <v-input
-      v-model="form.district"
-      :label="$t('district')"
+    <q-input
+      v-model="form.stateRegistration"
+      :label="$t('stateRegistration')"
       :disable="viewMode"
     />
 
-    <v-input
-      v-model="form.city"
-      :label="$t('city')"
-      :disable="viewMode"
-    />
+    <q-card class="q-pa-md q-mt-md">
+      <div class="text-h6">
+        {{ $t('adress') }}
+      </div>
+      <v-input-cep
+        v-model="form.cep"
+        label="CEP"
+        :disable="viewMode"
+        @response="setAdress"
+      />
 
-    <v-input
-      v-model="form.state"
-      :label="$t('state')"
-      :disable="viewMode"
-    />
+      <v-input
+        v-model="form.publicPlace"
+        :label="$t('publicPlace')"
+        :disable="viewMode"
+      />
 
-    <v-input
-      v-model="form.complement"
-      :label="$t('complement')"
-      :disable="viewMode"
-    />
+      <v-input
+        v-model="form.number"
+        :label="$t('number')"
+        :disable="viewMode"
+        type="number"
+      />
+
+      <v-input
+        v-model="form.district"
+        :label="$t('district')"
+        :disable="viewMode"
+      />
+
+      <v-input
+        v-model="form.city"
+        :label="$t('city')"
+        :disable="viewMode"
+      />
+
+      <v-input
+        v-model="form.state"
+        :label="$t('state')"
+        :disable="viewMode"
+      />
+
+      <v-input
+        v-model="form.complement"
+        :label="$t('complement')"
+        :disable="viewMode"
+      />
+    </q-card>
 
     <div class="row q-gutter-md q-mt-md justify-between">
       <q-btn
@@ -132,6 +149,8 @@ export default defineComponent({
         phone: '',
         observation: '',
         document: '',
+        cnpj: '',
+        stateRegistration: '',
         publicPlace: '',
         number: '',
         district: '',

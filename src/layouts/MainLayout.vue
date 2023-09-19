@@ -69,12 +69,12 @@ q-layout(:view="`lHh Lpr lFf`")
 
       q-separator
       q-item(to="/products") {{ $t('product', 2) }}
-      q-item(to="/categories") {{ $t('category', 2) }}
+      //- q-item(to="/categories") {{ $t('category', 2) }}
 
       q-separator
       q-item(to="/suppliers") {{ $t('supplier', 2) }}
       q-item(to="/expenses") {{ $t('expense', 2) }}
-      q-item(to="/expense-products") {{ $t('expenseProduct', 2) }}
+      //- q-item(to="/expense-products") {{ $t('expenseProduct', 2) }}
 
     div(class="absolute-bottom")
       q-separator

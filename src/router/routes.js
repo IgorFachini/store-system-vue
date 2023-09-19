@@ -2,7 +2,7 @@ const simpleCrudRoutersPath = [
   'customers',
   'expense-products',
   'products',
-  'categories',
+  // 'categories',
   'expenses',
   'suppliers'
 ];

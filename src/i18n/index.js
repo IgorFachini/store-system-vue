@@ -402,6 +402,18 @@ const labels = {
   item: {
     enUS: 'Item | Items',
     pt: 'Item | Itens'
+  },
+  stateRegistration: {
+    enUS: 'State Registration',
+    pt: 'Inscrição Estadual'
+  },
+  find: {
+    enUS: 'Find',
+    pt: 'Encontrar'
+  },
+  adress: {
+    enUS: 'Adress',
+    pt: 'Endereço'
   }
 }
 

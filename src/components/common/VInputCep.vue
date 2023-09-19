@@ -31,10 +31,8 @@
   >
     <template #after>
       <q-btn
-        round
-        dense
-        flat
         icon="download"
+        :label="$t('find')"
         :disable="disable"
         :loading="loadingInside"
         @click="load"

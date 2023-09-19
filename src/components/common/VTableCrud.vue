@@ -15,6 +15,7 @@ q-table(
   template(#top-right)
     div(class="row full-width justify-center")
       q-btn.q-ma-md(
+        v-if="!hideAdd"
         color="accent"
         :label="$t('add')"
         @click="$router.push(`/${parentName}/add`)"
@@ -83,12 +84,12 @@ q-table(
               color="primary"
             )
               q-item.column.no-wrap.q-gutter-md
-                q-btn(
-                  :label="$t('view')"
-                  dense
-                  color="primary"
-                  @click="$emit('view', props.row)"
-                )
+                //- q-btn(
+                //-   :label="$t('view')"
+                //-   dense
+                //-   color="primary"
+                //-   @click="$emit('view', props.row)"
+                //- )
                 q-btn(
                   :label="$t('edit')"
                   dense
@@ -106,6 +107,28 @@ q-table(
                   name="action-more"
                   v-bind="props"
                 )
+    transition(
+      appear
+      enter-active-class="animated fadeIn"
+      leave-active-class="animated fadeOut"
+    )
+      q-tr(
+        v-if="props.expand"
+        :props="props"
+      )
+        q-td(colspan="100%")
+          slot(
+            name="expand"
+            v-bind="props"
+          )
+  template(
+    v-for="propSlot in Object.keys($slots)"
+    #[propSlot]="props"
+  )
+      slot(
+      :name="propSlot"
+      v-bind="props"
+    )
 </template>
 
 <script>
@@ -115,6 +138,10 @@ export default {
   name: 'VTableCrud',
 
   mixins: [QTable],
+
+  props: {
+    hideAdd: Boolean
+  },
 
   emits: ['view', 'edit', 'delete', 'choose'],
 

@@ -28,7 +28,7 @@
       :disable="viewMode"
     />
 
-    <v-select
+    <!-- <v-select
       v-model="form.category"
       :loading="loading"
       autocomplete
@@ -36,7 +36,7 @@
       :label="$t('category')"
       :options="categories.map(c => c.name)"
       :disable="viewMode"
-    />
+    /> -->
 
     <div
       v-if="!viewMode"
@@ -83,7 +83,7 @@
       :disable="viewMode"
     />
 
-    <q-card>
+    <!-- <q-card>
       <q-card-section>
         <div class="text-h6">
           {{ $t('recipe') }}
@@ -169,7 +169,7 @@
           </transition-group>
         </q-list>
       </q-card-section>
-    </q-card>
+    </q-card> -->
 
     <div class="row q-gutter-md q-mt-md justify-between">
       <q-btn
@@ -193,7 +193,7 @@
 
 import { Notify } from 'quasar'
 import { defineComponent } from 'vue'
-import ProductRecipeInfo from 'components/product/ProductRecipeInfo.vue'
+// import ProductRecipeInfo from 'components/product/ProductRecipeInfo.vue'
 import BarcodeReaderModal from 'components/common/BarcodeReaderModal.vue'
 import { useFirebaseStore } from 'stores/firebase'
 import { storeToRefs } from 'pinia'
@@ -202,7 +202,7 @@ export default defineComponent({
   name: 'ProductsForm',
 
   components: {
-    ProductRecipeInfo,
+    // ProductRecipeInfo,
     BarcodeReaderModal
   },
 
