@@ -137,7 +137,7 @@ onMounted(() => {
 
 <template lang="pug">
 q-page(class="q-col-gutter-md" padding)
-  v-input(v-model="modelData" :label="t('date')" date range clearable)
+  v-input(v-model="modelData" :label="t('purchaseDath')" date range clearable)
   div(class="row q-col-gutter-md")
     div.col-6
       q-field(:label="t('sold')" readonly stack-label)
