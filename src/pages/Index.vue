@@ -91,7 +91,7 @@ const customersCashFlowGrouped = computed(() => {
 
 const customersCashFlowGroupedColumns = computed(() => {
   return [
-    { name: 'name', label: t('name'), field: 'name' },
+    { name: 'name', label: t('name'), field: 'name', sortable: true },
     { name: 'total', label: 'Total', field: 'total', format: value => value.toFixed(2), sortable: true },
     { name: 'expand', label: t('cashFlow') }
   ];
@@ -114,7 +114,7 @@ const customersCashFlowGroupedCashFlowColumns = computed(() => {
 
 const customersCashFlowGroupedProductColumns = computed(() => {
   return [
-    { name: 'name', label: t('name'), field: 'name' },
+    { name: 'name', label: t('name'), field: 'name', sortable: true },
     { name: 'quantity', label: t('quantity'), field: 'quantity', sortable: true },
     { name: 'unitaryValue', label: t('unitaryValue'), field: 'unitaryValue', sortable: true },
     { name: 'total', label: 'Total', field: (row) => row.quantity * row.unitaryValue, sortable: true }
