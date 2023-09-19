@@ -7,9 +7,9 @@
     "source.fixAll.eslint"
   ],
   "eslint.validate": [
-    "javascript",
-    "javascriptreact",
-    "typescript",
-    "vue"
-  ]
+    "javascript"
+  ],
+  "[vue]": {
+    "editor.foldingStrategy": "indentation"
+  }
 }

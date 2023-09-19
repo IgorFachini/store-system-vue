@@ -10,6 +10,15 @@
       date
     />
 
+    <v-select
+      v-model="form.supplier"
+      autocomplete
+      sorted
+      :label="$t('supplier')"
+      :options="suppliers.map(c => c.name)"
+      :disable="viewMode"
+    />
+
     <v-input
       v-model="form.description"
       type="textarea"
@@ -19,7 +28,7 @@
     <q-card>
       <q-card-section>
         <div class="text-h6">
-          {{ $t('expenseProduct', 2) }}
+          {{ $t('product', 2) }}
         </div>
       </q-card-section>
       <q-separator />
@@ -28,41 +37,40 @@
         v-if="!viewMode"
       >
         <q-form
-          ref="expenseProductForm"
+          ref="productForm"
           class="row"
-          @submit="saveExpenseProduct"
+          @submit="saveproduct"
         >
           <v-select
-            v-model="expenseProductForm.id"
+            v-model="productForm.id"
             reactive-rules
             class="col-12"
             autocomplete
             sorted
             :label="$t('product')"
-            :options="expenseProductsOptions"
+            :options="productsOptions"
             :rules="[
-              val => !expenseProductForm.quantity || !!val.length,
-              val => !form.expenseProducts.map(c => c.id).includes(val) || $t('alredyExist')
+              val => !productForm.quantity || !!val.length,
+              val => !form.products.map(c => c.id).includes(val) || $t('alredyExist')
             ]"
           />
           <v-input
-            v-model="expenseProductForm.quantity"
+            v-model="productForm.quantity"
             reactive-rules
             class="col-12"
             type="number"
             :label="$t('quantity')"
-            :rules="[ val => (expenseProductForm.id.length && val > 0) || !expenseProductForm.id ]"
-            :hint="`${$t('weightType')}: ${weightLabel}`"
+            :rules="[ val => (productForm.id.length && val > 0) || !productForm.id ]"
           />
 
           <q-checkbox
-            v-model="expenseProductForm.increaseStock"
+            v-model="productForm.increaseStock"
             :label="$t('increaseStock')"
             left-label
           />
 
           <v-input
-            v-model="expenseProductForm.value"
+            v-model="productForm.value"
             class="col-12"
             :label="$t('value')"
             currency
@@ -73,11 +81,11 @@
           >
             <q-btn
               label="Reset"
-              @click="resetExpenseProductForm"
+              @click="resetproductForm"
             />
             <q-btn
               :label="$t('add')"
-              :disable="!expenseProductForm.id"
+              :disable="!productForm.id"
               type="submit"
               color="positive"
             />
@@ -100,23 +108,22 @@
             leave-active-class="animated fadeOut"
           >
             <q-item
-              v-for="expenseProduct in form.expenseProducts"
-              :key="expenseProduct.id"
+              v-for="product in form.products"
+              :key="product.id"
               v-ripple
               clickable
             >
               <q-item-section>
                 <label>
-                  {{ expenseProduct.name }}
+                  {{ product.name }}
                 </label>
                 <label>
-                  {{ $t('increaseStock') }} : {{ expenseProduct.increaseStock ? $t('yes') : $t('no') }}
+                  {{ $t('increaseStock') }} : {{ product.increaseStock ? $t('yes') : $t('no') }}
                 </label>
                 <label>
-                  {{ $t('quantity') }}: {{ expenseProduct.quantity }}
+                  {{ $t('quantity') }}: {{ product.quantity }}
                 </label>
-                <label> {{ $t('weightType') }}: {{ expenseProduct.weightType }} </label>
-                <label> {{ $t('value') }}: {{ expenseProduct.value }} </label>
+                <label> {{ $t('value') }}: {{ product.value }} </label>
               </q-item-section>
               <q-item-section side>
                 <q-btn
@@ -124,7 +131,7 @@
                   :label="$t('delete')"
                   dense
                   color="negative"
-                  @click="form.expenseProducts = form.expenseProducts.filter(p => p.id !== expenseProduct.id)"
+                  @click="form.products = form.products.filter(p => p.id !== product.id)"
                 />
               </q-item-section>
             </q-item>
@@ -173,23 +180,26 @@ export default defineComponent({
     const storeFirebase = useFirebaseStore()
     const {
       expenses,
-      expenseProducts,
-      loadingDatabase
+      products,
+      loadingDatabase,
+      suppliers
     } = storeToRefs(storeFirebase)
 
     return {
       expenses,
-      expenseProducts,
+      products,
       loadingDatabase,
+      suppliers,
       modelForm: {
         date: '',
         description: '',
         quantity: 0,
-        expenseProducts: [],
+        products: [],
+        supplier: '',
         total: 0
       },
 
-      modelExpenseProductForm: {
+      modelproductForm: {
         id: '',
         name: '',
         quantity: 1,
@@ -202,21 +212,26 @@ export default defineComponent({
   data () {
     return {
       form: {},
-      expenseProductForm: {},
+      productForm: {},
       viewMode: false
     }
   },
 
   computed: {
     weightLabel () {
-      return this.expenseProductForm.id ? this.expenseProducts.find(e => e.id === this.expenseProductForm.id).weightType : ''
+      return this.productForm.id ? this.products.find(e => e.id === this.productForm.id).weightType : ''
     },
-    expenseProductsOptions () {
-      return this.expenseProducts.map(e => ({ label: e.name, value: e.id }))
+    productsOptions () {
+      return this.products.map(e => ({ label: e.name, value: e.id }))
     }
   },
 
   watch: {
+    'productForm.id' (val) {
+      if (val) {
+        this.productForm.value = this.products.find(e => e.id === val).purchasePrice
+      }
+    },
     loadingDatabase (val) {
       if (!val) {
         this.globalLoading = false
@@ -230,7 +245,7 @@ export default defineComponent({
   created () {
     this.form = { ...this.modelForm }
     this.form.date = formatDate(Date.now(), 'YYYY/MM/DD HH:mm')
-    this.expenseProductForm = { ...this.modelExpenseProductForm }
+    this.productForm = { ...this.modelproductForm }
     this.firebaseMixinInstance = this.firebaseMixin('expenses')
     if (this.$route.params.id && !this.loadingDatabase) {
       this.checkExists(this.$route.params.id)
@@ -241,24 +256,24 @@ export default defineComponent({
   },
 
   methods: {
-    saveExpenseProduct () {
-      const expenseProduct = this.expenseProducts.find(e => e.id === this.expenseProductForm.id)
-      this.form.expenseProducts.push({
-        ...this.expenseProductForm,
-        name: expenseProduct.name,
-        weightType: expenseProduct.weightType
+    saveproduct () {
+      const product = this.products.find(e => e.id === this.productForm.id)
+      this.form.products.push({
+        ...this.productForm,
+        name: product.name,
+        weightType: product.weightType
       })
-      this.form.total = this.form.expenseProducts.reduce((acc, cur) => acc + cur.value, 0)
-      this.resetExpenseProductForm()
+      this.form.total = this.form.products.reduce((acc, cur) => acc + cur.value, 0)
+      this.resetproductForm()
     },
-    resetExpenseProductForm () {
-      this.expenseProductForm = { ...this.modelExpenseProductForm }
+    resetproductForm () {
+      this.productForm = { ...this.modelproductForm }
       this.$nextTick(() => {
-        this.$refs.expenseProductForm?.resetValidation()
+        this.$refs.productForm?.resetValidation()
       })
     },
     reset () {
-      this.form = { ...this.modelForm, expenseProducts: [] }
+      this.form = { ...this.modelForm, products: [] }
       this.form.date = formatDate(Date.now(), 'YYYY/MM/DD HH:mm')
 
       this.$nextTick(() => {
@@ -267,15 +282,20 @@ export default defineComponent({
     },
     save () {
       const ref = this.firebaseMixinInstance
-      const form = { ...this.form, expenseProducts: this.form.expenseProducts.map(({ id, value, quantity, name, weightType }) => ({ id, value, quantity, name, weightType })) }
-      const expenseProducts = this.form.expenseProducts
+      const form = { ...this.form, products: this.form.products.map(({ id, value, quantity, name, weightType }) => ({ id, value, quantity, name, weightType })) }
+      const products = this.form.products
       const action = form.id
         ? ref.id(form.id).update : ref.add
+
+      if (this.form.supplier) {
+        const idSupplier = this.suppliers.find(c => c.name === this.form.supplier).id
+        this.form.supplier = this.firebaseMixin('suppliers').id(idSupplier).doc()
+      }
       action(form).then(() => {
-        expenseProducts.forEach(item => {
+        products.forEach(item => {
           if (item.increaseStock) {
-            this.firebaseMixin('expenseProductsStockHistory').add({
-              expenseProductId: item.id,
+            this.firebaseMixin('productsStockHistory').add({
+              productId: item.id,
               quantity: item.quantity,
               description: form.description
             })

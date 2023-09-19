@@ -1,0 +1,419 @@
+{
+  "__collections__": {
+    "cashFlow": {
+      "68upmxyXqFFkinZPiknK": {
+        "date": {
+          "__datatype__": "timestamp",
+          "value": {
+            "_seconds": 1693342800,
+            "_nanoseconds": 0
+          }
+        },
+        "createdAt": {
+          "__datatype__": "timestamp",
+          "value": {
+            "_seconds": 1693342873,
+            "_nanoseconds": 893000000
+          }
+        },
+        "total": 1.11,
+        "description": "benda rapida",
+        "type": "quickExit",
+        "__collections__": {}
+      },
+      "DBJALQSLcJPLbLsTRpTa": {
+        "date": {
+          "__datatype__": "timestamp",
+          "value": {
+            "_seconds": 1693342800,
+            "_nanoseconds": 0
+          }
+        },
+        "createdAt": {
+          "__datatype__": "timestamp",
+          "value": {
+            "_seconds": 1693342820,
+            "_nanoseconds": 666000000
+          }
+        },
+        "total": 2.22,
+        "type": "payment",
+        "customer": {
+          "name": "mercado são joão",
+          "id": "pUSqvf7pRcNpXIy3DlQO"
+        },
+        "__collections__": {}
+      },
+      "aQog40xtH38mEO2vfJeI": {
+        "date": {
+          "__datatype__": "timestamp",
+          "value": {
+            "_seconds": 1693342800,
+            "_nanoseconds": 0
+          }
+        },
+        "createdAt": {
+          "__datatype__": "timestamp",
+          "value": {
+            "_seconds": 1693342828,
+            "_nanoseconds": 719000000
+          }
+        },
+        "total": 2.22,
+        "type": "fastSale",
+        "products": [{
+          "quantity": 1,
+          "name": "batata salgada",
+          "id": "WstoYbRcMV4JTQHOo5qI",
+          "unitaryValue": 2.22
+        }],
+        "__collections__": {}
+      },
+      "kOUH0MOn72zaX2vRy3zM": {
+        "date": {
+          "__datatype__": "timestamp",
+          "value": {
+            "_seconds": 1693342800,
+            "_nanoseconds": 0
+          }
+        },
+        "createdAt": {
+          "__datatype__": "timestamp",
+          "value": {
+            "_seconds": 1693342818,
+            "_nanoseconds": 921000000
+          }
+        },
+        "total": 2.22,
+        "type": "purchase",
+        "customer": {
+          "name": "mercado são joão",
+          "id": "pUSqvf7pRcNpXIy3DlQO"
+        },
+        "products": [{
+          "quantity": 1,
+          "name": "batata salgada",
+          "id": "WstoYbRcMV4JTQHOo5qI",
+          "unitaryValue": 2.22
+        }],
+        "__collections__": {}
+      }
+    },
+    "categories": {
+      "u58eLXMLmUH3dgQxUW86": {
+        "createdAt": {
+          "__datatype__": "timestamp",
+          "value": {
+            "_seconds": 1693270911,
+            "_nanoseconds": 266000000
+          }
+        },
+        "name": "salgadinho",
+        "description": "",
+        "__collections__": {}
+      }
+    },
+    "customers": {
+      "pUSqvf7pRcNpXIy3DlQO": {
+        "city": "Jaraguá do Sul",
+        "cep": "89260-842",
+        "number": 11,
+        "createdAt": {
+          "__datatype__": "timestamp",
+          "value": {
+            "_seconds": 1693270820,
+            "_nanoseconds": 529000000
+          }
+        },
+        "phone": "4733728524",
+        "publicPlace": "Rua Tarcísio José Lescowicz",
+        "district": "Jaraguá 84",
+        "cellphone": "47997564332",
+        "state": "SC",
+        "observation": "observação",
+        "document": "documento",
+        "id": "pUSqvf7pRcNpXIy3DlQO",
+        "complement": "casa",
+        "name": "mercado são joão",
+        "updatedAt": {
+          "__datatype__": "timestamp",
+          "value": {
+            "_seconds": 1693270930,
+            "_nanoseconds": 152000000
+          }
+        },
+        "__collections__": {}
+      }
+    },
+    "expenseProducts": {
+      "1QKUbkMkctiamWJlRYwQ": {
+        "weightTYpe": "",
+        "weightType": "UN",
+        "createdAt": {
+          "__datatype__": "timestamp",
+          "value": {
+            "_seconds": 1693342640,
+            "_nanoseconds": 22000000
+          }
+        },
+        "name": "batata",
+        "description": "batata",
+        "id": "1QKUbkMkctiamWJlRYwQ",
+        "updatedAt": {
+          "__datatype__": "timestamp",
+          "value": {
+            "_seconds": 1693342650,
+            "_nanoseconds": 436000000
+          }
+        },
+        "__collections__": {}
+      },
+      "DfO9VSCssdiLrILCTVzp": {
+        "weightTYpe": "",
+        "weightType": "UN",
+        "createdAt": {
+          "__datatype__": "timestamp",
+          "value": {
+            "_seconds": 1693342551,
+            "_nanoseconds": 512000000
+          }
+        },
+        "name": "sal",
+        "description": "sal",
+        "__collections__": {}
+      }
+    },
+    "expenseProductsStockHistory": {
+      "DQukJmH8VYI1n0YO5eqi": {
+        "createdAt": {
+          "__datatype__": "timestamp",
+          "value": {
+            "_seconds": 1693342572,
+            "_nanoseconds": 62000000
+          }
+        },
+        "quantity": 2,
+        "description": "",
+        "expenseProductId": "DfO9VSCssdiLrILCTVzp",
+        "__collections__": {}
+      },
+      "XgUNdaSpZqBGMiIIZRZO": {
+        "createdAt": {
+          "__datatype__": "timestamp",
+          "value": {
+            "_seconds": 1693342785,
+            "_nanoseconds": 62000000
+          }
+        },
+        "quantity": 1,
+        "expenseProductId": "1QKUbkMkctiamWJlRYwQ",
+        "description": "batata",
+        "__collections__": {}
+      },
+      "i2mVBFKJZVLc27xpfG92": {
+        "createdAt": {
+          "__datatype__": "timestamp",
+          "value": {
+            "_seconds": 1693342663,
+            "_nanoseconds": 882000000
+          }
+        },
+        "quantity": 2,
+        "description": "2",
+        "expenseProductId": "1QKUbkMkctiamWJlRYwQ",
+        "__collections__": {}
+      },
+      "mZqPV8byJz9MtNmu807C": {
+        "createdAt": {
+          "__datatype__": "timestamp",
+          "value": {
+            "_seconds": 1693342702,
+            "_nanoseconds": 248000000
+          }
+        },
+        "quantity": -2,
+        "expenseProductId": "DfO9VSCssdiLrILCTVzp",
+        "description": "Aumentar Estoque: batata salgada",
+        "__collections__": {}
+      },
+      "oFVPbpgEa9sowkknlWs7": {
+        "createdAt": {
+          "__datatype__": "timestamp",
+          "value": {
+            "_seconds": 1693342702,
+            "_nanoseconds": 248000000
+          }
+        },
+        "quantity": -2,
+        "expenseProductId": "1QKUbkMkctiamWJlRYwQ",
+        "description": "Aumentar Estoque: batata salgada",
+        "__collections__": {}
+      }
+    },
+    "expenses": {
+      "GfE04JYebKM4MSuQ42hw": {
+        "date": {
+          "__datatype__": "timestamp",
+          "value": {
+            "_seconds": 1693342740,
+            "_nanoseconds": 0
+          }
+        },
+        "createdAt": {
+          "__datatype__": "timestamp",
+          "value": {
+            "_seconds": 1693342784,
+            "_nanoseconds": 880000000
+          }
+        },
+        "total": 2.22,
+        "quantity": 0,
+        "expenseProducts": [{
+          "weightType": "UN",
+          "quantity": 1,
+          "name": "batata",
+          "id": "1QKUbkMkctiamWJlRYwQ",
+          "value": 2.22
+        }],
+        "description": "batata",
+        "id": "GfE04JYebKM4MSuQ42hw",
+        "updatedAt": {
+          "__datatype__": "timestamp",
+          "value": {
+            "_seconds": 1693342795,
+            "_nanoseconds": 467000000
+          }
+        },
+        "__collections__": {}
+      }
+    },
+    "products": {
+      "WstoYbRcMV4JTQHOo5qI": {
+        "recipes": [{
+          "quantity": 1,
+          "id": "1QKUbkMkctiamWJlRYwQ"
+        }, {
+          "quantity": 1,
+          "id": "DfO9VSCssdiLrILCTVzp"
+        }],
+        "createdAt": {
+          "__datatype__": "timestamp",
+          "value": {
+            "_seconds": 1693342702,
+            "_nanoseconds": 87000000
+          }
+        },
+        "code": "1",
+        "name": "batata salgada",
+        "description": "batata salgada",
+        "saleValue": 2.22,
+        "purchasePrice": 3.33,
+        "id": "WstoYbRcMV4JTQHOo5qI",
+        "category": "salgadinho",
+        "updatedAt": {
+          "__datatype__": "timestamp",
+          "value": {
+            "_seconds": 1693342718,
+            "_nanoseconds": 239000000
+          }
+        },
+        "__collections__": {}
+      }
+    },
+    "productsStockHistory": {
+      "Ay8PURjnEzgfIMBN6yeq": {
+        "createdAt": {
+          "__datatype__": "timestamp",
+          "value": {
+            "_seconds": 1693342702,
+            "_nanoseconds": 247000000
+          }
+        },
+        "quantity": 2,
+        "productId": "WstoYbRcMV4JTQHOo5qI",
+        "description": "Entrada",
+        "__collections__": {}
+      },
+      "hSuiArjnHgSTxPzGqNwr": {
+        "createdAt": {
+          "__datatype__": "timestamp",
+          "value": {
+            "_seconds": 1693342818,
+            "_nanoseconds": 921000000
+          }
+        },
+        "quantity": -1,
+        "productId": "WstoYbRcMV4JTQHOo5qI",
+        "description": "Comprado por Cliente: mercado são joão",
+        "__collections__": {}
+      },
+      "syJf7OBnIIg8nfckEVDz": {
+        "createdAt": {
+          "__datatype__": "timestamp",
+          "value": {
+            "_seconds": 1693342828,
+            "_nanoseconds": 719000000
+          }
+        },
+        "quantity": -1,
+        "productId": "WstoYbRcMV4JTQHOo5qI",
+        "description": "Comprado por Venda Rápida",
+        "__collections__": {}
+      }
+    },
+    "stockHistory": {
+      "8st4SKpd3lV1NkhXb8GM": {
+        "createdAt": {
+          "__datatype__": "timestamp",
+          "value": {
+            "_seconds": 1693342640,
+            "_nanoseconds": 180000000
+          }
+        },
+        "quantity": 2,
+        "expenseProductId": "1QKUbkMkctiamWJlRYwQ",
+        "description": "Entrada",
+        "__collections__": {}
+      },
+      "PCfkNDh5y8Aeu71rDM1U": {
+        "createdAt": {
+          "__datatype__": "timestamp",
+          "value": {
+            "_seconds": 1693342551,
+            "_nanoseconds": 731000000
+          }
+        },
+        "quantity": 1,
+        "expenseProductId": "DfO9VSCssdiLrILCTVzp",
+        "description": "Entrada",
+        "__collections__": {}
+      },
+      "Y8CHV2QWRO6P0ubWGcim": {
+        "createdAt": {
+          "__datatype__": "timestamp",
+          "value": {
+            "_seconds": 1693271074,
+            "_nanoseconds": 976000000
+          }
+        },
+        "quantity": 1000,
+        "expenseProductId": "AiNizcLRc6VhNDsvR8A6",
+        "description": "Entrada",
+        "__collections__": {}
+      },
+      "oPAnUtA7wIlnEf5k2nVi": {
+        "createdAt": {
+          "__datatype__": "timestamp",
+          "value": {
+            "_seconds": 1693271033,
+            "_nanoseconds": 629000000
+          }
+        },
+        "quantity": 2,
+        "expenseProductId": "u7oh3pZ3td54uJhZZBxB",
+        "description": "Entrada",
+        "__collections__": {}
+      }
+    }
+  }
+}

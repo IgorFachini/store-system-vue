@@ -1,0 +1,177 @@
+{
+  "cashFlow": [{
+      "id": "68upmxyXqFFkinZPiknK",
+      "date": 1693342800,
+      "createdAt": 1693342873893,
+      "total": 1.11,
+      "description": "benda rapida",
+      "type": "quickExit"
+    },
+    {
+      "id": "DBJALQSLcJPLbLsTRpTa",
+      "date": 1693342800,
+      "createdAt": 1693342820666,
+      "total": 2.22,
+      "type": "payment",
+      "customer": {
+        "name": "mercado são joão",
+        "id": "pUSqvf7pRcNpXIy3DlQO"
+      }
+    },
+    {
+      "id": "aQog40xtH38mEO2vfJeI",
+      "date": 1693342800,
+      "createdAt": 1693342828719,
+      "total": 2.22,
+      "type": "fastSale",
+      "products": [{
+        "quantity": 1,
+        "name": "batata salgada",
+        "id": "WstoYbRcMV4JTQHOo5qI",
+        "unitaryValue": 2.22
+      }]
+    },
+    {
+      "id": "kOUH0MOn72zaX2vRy3zM",
+      "date": 1693342800,
+      "createdAt": 1693342818921,
+      "total": 2.22,
+      "type": "purchase",
+      "customer": {
+        "name": "mercado são joão",
+        "id": "pUSqvf7pRcNpXIy3DlQO"
+      },
+      "products": [{
+        "quantity": 1,
+        "name": "batata salgada",
+        "id": "WstoYbRcMV4JTQHOo5qI",
+        "unitaryValue": 2.22
+      }]
+    }
+  ],
+  "categories": [{
+    "id": "u58eLXMLmUH3dgQxUW86",
+    "createdAt": 1693270911266,
+    "name": "salgadinho"
+  }],
+  "customers": [{
+    "id": "pUSqvf7pRcNpXIy3DlQO",
+    "city": "Jaraguá do Sul",
+    "cep": "89260-842",
+    "number": 11,
+    "createdAt": 1693270820529,
+    "phone": "4733728524",
+    "publicPlace": "Rua Tarcísio José Lescowicz",
+    "district": "Jaraguá 84",
+    "cellphone": "47997564332",
+    "state": "SC",
+    "observation": "observação",
+    "document": "documento",
+    "complement": "casa",
+    "name": "mercado são joão",
+    "updatedAt": 1693270930152
+  }],
+  "expenseProducts": [{
+      "id": "1QKUbkMkctiamWJlRYwQ",
+      "weightTYpe": "",
+      "weightType": "UN",
+      "createdAt": 1693342640022,
+      "name": "batata",
+      "description": "batata"
+    },
+    {
+      "id": "DfO9VSCssdiLrILCTVzp",
+      "weightTYpe": "",
+      "weightType": "UN",
+      "createdAt": 1693342551512,
+      "name": "sal"
+    }
+  ],
+  "expenseProductsStockHistory": [{
+      "id": "DQukJmH8VYI1n0YO5eqi",
+      "createdAt": 1693342572062,
+      "quantity": 2,
+      "description": "",
+      "expenseProductId": "DfO9VSCssdiLrILCTVzp"
+    },
+    {
+      "id": "XgUNdaSpZqBGMiIIZRZO",
+      "createdAt": 1693342785062,
+      "quantity": 1,
+      "expenseProductId": "1QKUbkMkctiamWJlRYwQ",
+      "description": "batata"
+    },
+    {
+      "id": "i2mVBFKJZVLc27xpfG92",
+      "createdAt": 1693342663882,
+      "quantity": 2,
+      "description": "2",
+      "expenseProductId": "1QKUbkMkctiamWJlRYwQ"
+    },
+    {
+      "id": "mZqPV8byJz9MtNmu807C",
+      "createdAt": 1693342702248,
+      "quantity": -2,
+      "expenseProductId": "DfO9VSCssdiLrILCTVzp",
+      "description": "Aumentar Estoque: batata salgada"
+    },
+    {
+      "id": "oFVPbpgEa9sowkknlWs7",
+      "createdAt": 1693342702248,
+      "quantity": -2,
+      "expenseProductId": "1QKUbkMkctiamWJlRYwQ",
+      "description": "Aumentar Estoque: batata salgada"
+    }
+  ],
+  "productsStockHistory": [{
+      "id": "Ay8PURjnEzgfIMBN6yeq",
+      "createdAt": 1693342702180,
+      "quantity": 2,
+      "productId": "1QKUbkMkctiamWJlRYwQ",
+      "description": "Entrada"
+    },
+    {
+      "id": "hSuiArjnHgSTxPzGqNwr",
+      "createdAt": 1693342818921,
+      "quantity": -1,
+      "productId": "WstoYbRcMV4JTQHOo5qI",
+      "description": "Comprado por Cliente: mercado são joão"
+    },
+    {
+      "id": "syJf7OBnIIg8nfckEVDz",
+      "createdAt": 1693342828719,
+      "quantity": -1,
+      "productId": "WstoYbRcMV4JTQHOo5qI",
+      "description": "Comprado por Venda Rápida"
+    }
+  ],
+  "stockHistory": [{
+      "id": "8st4SKpd3lV1NkhXb8GM",
+      "createdAt": 1693342640180,
+      "quantity": 2,
+      "expenseProductId": "1QKUbkMkctiamWJlRYwQ",
+      "description": "Entrada"
+    },
+    {
+      "id": "PCfkNDh5y8Aeu71rDM1U",
+      "createdAt": 1693342551731,
+      "quantity": 1,
+      "expenseProductId": "DfO9VSCssdiLrILCTVzp",
+      "description": "Entrada"
+    },
+    {
+      "id": "Y8CHV2QWRO6P0ubWGcim",
+      "createdAt": 1693271074976,
+      "quantity": 1000,
+      "expenseProductId": "AiNizcLRc6VhNDsvR8A6",
+      "description": "Entrada"
+    },
+    {
+      "id": "oPAnUtA7wIlnEf5k2nVi",
+      "createdAt": 1693271033629,
+      "quantity": 2,
+      "expenseProductId": "u7oh3pZ3td54uJhZZBxB",
+      "description": "Entrada"
+    }
+  ]
+}

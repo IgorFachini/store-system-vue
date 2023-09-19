@@ -12,11 +12,13 @@
         @delete="row => firebaseDeleteItem(nameHistory, 'stockHistory', row.id)"
       >
         <template #top-left>
-          <div class="q-table__title">
-            {{ $t('stockHistory', 2) }}: {{ item.name }}
-          </div>
-          <div class="row">
-            {{ $t('inStock') }}: {{ quantity }}
+          <div>
+            <div class="q-table__title">
+              {{ $t('stockHistory', 2) }}: {{ item.name }}
+            </div>
+            <div class="row">
+              {{ $t('inStock') }}: {{ quantity }}
+            </div>
           </div>
         </template>
       </v-table-crud>

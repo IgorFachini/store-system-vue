@@ -10,7 +10,7 @@
       :disable="viewMode"
       :rules="[
         val => val && val.length || $t('fillTheField', { field: $t('name') }),
-        val => !!form.id && nameBefore === val || (!customers.map(c => c.name.toLowerCase()).includes(val.toLowerCase()) || $t('alredyExist'))
+        val => !!form.id && nameBefore === val || (!suppliers.map(c => c.name.toLowerCase()).includes(val.toLowerCase()) || $t('alredyExist'))
       ]"
     />
 
@@ -129,7 +129,7 @@ import { useFirebaseStore } from 'stores/firebase'
 import { storeToRefs } from 'pinia'
 
 export default defineComponent({
-  name: 'CustomersForm',
+  name: 'suppliersForm',
 
   components: {
     VInputCep
@@ -139,18 +139,18 @@ export default defineComponent({
 
   setup () {
     const storeFirebase = useFirebaseStore()
-    const { customers, loadingDatabase } = storeToRefs(storeFirebase)
+    const { suppliers, loadingDatabase } = storeToRefs(storeFirebase)
     return {
-      customers,
+      suppliers,
       loadingDatabase,
       modelForm: {
         name: '',
         cellphone: '',
-        cnpj: '',
-        stateRegistration: '',
         phone: '',
         observation: '',
         document: '',
+        cnpj: '',
+        stateRegistration: '',
         publicPlace: '',
         number: '',
         district: '',
@@ -163,7 +163,7 @@ export default defineComponent({
 
   data () {
     return {
-      // customers: [],
+      // suppliers: [],
       firebaseMixinInstance: null,
       form: {},
       loading: false,
@@ -193,9 +193,9 @@ export default defineComponent({
 
   mounted () {
     // this.loading = true
-    this.firebaseMixinInstance = this.firebaseMixin('customers')
+    this.firebaseMixinInstance = this.firebaseMixin('suppliers')
 
-    // this.firebaseMixinInstance.bindField('customers').finally(() => {
+    // this.firebaseMixinInstance.bindField('suppliers').finally(() => {
     //   this.loading = false
     //   if (this.$route.params.id) {
     //     this.checkExists(this.$route.params.id)
@@ -233,7 +233,7 @@ export default defineComponent({
       this.$emit('done')
     },
     checkExists (id) {
-      const row = this.customers.find(p => p.id === id)
+      const row = this.suppliers.find(p => p.id === id)
 
       if (!row) {
         Notify.create({
@@ -241,10 +241,10 @@ export default defineComponent({
           color: 'negative',
           closeBtn: true
         })
-        this.$router.push('/customers')
+        this.$router.push('/suppliers')
         return
       }
-      const isView = this.$route.name === 'customers.view'
+      const isView = this.$route.name === 'suppliers.view'
       this[isView ? 'view' : 'edit'](row)
     },
     edit (row) {

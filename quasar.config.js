@@ -10,9 +10,10 @@
 
 const { configure } = require('quasar/wrappers')
 const path = require('path')
+const vuePugPlugin = require('vue-pug-plugin')
 const env = process.env.NODE_ENV === 'development' ? require('dotenv').config().parsed : process.env
 
-module.exports = configure(function (/* ctx */) {
+module.exports = configure(function (ctx) {
   return {
     eslint: {
       // fix: true,
@@ -45,7 +46,7 @@ module.exports = configure(function (/* ctx */) {
     extras: [
       // 'ionicons-v4',
       // 'mdi-v5',
-      // 'fontawesome-v6',
+      // "fontawesome-v6",
       // 'eva-icons',
       // 'themify',
       // 'line-awesome',
@@ -57,25 +58,6 @@ module.exports = configure(function (/* ctx */) {
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#build
     build: {
-      alias: {
-        services: path.resolve(__dirname, './src/services'),
-        utils: path.resolve(__dirname, './src/utils'),
-        mixins: path.resolve(__dirname, './src/mixins')
-      },
-      target: {
-        browser: ['es2019', 'edge88', 'firefox78', 'chrome87', 'safari13.1'],
-        node: 'node16'
-      },
-
-      vueRouterMode: 'history', // available values: 'hash', 'history'
-      // vueRouterBase,
-      // vueDevtools,
-      // vueOptionsAPI: false,
-
-      // rebuildCache: true, // rebuilds Vite/linter/etc cache on startup
-
-      // publicPath: '/',
-      // analyze: true,
       env: {
         FIREBASE_API_KEY: env.FIREBASE_API_KEY,
         FIREBASE_AUTH_DOMAIN: env.FIREBASE_AUTH_DOMAIN,
@@ -85,15 +67,40 @@ module.exports = configure(function (/* ctx */) {
         FIREBASE_MESSAGING_SENDER_ID: env.FIREBASE_MESSAGING_SENDER_ID,
         FIREBASE_APP_ID: env.FIREBASE_APP_ID,
         FIREBASE_MEASUREMENT_ID: env.FIREBASE_MEASUREMENT_ID,
-        DEPLOY: env.DEPLOY || ''
+        DEPLOY: env.DEPLOY || 'development'
       },
+      target: {
+        browser: ['es2019', 'edge88', 'firefox78', 'chrome87', 'safari13.1'],
+        node: 'node16'
+      },
+
+      vueRouterMode: 'history', // available values: 'hash', 'history'
+      uglifyOptions: {
+        compress: { drop_console: true }
+      },
+      // vueRouterBase,
+      // vueDevtools,
+      // vueOptionsAPI: false,
+
+      // rebuildCache: true, // rebuilds Vite/linter/etc cache on startup
+
+      // publicPath: "/procon/",
+      // analyze: true,
+      // env: {},
       // rawDefine: {}
       // ignorePublicFolder: true,
       // minify: false,
       // polyfillModulePreload: true,
       // distDir
 
-      // extendViteConf (viteConf) {},
+      extendViteConf (viteConf) {
+        if (ctx.dev) {
+          viteConf.server.fs.strict = false
+        }
+        viteConf.optimizeDeps = {
+          include: ['axios']
+        }
+      },
       // viteVuePluginOptions: {},
 
       vitePlugins: [
@@ -104,22 +111,35 @@ module.exports = configure(function (/* ctx */) {
 
           // you need to set i18n resource including paths !
           include: path.resolve(__dirname, './src/i18n/**')
-        }]
-      ]
+        }],
+        vuePugPlugin
+      ],
+      alias: {
+        services: path.resolve(__dirname, './src/services'),
+        utils: path.resolve(__dirname, './src/utils'),
+        mixins: path.resolve(__dirname, './src/mixins')
+      }
     },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer
     devServer: {
+      port: 8080,
       // https: true
       open: true // opens browser window automatically
     },
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework
     framework: {
-      config: {},
+      config: {
+        notify: {
+          position: 'top-right',
+          timeout: 1000,
+          actions: [{ icon: 'close', color: 'white' }]
+        }
+      },
 
       // iconSet: 'material-icons', // Quasar icon set
-      // lang: 'en-US', // Quasar language pack
+      lang: 'pt-BR', // Quasar language pack
 
       // For special cases outside of where the auto-import strategy can have an impact
       // (like functional components as one of the examples),
@@ -130,14 +150,19 @@ module.exports = configure(function (/* ctx */) {
 
       // Quasar plugins
       plugins: [
-        'Dialog',
-        'Notify'
+        'Notify',
+        'Dialog'
       ]
     },
 
     // animations: 'all', // --- includes all animations
     // https://v2.quasar.dev/options/animations
-    animations: [],
+    animations: [
+      'slideInRight',
+      'slideInLeft',
+      'fadeIn',
+      'fadeOut'
+    ],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#property-sourcefiles
     // sourceFiles: {
@@ -172,21 +197,21 @@ module.exports = configure(function (/* ctx */) {
       ]
     },
 
-    // https://v2.quasar.dev/quasar-cli/developing-pwa/configuring-pwa
     pwa: {
       workboxMode: 'generateSW', // or 'injectManifest'
       injectPwaMetaTags: true,
       swFilename: 'sw.js',
       manifestFilename: 'manifest.json',
       useCredentialsForManifestTag: false,
-      manifest: {
-        name: 'store-system-pe',
-        short_name: 'store-system-pe'
-      }
+      // useFilenameHashes: true,
       // extendGenerateSWOptions (cfg) {}
       // extendInjectManifestOptions (cfg) {},
-      // extendManifestJson (json) {}
       // extendPWACustomSWConf (esbuildConf) {}
+      extendManifestJson (json) {
+        json.name = 'store-system ' + env.DEPLOY || ''
+        json.short_name = 'store-system ' + env.DEPLOY || ''
+        return json
+      }
     },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli/developing-cordova-apps/configuring-cordova
@@ -224,7 +249,7 @@ module.exports = configure(function (/* ctx */) {
       builder: {
         // https://www.electron.build/configuration/configuration
 
-        appId: 'quasar-vite'
+        appId: 'new-frontend'
       }
     },
 

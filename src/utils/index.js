@@ -1,4 +1,3 @@
-
 /**
  * Converts currency BRL string to float number
  * @param {String} str
