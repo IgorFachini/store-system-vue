@@ -23,6 +23,7 @@
         />
       </q-tabs>
       <q-btn
+        :label="`${$t('discount')} ${$t('shoppingCart')}`"
         icon="local_offer"
         color="green"
         @click="openDiscountModal()"
@@ -37,7 +38,7 @@
         <q-btn
           class="q-ma-md"
           color="accent"
-          :label="$t('add')"
+          :label="`${$t('add')} ${$t('product')}`"
           @click="addProductModalOpen = true"
         />
         <q-table
@@ -56,7 +57,6 @@
           <template #top-right>
             <q-input
               v-model="filter"
-              borderless
               dense
               debounce="300"
               :placeholder="$t('search')"
@@ -155,17 +155,19 @@
                 @blur="updateCartShopItemQuantity(item.product.id, cartShopProducts[item.product.id].quantity)"
               />
               <q-btn
+                :label="`${$t('discount')} ${$t('product')}`"
                 icon="local_offer"
                 color="green"
                 class="col-2"
-                flat
+                outline
                 @click="openDiscountModal(item.product.id)"
               />
               <q-btn
+                :label="$t('removeItem')"
                 icon="delete"
                 color="red"
                 class="col-2"
-                flat
+                outline
                 @click="removeItem(item.product.id)"
               />
               <q-checkbox
@@ -307,7 +309,7 @@
               <q-item-section>
                 <v-input
                   v-model="date"
-                  :label="$t('date')"
+                  :label="$t('purchaseDath')"
                   date
                 />
               </q-item-section>
@@ -323,7 +325,7 @@
       <q-btn
         :icon="tab === 'products' ? 'close' : 'arrow_back'"
         :color="tab === 'products' ? 'red' : 'blue'"
-        round
+        :label="tab === 'products' ? $t('cancel') : $t('back')"
         @click="back"
       />
       <div class="text-green text-h4">
@@ -332,7 +334,7 @@
       <q-btn
         :icon="tab === 'products' ? 'arrow_forward' : 'done'"
         :color="tab === 'products' ? 'blue' : 'green'"
-        round
+        :label="tab === 'products' ? $t('shoppingCart') : $t('save')"
         @click="foward"
       />
     </q-footer>

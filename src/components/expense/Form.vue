@@ -218,9 +218,6 @@ export default defineComponent({
   },
 
   computed: {
-    weightLabel () {
-      return this.productForm.id ? this.products.find(e => e.id === this.productForm.id).weightType : ''
-    },
     productsOptions () {
       return this.products.map(e => ({ label: e.name, value: e.id }))
     }
@@ -282,14 +279,14 @@ export default defineComponent({
     },
     save () {
       const ref = this.firebaseMixinInstance
-      const form = { ...this.form, products: this.form.products.map(({ id, value, quantity, name, weightType }) => ({ id, value, quantity, name, weightType })) }
+      const form = { ...this.form, products: this.form.products.map(({ id, value, quantity, name }) => ({ id, value, quantity, name })) }
       const products = this.form.products
       const action = form.id
         ? ref.id(form.id).update : ref.add
 
       if (this.form.supplier) {
         const idSupplier = this.suppliers.find(c => c.name === this.form.supplier).id
-        this.form.supplier = this.firebaseMixin('suppliers').id(idSupplier).doc()
+        form.supplier = this.firebaseMixin('suppliers').id(idSupplier).doc()
       }
       action(form).then(() => {
         products.forEach(item => {

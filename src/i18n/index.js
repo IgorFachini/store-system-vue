@@ -414,6 +414,14 @@ const labels = {
   adress: {
     enUS: 'Adress',
     pt: 'Endereço'
+  },
+  purchaseDath: {
+    enUS: 'Purchase Dath',
+    pt: 'Data da Compra'
+  },
+  back: {
+    enUS: 'Back',
+    pt: 'Voltar'
   }
 }
 

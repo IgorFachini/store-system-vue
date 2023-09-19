@@ -34,7 +34,7 @@ function edit (row) {
 
 const columns = [
   ...props.chooseMode ? [{ name: 'actionChoose', label: t('choose'), align: 'left' }] : [{ name: 'action', label: t('action'), align: 'left' }],
-  { name: 'name', label: t('name'), field: 'name' },
+  { name: 'name', label: t('name'), field: 'name', sortable: true },
   { name: 'cellphone', label: t('cellphone'), field: 'cellphone' },
   { name: 'phone', label: t('phone'), field: 'phone' },
   { name: 'observation', label: t('observation'), field: 'observation' },

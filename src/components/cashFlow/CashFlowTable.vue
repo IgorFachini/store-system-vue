@@ -7,12 +7,17 @@
     class="full-width"
   >
     <template #top-left>
-      <div class="q-table__title">
-        {{ $t('cashFlow') }}
-      </div>
-      <div class="row">
-        {{ $t('debt') }}: <div :class="debt < 0 ? 'text-red' : 'text-green'">
-          {{ debt.toFixed(2) }}
+      <div class="q-gutter-y-sm">
+        <div class="q-table__title">
+          {{ $t('cashFlow') }}
+        </div>
+        <div v-if="customerId" class="q-table__title">
+          {{ $t('customer') }}: {{ customer.name }}
+        </div>
+        <div class="row">
+          {{ $t('debt') }}: <div :class="debt < 0 ? 'text-red' : 'text-green'">
+            {{ debt.toFixed(2) }}
+          </div>
         </div>
       </div>
     </template>
@@ -100,11 +105,12 @@ export default defineComponent({
 
   setup () {
     const storeFirebase = useFirebaseStore()
-    const { cashFlowByCustomerIdOrAll, loadingDatabase } = storeToRefs(storeFirebase)
+    const { cashFlowByCustomerIdOrAll, loadingDatabase, customerById } = storeToRefs(storeFirebase)
 
     return {
       cashFlowByCustomerIdOrAll,
-      loadingDatabase
+      loadingDatabase,
+      customerById
     }
   },
 
@@ -124,6 +130,9 @@ export default defineComponent({
   },
 
   computed: {
+    customer () {
+      return this.customerById(this.customerId)
+    },
     cashFlow () {
       return this.cashFlowByCustomerIdOrAll(this.customerId).map(item => {
         item.date = this.getDate(item.date)
@@ -150,7 +159,7 @@ export default defineComponent({
           align: 'left'
         },
         { name: 'total', label: 'Total', field: 'total', classes: row => this.getClassColor(row.type), sortable: true },
-        { name: 'date', label: this.$t('date'), field: 'date', sortable: true, align: 'left' },
+        { name: 'date', label: this.$t('purchaseDath'), field: 'date', sortable: true, align: 'left' },
         {
           name: 'createdAt',
           label: this.$t('createdAt'),

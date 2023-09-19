@@ -20,27 +20,27 @@
         <q-item-section>
           <v-input
             v-model="date"
-            :label="$t('date')"
+            :label="$t('purchaseDath')"
             date
           />
           <div class="row justify-between q-my-md">
             <q-btn
+              :label="$t('quickExit')"
               color="red"
               icon="arrow_downward"
-              round
               :disable="total <= 0"
               @click="save(false)"
             />
             <q-btn
+              :label="$t('shoppingCart')"
               color="blue"
               icon="shopping_cart"
-              round
               @click="$router.push('/cart-shop')"
             />
             <q-btn
+              :label="$t('fastSale')"
               color="green"
               icon="arrow_upward"
-              round
               :disable="total <= 0"
               @click="save(true)"
             />
