@@ -422,6 +422,10 @@ const labels = {
   back: {
     enUS: 'Back',
     pt: 'Voltar'
+  },
+  remove: {
+    enUS: 'Remove',
+    pt: 'Remover'
   }
 }
 
