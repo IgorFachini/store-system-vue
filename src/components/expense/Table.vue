@@ -14,7 +14,7 @@ const { formatDate } = date
 const { t } = useI18n({ useScope: 'global' });
 const storeFirebase = useFirebaseStore()
 
-const { expenses, productsStockHistory, loadingDatabase } = storeToRefs(storeFirebase)
+const { expenses, loadingDatabase } = storeToRefs(storeFirebase)
 
 const columns = computed(() => [
   { name: 'action', label: t('action'), align: 'left' },
