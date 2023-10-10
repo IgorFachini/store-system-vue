@@ -403,7 +403,7 @@ export default defineComponent({
       this.nameBefore = row.name
       this.form = { ...row, id: row.id }
     },
-    edit (row, id) {
+    edit (row) {
       this.viewMode = false
       this.form = {
         ...row,

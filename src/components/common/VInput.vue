@@ -252,7 +252,7 @@ export default {
 
       this.hasErrorCheck = Boolean(hasError)
     },
-    onInput (modelValue, isInput) {
+    onInput (modelValue) {
       if (this.currency) {
         this.cValue = String(modelValue).replace(/\./g, '') || '0'
         modelValue = currencyToFloat(modelValue)

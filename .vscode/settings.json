@@ -11,5 +11,6 @@
   ],
   "[vue]": {
     "editor.foldingStrategy": "indentation"
-  }
+  },
+  "references.preferredLocation": "peek"
 }

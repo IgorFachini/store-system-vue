@@ -55,6 +55,7 @@ const dateGetTimeFn = (date) => {
 }
 
 function firebaseMixin (refName, rtdb) {
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
   const refThis = this
   const ref = rtdb ? db.ref(refName) : fr.collection(refName)
 

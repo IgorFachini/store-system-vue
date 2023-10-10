@@ -1,105 +1,221 @@
+<script setup lang="ts">
+import { useFirebaseStore } from 'stores/firebase'
+import { storeToRefs } from 'pinia'
+import { useI18n } from 'vue-i18n'
+import { Notify } from 'quasar'
+import { useRouter, useRoute } from 'vue-router'
+import { ref, watch } from 'vue'
+import { Customer } from 'src/models/models'
+import { methods } from 'boot/firebase'
+
+const { firebaseMixin } = methods
+
+const firebaseMixinInstance = firebaseMixin('customers')
+
+const router = useRouter()
+const route = useRoute()
+
+const formData = ref<Customer>({
+  id: '',
+  city: '',
+  cep: '',
+  number: 0,
+  createdAt: 0,
+  phone: '',
+  publicPlace: '',
+  district: '',
+  cellphone: '',
+  state: '',
+  observation: '',
+  document: '',
+  complement: '',
+  name: '',
+  updatedAt: 0
+})
+
+const { t } = useI18n({ useScope: 'global' })
+const storeFirebase = useFirebaseStore()
+const { customers, loadingDatabase } = storeToRefs(storeFirebase)
+const viewMode = ref(false)
+const nameBefore = ref('')
+
+watch(loadingDatabase, (val) => {
+  if (route.params.id && !val) {
+    checkExists(route.params.id)
+  }
+})
+
+function checkExists (id: string|string[]) {
+  const row = storeFirebase.customers.find(p => p.id === id)
+
+  if (!row) {
+    Notify.create({
+      message: t('notExist'),
+      color: 'negative',
+      closeBtn: true
+    })
+    router.push('/customers')
+  }
+
+  const isView = route.name === 'customers.view'
+  if (!isView) {
+    edit(row)
+  }
+}
+
+function edit (row: Customer) {
+  viewMode.value = false
+  nameBefore.value = row.name
+  formData.value = { ...row, id: row.id }
+}
+
+if (route.params.id && !storeFirebase.loadingDatabase) {
+  checkExists(route.params.id)
+}
+
+function save () {
+  const ref = firebaseMixinInstance
+  const action = formData.value.id
+    ? ref.id(formData.value.id).update : ref.add
+  action(formData.value).catch((err) => {
+    console.log('err', err)
+  })
+  Notify.create({
+    message: t('savedOperation'),
+    color: 'positive',
+    closeBtn: true
+  })
+  reset()
+  router.push('/customers')
+}
+
+function setAdress ({ logradouro, bairro, localidade, uf }) {
+  formData.value.publicPlace = logradouro
+  formData.value.district = bairro
+  formData.value.city = localidade
+  formData.value.state = uf
+}
+
+function reset () {
+  viewMode.value = false
+  formData.value = {}
+  // $nextTick(() => {
+  //   $refs.formData.resetValidation()
+  // })
+}
+
+function teste (val) {
+  console.log(val)
+  console.log((!customers.value.map(c => c.name.toLowerCase()).includes(val.toLowerCase()) || t('alredyExist')))
+  console.log(customers.value.map(c => c.name.toLowerCase()).includes(val.toLowerCase()))
+}
+
+</script>
+
 <template>
-  <q-form
+
+<q-form
     ref="form"
     class="full-width"
     @submit="save"
   >
-    <v-input
-      v-model="form.name"
-      :label="$t('name')"
+    <q-input
+      v-model="formData.name"
+      :label="t('name')"
       :disable="viewMode"
       :rules="[
-        val => val && val.length || $t('fillTheField', { field: $t('name') }),
-        val => !!form.id && nameBefore === val || (!customers.map(c => c.name.toLowerCase()).includes(val.toLowerCase()) || $t('alredyExist'))
+        val => val && val.length || t('fillTheField', { field: t('name') }),
+        val => !!formData.id && nameBefore === val || (!customers.map(c => c.name.toLowerCase()).includes(val.toLowerCase()) || t('alredyExist')),
+        val => teste(val)
       ]"
     />
 
     <v-input
-      v-model="form.cellphone"
-      :label="$t('cellphone')"
+      v-model="formData.cellphone"
+      :label="t('cellphone')"
       :disable="viewMode"
       mask="#"
       reverse-fill-mask
     />
 
     <v-input
-      v-model="form.phone"
-      :label="$t('phone')"
+      v-model="formData.phone"
+      :label="t('phone')"
       :disable="viewMode"
       mask="#"
       reverse-fill-mask
     />
 
     <v-input
-      v-model="form.observation"
+      v-model="formData.observation"
       type="textarea"
-      :label="$t('observation')"
+      :label="t('observation')"
       :disable="viewMode"
     />
 
     <q-input
-      v-model="form.document"
-      :label="$t('document')"
+      v-model="formData.document"
+      :label="t('document')"
       :disable="viewMode"
     />
 
     <q-input
-      v-model="form.cnpj"
+      v-model="formData.cnpj"
       label="CNPJ"
       :disable="viewMode"
     />
 
     <q-input
-      v-model="form.stateRegistration"
-      :label="$t('stateRegistration')"
+      v-model="formData.stateRegistration"
+      :label="t('stateRegistration')"
       :disable="viewMode"
     />
 
     <q-card class="q-pa-md q-mt-md">
       <div class="text-h6">
-        {{ $t('adress') }}
+        {{ t('adress') }}
       </div>
       <v-input-cep
-        v-model="form.cep"
+        v-model="formData.cep"
         label="CEP"
         :disable="viewMode"
         @response="setAdress"
       />
 
       <v-input
-        v-model="form.publicPlace"
-        :label="$t('publicPlace')"
+        v-model="formData.publicPlace"
+        :label="t('publicPlace')"
         :disable="viewMode"
       />
 
       <v-input
-        v-model="form.number"
-        :label="$t('number')"
+        v-model="formData.number"
+        :label="t('number')"
         :disable="viewMode"
         type="number"
       />
 
       <v-input
-        v-model="form.district"
-        :label="$t('district')"
+        v-model="formData.district"
+        :label="t('district')"
         :disable="viewMode"
       />
 
       <v-input
-        v-model="form.city"
-        :label="$t('city')"
+        v-model="formData.city"
+        :label="t('city')"
         :disable="viewMode"
       />
 
       <v-input
-        v-model="form.state"
-        :label="$t('state')"
+        v-model="formData.state"
+        :label="t('state')"
         :disable="viewMode"
       />
 
       <v-input
-        v-model="form.complement"
-        :label="$t('complement')"
+        v-model="formData.complement"
+        :label="t('complement')"
         :disable="viewMode"
       />
     </q-card>
@@ -110,7 +226,7 @@
         @click="reset"
       />
       <q-btn
-        :label="$t('save')"
+        :label="t('save')"
         type="submit"
         color="positive"
         :disable="viewMode"
@@ -118,146 +234,3 @@
     </div>
   </q-form>
 </template>
-
-<script>
-
-import { Notify } from 'quasar'
-import { defineComponent } from 'vue'
-import VInputCep from 'src/components/common/VInputCep.vue'
-
-import { useFirebaseStore } from 'stores/firebase'
-import { storeToRefs } from 'pinia'
-
-export default defineComponent({
-  name: 'CustomersForm',
-
-  components: {
-    VInputCep
-  },
-
-  emits: ['done'],
-
-  setup () {
-    const storeFirebase = useFirebaseStore()
-    const { customers, loadingDatabase } = storeToRefs(storeFirebase)
-    return {
-      customers,
-      loadingDatabase,
-      modelForm: {
-        name: '',
-        cellphone: '',
-        cnpj: '',
-        stateRegistration: '',
-        phone: '',
-        observation: '',
-        document: '',
-        publicPlace: '',
-        number: '',
-        district: '',
-        city: '',
-        state: '',
-        complement: ''
-      }
-    }
-  },
-
-  data () {
-    return {
-      // customers: [],
-      firebaseMixinInstance: null,
-      form: {},
-      loading: false,
-      nameBefore: '',
-      viewMode: false
-    }
-  },
-
-  watch: {
-    loadingDatabase (val) {
-      if (this.$route.params.id && !val) {
-        this.globalLoading = false
-        this.checkExists(this.$route.params.id)
-      }
-    }
-  },
-
-  created () {
-    this.form = { ...this.modelForm }
-    if (this.$route.params.id && !this.loadingDatabase) {
-      this.checkExists(this.$route.params.id)
-    }
-    if (this.loadingDatabase) {
-      this.globalLoading = true
-    }
-  },
-
-  mounted () {
-    // this.loading = true
-    this.firebaseMixinInstance = this.firebaseMixin('customers')
-
-    // this.firebaseMixinInstance.bindField('customers').finally(() => {
-    //   this.loading = false
-    //   if (this.$route.params.id) {
-    //     this.checkExists(this.$route.params.id)
-    //   }
-    // })
-  },
-
-  methods: {
-    setAdress ({ logradouro, bairro, localidade, uf }) {
-      this.form.publicPlace = logradouro
-      this.form.district = bairro
-      this.form.city = localidade
-      this.form.state = uf
-    },
-    reset () {
-      this.viewMode = false
-      this.form = { ...this.modelForm }
-      this.$nextTick(() => {
-        this.$refs.form.resetValidation()
-      })
-    },
-    save () {
-      const ref = this.firebaseMixinInstance
-      const action = this.form.id
-        ? ref.id(this.form.id).update : ref.add
-      action(this.form).catch((err) => {
-        console.log('err', err)
-      })
-      Notify.create({
-        message: this.$t('savedOperation'),
-        color: 'positive',
-        closeBtn: true
-      })
-      this.reset()
-      this.$emit('done')
-    },
-    checkExists (id) {
-      const row = this.customers.find(p => p.id === id)
-
-      if (!row) {
-        Notify.create({
-          message: this.$t('notExist'),
-          color: 'negative',
-          closeBtn: true
-        })
-        this.$router.push('/customers')
-        return
-      }
-      const isView = this.$route.name === 'customers.view'
-      this[isView ? 'view' : 'edit'](row)
-    },
-    edit (row) {
-      this.viewMode = false
-      this.nameBefore = row.name
-      this.form = { ...row, id: row.id }
-    },
-
-    view (row) {
-      this.viewMode = true
-      this.nameBefore = row.name
-      this.form = { ...row, id: row.id }
-    }
-  }
-})
-</script>
