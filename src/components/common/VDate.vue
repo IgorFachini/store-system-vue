@@ -8,7 +8,7 @@ q-input.col(
   :model-value="modelValue"
   :label="label"
   lazy-rules
-  :rules="[val => !!val || 'Obrigatório']"
+  :rules="rules"
   mask="##/##/####"
   clearable
   @update:model-value="val => $emit('update:modelValue', val)"

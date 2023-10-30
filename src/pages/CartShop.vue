@@ -310,6 +310,7 @@
                 <v-date
                   v-model="date"
                   :label="$t('purchaseDate')"
+                  :rules="[val => val && val.length || $t('fillTheField', { field: $t('purchaseDate') })]"
                 />
                 <q-checkbox
                   v-model="purchasePayed"
