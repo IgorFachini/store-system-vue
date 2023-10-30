@@ -289,7 +289,6 @@ export default defineComponent({
         form.supplier = this.firebaseMixin('suppliers').id(idSupplier).doc()
       }
       action(form).then((res) => {
-        console.log('t', res.id)
         products.forEach(item => {
           if (item.increaseStock) {
             this.firebaseMixin('productsStockHistory').add({

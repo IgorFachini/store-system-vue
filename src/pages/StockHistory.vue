@@ -3,11 +3,18 @@
     class="row q-col-gutter-md"
     padding
   >
-    <div class="col-xs-12 col-sm-12 col-md-8">
+    <div class="col-xs-12 col-sm-12 col-md-8 row justify-center">
+      <q-btn
+        label="Remover tudo"
+        color="negative"
+        class="q-mb-md"
+        @click="deleteAllRows()"
+      />
       <v-table-crud
         :rows="stockHistory"
         :columns="columns"
         :loading="loading"
+        hide-add
         @edit="edit"
         @delete="row => firebaseDeleteItem(nameHistory, 'stockHistory', row.id)"
       >
@@ -42,12 +49,12 @@
           :rules="[val => val != 0]"
         />
 
-        <q-checkbox
+        <!-- <q-checkbox
           v-if="nameHistory === 'productsStockHistory' && form.quantity > 0"
           v-model="decreaseStockRecipes"
           :label="`${$t('decreaseStock')} (${$t('recipe', 2)})`"
           left-label
-        />
+        /> -->
 
         <div class="row q-gutter-md q-mt-md justify-between">
           <q-btn
@@ -67,7 +74,7 @@
 
 <script>
 
-import { date, Notify } from 'quasar'
+import { date, Notify, Dialog } from 'quasar'
 import { defineComponent } from 'vue'
 const { formatDate } = date
 import { useFirebaseStore } from 'stores/firebase'
@@ -146,6 +153,17 @@ export default defineComponent({
   },
 
   methods: {
+    deleteAllRows () {
+      Dialog.create({
+        title: 'Deletar todo o histórico de estoque ?',
+        cancel: true,
+        persistent: true
+      }).onOk(() => {
+        this.stockHistory.forEach(item => {
+          this.firebaseMixin(this.nameHistory).id(item.id).delete()
+        })
+      })
+    },
     load () {
       this.firebaseMixin(this.collectionName).id(this.itemId).doc().get().then(doc => {
         if (!doc.exists) {

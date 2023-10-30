@@ -18,10 +18,9 @@
       </q-item>
       <q-item>
         <q-item-section>
-          <v-input
+          <v-date
             v-model="date"
             :label="$t('purchaseDate')"
-            date
           />
           <div class="row justify-between q-my-md">
             <q-btn
@@ -56,6 +55,7 @@
 import { date, Dialog, Notify } from 'quasar'
 const { formatDate } = date
 import { defineComponent } from 'vue'
+import moment from 'moment';
 
 export default defineComponent({
   name: 'FastAction',
@@ -69,7 +69,7 @@ export default defineComponent({
   },
 
   created () {
-    this.date = formatDate(Date.now(), 'YYYY/MM/DD HH:mm')
+    this.date = formatDate(Date.now(), 'DD/MM/YYYY')
   },
 
   mounted () {
@@ -87,7 +87,7 @@ export default defineComponent({
         const sale = {
           type: fastSale ? 'fastSale' : 'quickExit',
           description: this.description,
-          date: this.date,
+          date: moment(this.date, 'DD/MM/YYYY').toDate(),
           total: this.total
         }
         this.firebaseMixin('cashFlow').add(sale)
@@ -100,7 +100,7 @@ export default defineComponent({
       })
     },
     reset () {
-      this.date = formatDate(Date.now(), 'YYYY/MM/DD HH:mm')
+      this.date = formatDate(Date.now(), 'DD/MM/YYYY')
       this.total = 0
       this.description = ''
     }

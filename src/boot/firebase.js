@@ -2,6 +2,13 @@ import { boot } from 'quasar/wrappers'
 import { firestorePlugin, rtdbPlugin } from 'vuefire'
 import { covertDateFieldName } from 'src/utils/index'
 import firebase from 'firebase/compat/app'
+import {
+  getDownloadURL,
+  ref as firebaseRef,
+  uploadBytesResumable,
+  getStorage
+} from '@firebase/storage'
+
 import 'firebase/compat/firestore'
 import 'firebase/compat/database'
 import 'firebase/compat/auth'
@@ -12,8 +19,8 @@ import { Dialog, Notify } from 'quasar'
 const t = i18n.global.t
 
 const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY || 'AIzaSyDpWl0EN7ZPYs92Fbo1mcKKcIYTDOInlNI',
-  projectId: process.env.FIREBASE_PROJECT_ID || 'store-system-54b7a',
+  apiKey: process.env.FIREBASE_API_KEY,
+  projectId: process.env.FIREBASE_PROJECT_ID,
   databaseURL: process.env.FIREBASE_DATABASE_URL,
   authDomain: process.env.FIREBASE_AUTH_DOMAIN,
   storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
@@ -52,6 +59,50 @@ const firebaseDateFn = (date) => {
 
 const dateGetTimeFn = (date) => {
   return new Date(date).getTime()
+}
+
+function firebaseUploadFile (file, directory) {
+  return new Promise((resolve, reject) => {
+    const storageRef = firebaseRef(getStorage(firebaseApp), directory)
+    const uploadTask = uploadBytesResumable(storageRef, file)
+    uploadTask.on('state_changed',
+      (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        console.log('Upload is ' + progress + '% done')
+      },
+      (error) => {
+        reject(error)
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          resolve(downloadURL)
+        })
+      }
+    )
+  })
+}
+
+function firebaseGetFile (directory) {
+  return new Promise((resolve, reject) => {
+    const storageRef = firebaseRef(getStorage(firebaseApp), directory)
+    getDownloadURL(storageRef).then((url) => {
+      console.log('test', directory, url)
+      resolve(url)
+    }).catch((error) => {
+      reject(error)
+    })
+  })
+}
+
+function firebaseDeleteFile (directory) {
+  return new Promise((resolve, reject) => {
+    const storageRef = firebaseRef(getStorage(firebaseApp), directory)
+    storageRef.delete().then(() => {
+      resolve()
+    }).catch((error) => {
+      reject(error)
+    })
+  })
 }
 
 function firebaseMixin (refName, rtdb) {
@@ -146,4 +197,4 @@ export default boot(({ app }) => {
   return firebaseMixin
 })
 
-export { firebaseApp, firebaseAuth, fr, Timestamp, methods }
+export { firebaseApp, firebaseAuth, fr, Timestamp, firebaseMixin, firebaseUploadFile, firebaseGetFile, methods }

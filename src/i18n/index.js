@@ -335,8 +335,8 @@ const labels = {
     enUS: 'Choose',
     pt: 'Escolher'
   },
-  buyPayed: {
-    enUS: 'Buy Payed',
+  purchasePayed: {
+    enUS: 'Purchase Payed',
     pt: 'Compra Paga'
   },
   no: {
@@ -426,6 +426,18 @@ const labels = {
   remove: {
     enUS: 'Remove',
     pt: 'Remover'
+  },
+  image: {
+    enUS: 'Image',
+    pt: 'Imagem'
+  },
+  pay: {
+    enUS: 'Pay',
+    pt: 'Pagar'
+  },
+  selected: {
+    enUS: 'Selected | Selecteds',
+    pt: 'Selecionado | Selecionados'
   }
 }
 

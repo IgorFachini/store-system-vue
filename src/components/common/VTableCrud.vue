@@ -47,6 +47,11 @@ q-table(
             :class="col.classes"
           )
             | {{ col.value }}
+            slot(
+              v-if="col.name === 'image'"
+              name="body-cell-image"
+              v-bind="props"
+            )
             q-btn(
               v-if="col.name === 'expand'"
               size="sm"

@@ -1,10 +1,15 @@
 <template>
+<!-- // TODO - campo de data no formato certo e editavel, possibilidade de editar a linha -->
   <q-table
     v-model:pagination="paginationInside"
     :rows="cashFlow"
     :columns="columnsCashFlow"
     :loading="loadingDatabase"
     class="full-width"
+    :filter="search"
+    row-key="id"
+    v-model:selected="selected"
+    selection="multiple"
   >
     <template #top-left>
       <div class="q-gutter-y-sm">
@@ -22,17 +27,38 @@
       </div>
     </template>
     <template #top-right>
-      <q-input
-        v-model="search"
-        borderless
-        dense
-        debounce="300"
-        :placeholder="$t('search')"
-      >
-        <template #append>
-          <q-icon name="search" />
-        </template>
-      </q-input>
+      <div class="row q-gutter-md">
+        <q-btn
+          label="Pagar compras"
+          color="green"
+          :disabled="!selected.filter(({ type }) => type === 'purchase').length"
+          @click="makeAllPurchasePayed"
+        />
+        <q-btn
+          label="Deletar"
+          color="negative"
+          :disabled="!selected.length"
+          @click="deleteSelected"
+        />
+        <q-select
+          style="width: 150px"
+          v-model="search"
+          :label="$t('type')"
+          :options="typesOptions"
+          emit-value
+          map-options
+          clearable
+        />
+        <q-input
+          v-model="search"
+          debounce="300"
+          :placeholder="$t('search')"
+        >
+          <template #append>
+            <q-icon name="search" />
+          </template>
+        </q-input>
+      </div>
     </template>
     <template #body-cell-description="{ row }">
       <q-td :class="getClassColor(row.type)">
@@ -86,7 +112,7 @@
 
 <script>
 
-import { date } from 'quasar'
+import { date, Dialog } from 'quasar'
 import { defineComponent } from 'vue'
 const { formatDate } = date
 
@@ -125,7 +151,14 @@ export default defineComponent({
         rowsPerPage: 25,
         sortBy: 'date',
         descending: true
-      }
+      },
+      selected: [],
+      typesOptions: [
+        this.$t('quickExit'),
+        this.$t('payment'),
+        this.$t('fastSale'),
+        this.$t('purchase')
+      ]
     }
   },
 
@@ -159,7 +192,9 @@ export default defineComponent({
           align: 'left'
         },
         { name: 'total', label: 'Total', field: 'total', classes: row => this.getClassColor(row.type), sortable: true },
-        { name: 'date', label: this.$t('purchaseDate'), field: 'date', sortable: true, align: 'left' },
+        { name: 'purchasePayed', label: this.$t('purchasePayed'), field: 'purchasePayed', sortable: true, align: 'left', format: val => val !== undefined ? this.$t(val ? 'yes' : 'no') : '-' },
+        { name: 'type', label: this.$t('type'), field: 'type', sortable: true, align: 'left', format: val => this.$t(val) },
+        { name: 'date', label: this.$t('purchaseDate'), field: 'date', sortable: true, align: 'left', format: val => formatDate(val, 'DD/MM/YYYY') },
         {
           name: 'createdAt',
           label: this.$t('createdAt'),
@@ -177,6 +212,32 @@ export default defineComponent({
   // },
 
   methods: {
+    deleteSelected () {
+      Dialog.create({
+        title: `${this.$q.lang.label.remove} ${this.$t('selected', this.selected.length)} ?`,
+        cancel: true,
+        persistent: true
+      }).onOk(() => {
+        this.selected.forEach(row => {
+          this.firebaseMixin('cashFlow').id(row.id).delete()
+        })
+        this.selected = []
+      })
+    },
+    makeAllPurchasePayed () {
+      Dialog.create({
+        title: `${this.$t('pay')} ${this.$t('selected', this.selected.filter(({ type }) => type === 'purchase').length)} ?`,
+        cancel: true,
+        persistent: true
+      }).onOk(() => {
+        this.selected.filter(({ type }) => type === 'purchase').forEach(row => {
+          if (row.type === 'purchase' && !row.purchasePayed) {
+            this.update({ ...row, purchasePayed: true })
+          }
+        })
+        this.selected = []
+      })
+    },
     sumProductsWithDiscountValue (products) {
       return products.reduce((acc, item) => acc + (item.discountObject
         ? this.calcDiscountResult(item.discountObject, item.unitaryValue) * item.quantity

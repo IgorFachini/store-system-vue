@@ -4,22 +4,36 @@ import { useFirebaseStore } from 'stores/firebase';
 import { storeToRefs } from 'pinia';
 import { useI18n } from 'vue-i18n';
 import { date } from 'quasar';
+import moment from 'moment';
 
 const { formatDate } = date;
 const { t } = useI18n({ useScope: 'global' });
 const { cashFlow, expenses } = storeToRefs(useFirebaseStore());
 
-const modelData = ref({
-  from: '',
-  to: ''
+const dateFrom = ref('');
+const dateTo = ref('');
+
+const dateFromFormatedToIso = computed(() => {
+  const date = moment(dateFrom.value, 'DD/MM/YYYY');
+  if (date.isValid()) {
+    return date.format('YYYY-MM-DD');
+  }
+  return ''
 });
 
+const dateToFormatedToIso = computed(() => {
+  const date = moment(dateTo.value, 'DD/MM/YYYY');
+  if (date.isValid()) {
+    return date.format('YYYY-MM-DD');
+  }
+  return ''
+});
 const cashFlowFilterDateRange = computed(() => {
-  if (!modelData.value.from || !modelData.value.to) {
+  if (!dateFromFormatedToIso.value || !dateToFormatedToIso.value) {
     return cashFlow.value;
   }
-  const startDate = new Date(modelData.value.from);
-  const endDate = new Date(modelData.value.to);
+  const startDate = new Date(dateFromFormatedToIso.value);
+  const endDate = new Date(dateToFormatedToIso.value);
   return cashFlow.value.filter(c => {
     const date = typeof c.date === 'object' ? new Date(c.date.toDate()) : c.date;
     return (date >= startDate && date <= endDate);
@@ -27,11 +41,11 @@ const cashFlowFilterDateRange = computed(() => {
 });
 
 const expensesFilterDateRange = computed(() => {
-  if (!modelData.value.from || !modelData.value.to) {
+  if (!dateFromFormatedToIso.value || !dateToFormatedToIso.value) {
     return expenses.value;
   }
-  const startDate = new Date(modelData.value.from);
-  const endDate = new Date(modelData.value.to);
+  const startDate = new Date(dateFromFormatedToIso.value);
+  const endDate = new Date(dateToFormatedToIso.value);
   return expenses.value.filter(c => {
     const date = typeof c.date === 'object' ? new Date(c.date.toDate()) : c.date;
     return (date >= startDate && date <= endDate);
@@ -125,8 +139,8 @@ function loadCurrentMonth () {
   const date = new Date(), y = date.getFullYear(), m = date.getMonth();
   const firstDay = new Date(y, m, 1);
   const lastDay = new Date(y, m + 1, 0);
-  modelData.value.from = formatDate(firstDay, 'YYYY/MM/DD');
-  modelData.value.to = formatDate(lastDay, 'YYYY/MM/DD');
+  dateFrom.value = formatDate(firstDay, 'DD/MM/YYYY');
+  dateTo.value = formatDate(lastDay, 'DD/MM/YYYY');
 }
 
 onMounted(() => {
@@ -137,7 +151,9 @@ onMounted(() => {
 
 <template lang="pug">
 q-page(class="q-col-gutter-md" padding)
-  v-input(v-model="modelData" :label="t('purchaseDate')" date range clearable)
+  div.row.q-gutter-md
+    v-date(v-model="dateFrom" label="Data de compra inicio")
+    v-date(v-model="dateTo" label="Data de compra fim")
   div(class="row q-col-gutter-md")
     div.col-6
       q-field(:label="t('sold')" readonly stack-label)
