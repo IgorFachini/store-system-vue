@@ -207,10 +207,10 @@ export default defineComponent({
       }).catch((err) => {
         console.log('err', err)
       })
-      const files = this.$refs.uploader.files
-      if (files.length) {
-        firebaseUploadFile(files[0], `product-${form.name}`)
-      }
+      // const files = this.$refs.uploader.files
+      // if (files.length) {
+      //   firebaseUploadFile(files[0], `product-${form.name}`)
+      // }
       Notify.create({
         message: this.$t('savedOperation'),
         color: 'positive',
