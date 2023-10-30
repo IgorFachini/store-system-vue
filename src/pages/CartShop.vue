@@ -307,11 +307,16 @@
             </q-item>
             <q-item>
               <q-item-section>
-                <v-input
+                <v-date
                   v-model="date"
                   :label="$t('purchaseDate')"
-                  date
+                  :rules="[val => val && val.length || $t('fillTheField', { field: $t('purchaseDate') })]"
                 />
+                <q-checkbox
+                  v-model="purchasePayed"
+                  :label="$t('purchasePayed')"
+                />
+
               </q-item-section>
             </q-item>
           </q-card>
@@ -460,6 +465,7 @@ const { formatDate } = date
 import { defineComponent } from 'vue'
 import { useFirebaseStore } from 'stores/firebase'
 import { storeToRefs } from 'pinia'
+import moment from 'moment';
 
 export default defineComponent({
   name: 'PageCartShop',
@@ -495,7 +501,8 @@ export default defineComponent({
       saveDialogOpen: false,
       chooseCustomerModalOpen: false,
       addCustomerModalOpen: false,
-      date: null
+      date: null,
+      purchasePayed: true
     }
   },
 
@@ -556,7 +563,7 @@ export default defineComponent({
   },
 
   created () {
-    this.date = formatDate(Date.now(), 'YYYY/MM/DD HH:mm')
+    this.date = formatDate(Date.now(), 'DD/MM/YYYY')
     if (this.loadingDatabase) {
       this.globalLoading = true
     }
@@ -724,7 +731,7 @@ export default defineComponent({
         const sale = {
           type: customer?.name ? 'purchase' : 'fastSale',
           ...(this.subTotalDiscountObject?.type) && { subTotalDiscountObject: this.subTotalDiscountObject },
-          date: this.date,
+          date: moment(this.date, 'DD/MM/YYYY').toDate(),
           total: this.total,
           ...customerId && {
             customer: {
@@ -740,36 +747,22 @@ export default defineComponent({
             ...(item.discountObject?.type) && { discountObject: item.discountObject }
           }))
         }
-        this.firebaseMixin('cashFlow').add({ ...sale })
-        this.cartShopGroupedArray.forEach(item => {
-          if (item.decreaseStock) {
-            this.firebaseMixin('productsStockHistory').add({
-              productId: item.product.id,
-              quantity: -Math.abs(item.quantity),
-              description: `${this.$t('boughtBy')} ` + (customerId ? `${this.$t('customer')}: ${customer?.name}` : this.$t('fastSale'))
-            })
-          }
+        if (customer?.name) {
+          sale.purchasePayed = this.purchasePayed
+        }
+        this.firebaseMixin('cashFlow').add({ ...sale }).then((res) => {
+          this.cartShopGroupedArray.forEach(item => {
+            if (item.decreaseStock) {
+              this.firebaseMixin('productsStockHistory').add({
+                productId: item.product.id,
+                quantity: -Math.abs(item.quantity),
+                description: `${this.$t('boughtBy')} ` + (customerId ? `${this.$t('customer')}: ${customer?.name}` : this.$t('fastSale')),
+                refId: res.id
+              })
+            }
+          })
         })
 
-        if (customer?.name) {
-          Dialog.create({
-            title: this.$t('buyPayed') + '?',
-            cancel: {
-              label: this.$t('no')
-            },
-            ok: {
-              label: this.$t('yes')
-            },
-            persistent: true
-          }).onOk(() => {
-            this.firebaseMixin('cashFlow').add({
-              type: 'payment',
-              total: sale.total,
-              customer: sale.customer,
-              date: sale.date
-            })
-          })
-        }
         Notify.create({
           message: this.$t('savedOperation'),
           color: 'positive',
@@ -779,7 +772,7 @@ export default defineComponent({
       })
     },
     reset () {
-      this.date = formatDate(Date.now(), 'YYYY/MM/DD HH:mm')
+      this.date = formatDate(Date.now(), 'DD/MM/YYYY')
       this.cartShopProducts = {}
       this.subTotalDiscountObject = {}
       this.tab = 'products'

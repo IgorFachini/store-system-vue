@@ -159,7 +159,7 @@ export default defineComponent({
         this.firebaseMixin('cashFlow').add({ ...sale })
         if (purchase) {
           Dialog.create({
-            title: this.$t('buyPayed') + '?',
+            title: this.$t('purchasePayed') + '?',
             cancel: {
               label: this.$t('no')
             },

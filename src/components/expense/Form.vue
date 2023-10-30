@@ -288,13 +288,14 @@ export default defineComponent({
         const idSupplier = this.suppliers.find(c => c.name === this.form.supplier).id
         form.supplier = this.firebaseMixin('suppliers').id(idSupplier).doc()
       }
-      action(form).then(() => {
+      action(form).then((res) => {
         products.forEach(item => {
           if (item.increaseStock) {
             this.firebaseMixin('productsStockHistory').add({
               productId: item.id,
               quantity: item.quantity,
-              description: form.description
+              description: form.description || 'Despesa',
+              refId: res.id
             })
           }
         })

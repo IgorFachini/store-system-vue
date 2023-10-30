@@ -3,10 +3,11 @@
 import { date } from 'quasar'
 import { useRouter } from 'vue-router'
 import { useFirebaseStore } from 'stores/firebase'
-import firebaseMixin from 'boot/firebase'
+import { firebaseMixin } from 'boot/firebase'
 import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
 import { computed } from 'vue';
+// import { firebaseGetFile } from 'src/boot/firebase'
 
 const { t } = useI18n({ useScope: 'global' });
 const { formatDate } = date
@@ -18,6 +19,8 @@ const { products, loadingDatabase } = storeToRefs(storeFirebase);
 const columns = computed(() => [
   // { name: 'expand', label: t('recipe'), align: 'left' },
   { name: 'action', label: t('action'), align: 'left' },
+  // ADD image
+  // { name: 'image', label: t('image'), field: row => { firebaseGetFile(`product-${row.name}`).then((image) => { row.image = image }) }, align: 'left' },
   { name: 'name', label: t('name'), field: 'name', sortable: true },
   { name: 'saleValue', label: t('saleValue'), field: 'saleValue', sortable: true },
   { name: 'purchasePrice', label: t('purchasePrice'), field: 'purchasePrice', sortable: true },
@@ -83,17 +86,12 @@ v-table-crud(
   @edit="edit"
   @delete="row => firebaseDeleteItem('products', 'product', row).then(() => deleteStockHistory(row.id))"
 )
-  //- template(#expand="props")
-  //-   q-list(
-  //-     bordered
-  //-     separator
-  //-   )
-  //-     product-recipe-info(
-  //-       v-for="recipe in props.row.recipes"
-  //-       :key="recipe.id"
-  //-       :product="recipe"
-  //-       hide-remove
-  //-     )
+  template(#body-cell-image="props")
+    q-img(
+      v-if="props.row.image"
+      :src="props.row.image"
+      style="height: 100px; max-width: 100px"
+    )
   template(#action-more="props")
     q-btn(
       :label="$t('stockHistory')"

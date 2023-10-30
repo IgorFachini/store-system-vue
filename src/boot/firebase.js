@@ -2,13 +2,25 @@ import { boot } from 'quasar/wrappers'
 import { firestorePlugin, rtdbPlugin } from 'vuefire'
 import { covertDateFieldName } from 'src/utils/index'
 import firebase from 'firebase/compat/app'
+import {
+  getDownloadURL,
+  ref as firebaseRef,
+  uploadBytesResumable,
+  getStorage
+} from '@firebase/storage'
+
 import 'firebase/compat/firestore'
 import 'firebase/compat/database'
 import 'firebase/compat/auth'
+import { i18n } from './i18n'
+
+import { Dialog, Notify } from 'quasar'
+
+const t = i18n.global.t
 
 const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY || 'AIzaSyDpWl0EN7ZPYs92Fbo1mcKKcIYTDOInlNI',
-  projectId: process.env.FIREBASE_PROJECT_ID || 'store-system-54b7a',
+  apiKey: process.env.FIREBASE_API_KEY,
+  projectId: process.env.FIREBASE_PROJECT_ID,
   databaseURL: process.env.FIREBASE_DATABASE_URL,
   authDomain: process.env.FIREBASE_AUTH_DOMAIN,
   storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
@@ -48,87 +60,134 @@ const firebaseDateFn = (date) => {
 const dateGetTimeFn = (date) => {
   return new Date(date).getTime()
 }
-import { Dialog, Notify } from 'quasar'
 
-export default boot(({ app }) => {
-  const firebaseMixin = {
-    methods: {
-      firebaseDeleteItem (refName, i18nLabelName, refData) {
-        return new Promise((resolve, reject) => {
-          Dialog.create({
-            title: `${this.$q.lang.label.remove} ${this.$t(i18nLabelName)} ?`,
-            cancel: true,
-            persistent: true
-          }).onOk(() => {
-            if (typeof refData === 'object') {
-              refData.loading = true
-            }
-            this.firebaseMixin(refName).id(refData?.id || refData).delete().finally(() => {
-              if (typeof refData === 'object') {
-                refData.loading = false
-              }
-              Notify.create({
-                message: this.$t('savedOperation'),
-                color: 'positive',
-                closeBtn: true
-              })
-            })
-            resolve()
-          }).onCancel(() => reject())
-        })
+function firebaseUploadFile (file, directory) {
+  return new Promise((resolve, reject) => {
+    const storageRef = firebaseRef(getStorage(firebaseApp), directory)
+    const uploadTask = uploadBytesResumable(storageRef, file)
+    uploadTask.on('state_changed',
+      (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        console.log('Upload is ' + progress + '% done')
       },
-      firebaseMixin (refName, rtdb) {
-        const refThis = this
-        const ref = rtdb ? db.ref(refName) : fr.collection(refName)
+      (error) => {
+        reject(error)
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          resolve(downloadURL)
+        })
+      }
+    )
+  })
+}
 
-        return {
-          ref () {
-            return ref
-          },
+function firebaseGetFile (directory) {
+  return new Promise((resolve, reject) => {
+    const storageRef = firebaseRef(getStorage(firebaseApp), directory)
+    getDownloadURL(storageRef).then((url) => {
+      console.log('test', directory, url)
+      resolve(url)
+    }).catch((error) => {
+      reject(error)
+    })
+  })
+}
 
-          bindField (fieldName) {
-            return refThis[rtdb ? '$rtdbBind' : '$bind'](fieldName, ref)
-          },
+function firebaseDeleteFile (directory) {
+  return new Promise((resolve, reject) => {
+    const storageRef = firebaseRef(getStorage(firebaseApp), directory)
+    storageRef.delete().then(() => {
+      resolve()
+    }).catch((error) => {
+      reject(error)
+    })
+  })
+}
 
-          add (data) {
-            data = covertDateFieldName(data, null, rtdb ? dateGetTimeFn : firebaseDateFn)
-            const send = { ...data, createdAt: rtdb ? new Date().getTime() : Timestamp.fromDate(new Date()) }
-            return ref[rtdb ? 'push' : 'add'](send)
-          },
+function firebaseMixin (refName, rtdb) {
+  const refThis = this
+  const ref = rtdb ? db.ref(refName) : fr.collection(refName)
 
-          id (id) {
-            return {
-              doc () {
-                return ref.doc(id)
-              },
+  return {
+    ref () {
+      return ref
+    },
 
-              set (data) {
-                data = covertDateFieldName(data, null, rtdb ? dateGetTimeFn : firebaseDateFn)
-                const setRef = rtdb ? db.ref(`${refName}/${id}`) : ref.doc(id)
+    bindField (fieldName) {
+      return refThis[rtdb ? '$rtdbBind' : '$bind'](fieldName, ref)
+    },
 
-                return setRef.set({
-                  ...data,
-                  updatedAt: rtdb ? new Date().getTime() : Timestamp.fromDate(new Date())
-                })
-              },
+    add (data) {
+      data = covertDateFieldName(data, null, rtdb ? dateGetTimeFn : firebaseDateFn)
+      const send = { ...data, createdAt: rtdb ? new Date().getTime() : Timestamp.fromDate(new Date()) }
+      return ref[rtdb ? 'push' : 'add'](send)
+    },
 
-              update (data) {
-                data = covertDateFieldName(data, null, rtdb ? dateGetTimeFn : firebaseDateFn)
-                const updateRef = rtdb ? db.ref(`${refName}/${id}`) : ref.doc(id)
-                return updateRef.update({
-                  ...data,
-                  updatedAt: rtdb ? new Date().getTime() : Timestamp.fromDate(new Date())
-                })
-              },
+    id (id) {
+      return {
+        doc () {
+          return ref.doc(id)
+        },
 
-              delete () {
-                return rtdb ? db.ref(`${refName}/${id}`).remove() : ref.doc(id).delete()
-              }
-            }
-          }
+        set (data) {
+          data = covertDateFieldName(data, null, rtdb ? dateGetTimeFn : firebaseDateFn)
+          const setRef = rtdb ? db.ref(`${refName}/${id}`) : ref.doc(id)
+
+          return setRef.set({
+            ...data,
+            updatedAt: rtdb ? new Date().getTime() : Timestamp.fromDate(new Date())
+          })
+        },
+
+        update (data) {
+          data = covertDateFieldName(data, null, rtdb ? dateGetTimeFn : firebaseDateFn)
+          const updateRef = rtdb ? db.ref(`${refName}/${id}`) : ref.doc(id)
+          return updateRef.update({
+            ...data,
+            updatedAt: rtdb ? new Date().getTime() : Timestamp.fromDate(new Date())
+          })
+        },
+
+        delete () {
+          return rtdb ? db.ref(`${refName}/${id}`).remove() : ref.doc(id).delete()
         }
       }
     }
+  }
+}
+
+function firebaseDeleteItem (refName, i18nLabelName, refData) {
+  return new Promise((resolve, reject) => {
+    Dialog.create({
+      title: `${t('remove')} ${t(i18nLabelName)} ?`,
+      cancel: true,
+      persistent: true
+    }).onOk(() => {
+      if (typeof refData === 'object') {
+        refData.loading = true
+      }
+      firebaseMixin(refName).id(refData?.id || refData).delete().finally(() => {
+        if (typeof refData === 'object') {
+          refData.loading = false
+        }
+        Notify.create({
+          message: t('savedOperation'),
+          color: 'positive',
+          closeBtn: true
+        })
+      })
+      resolve()
+    }).onCancel(() => reject())
+  })
+}
+const methods = {
+  firebaseDeleteItem,
+  firebaseMixin
+}
+export default boot(({ app }) => {
+  const firebaseMixin = {
+    methods
   }
   app.mixin(firebaseMixin)
   app.use(firestorePlugin)
@@ -138,4 +197,4 @@ export default boot(({ app }) => {
   return firebaseMixin
 })
 
-export { firebaseApp, firebaseAuth, fr, Timestamp }
+export { firebaseApp, firebaseAuth, fr, Timestamp, firebaseMixin, firebaseUploadFile, firebaseGetFile, methods }
