@@ -119,7 +119,7 @@ const customersCashFlowGroupedCashFlowColumns = computed(() => {
       name: 'date',
       label: t('date'),
       field: 'date',
-      format: val => formatDate(val ? val.toDate() : '', 'DD/MM/YYYY'),
+      format: val => formatDate(typeof val === 'object' ? new Date(val.toDate()) : val, 'DD/MM/YYYY'),
       sortable: true
     },
     { name: 'expand', label: t('product', 2), disable: (row) => !row.products || !row.products.length }
