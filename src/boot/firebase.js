@@ -94,16 +94,16 @@ function firebaseGetFile (directory) {
   })
 }
 
-function firebaseDeleteFile (directory) {
-  return new Promise((resolve, reject) => {
-    const storageRef = firebaseRef(getStorage(firebaseApp), directory)
-    storageRef.delete().then(() => {
-      resolve()
-    }).catch((error) => {
-      reject(error)
-    })
-  })
-}
+// function firebaseDeleteFile (directory) {
+//   return new Promise((resolve, reject) => {
+//     const storageRef = firebaseRef(getStorage(firebaseApp), directory)
+//     storageRef.delete().then(() => {
+//       resolve()
+//     }).catch((error) => {
+//       reject(error)
+//     })
+//   })
+// }
 
 function firebaseMixin (refName, rtdb) {
   const refThis = this

@@ -79,23 +79,6 @@
         </div>
       </q-td>
     </template>
-    <template #body-cell-date="{ row }">
-      <q-td>
-        {{ row.date }}
-        <q-popup-edit
-          v-slot="scope"
-          v-model="row.date"
-          buttons
-          @save="(date) => update({...row, date})"
-        >
-          <v-input
-            v-model="scope.value"
-            :label="$t('date')"
-            date
-          />
-        </q-popup-edit>
-      </q-td>
-    </template>
     <template #body-cell-action="{ row }">
       <q-td>
         <q-btn
@@ -103,7 +86,7 @@
           dense
           color="negative"
           :loading="row.loading"
-          @click="firebaseDeleteItem('cashFlow', 'cashFlow', row.id)"
+          @click="firebaseDeleteItem('cashFlow', 'cashFlow', row.id).then(() => deleteProductStockHistory(row))"
         />
       </q-td>
     </template>
@@ -131,21 +114,19 @@ export default defineComponent({
 
   setup () {
     const storeFirebase = useFirebaseStore()
-    const { cashFlowByCustomerIdOrAll, loadingDatabase, customerById } = storeToRefs(storeFirebase)
+    const { cashFlowByCustomerIdOrAll, loadingDatabase, customerById, productsStockHistory } = storeToRefs(storeFirebase)
 
     return {
       cashFlowByCustomerIdOrAll,
       loadingDatabase,
-      customerById
+      customerById,
+      productsStockHistory
     }
   },
 
   data () {
     return {
       search: '',
-      // firebaseMixinInstance: null,
-      // loading: false,
-      // cashFlow: [],
       paginationInside: {
         page: 1,
         rowsPerPage: 25,
@@ -207,10 +188,6 @@ export default defineComponent({
     }
   },
 
-  // mounted () {
-  //   this.setup()
-  // },
-
   methods: {
     deleteSelected () {
       Dialog.create({
@@ -220,8 +197,14 @@ export default defineComponent({
       }).onOk(() => {
         this.selected.forEach(row => {
           this.firebaseMixin('cashFlow').id(row.id).delete()
+          this.deleteProductStockHistory(row)
         })
         this.selected = []
+      })
+    },
+    deleteProductStockHistory (row) {
+      this.productsStockHistory.filter(item => item.refId === row.id).forEach(item => {
+        this.firebaseMixin('productsStockHistory').id(item.id).delete()
       })
     },
     makeAllPurchasePayed () {
@@ -265,19 +248,6 @@ export default defineComponent({
     getDate (val) {
       return typeof val === 'object' ? formatDate(val.toDate(), 'YYYY/MM/DD HH:mm') : val
     },
-    // setup () {
-    //   this.loading = true
-    //   this.firebaseMixinInstance = this.firebaseMixin('cashFlow')
-    //   if (this.customerId) {
-    //     this.$bind('cashFlow', this.firebaseMixin('cashFlow').ref().where('customer.id', '==', this.customerId).orderBy('date')).finally(() => {
-    //       this.loading = false
-    //     })
-    //   } else {
-    //     this.firebaseMixinInstance.bindField('cashFlow').finally(() => {
-    //       this.loading = false
-    //     })
-    //   }
-    // },
     getClassColor (type) {
       const colorMapType = {
         quickExit: 'text-red',
