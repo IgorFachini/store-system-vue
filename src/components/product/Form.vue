@@ -98,7 +98,7 @@ import { defineComponent } from 'vue'
 import BarcodeReaderModal from 'components/common/BarcodeReaderModal.vue'
 import { useFirebaseStore } from 'stores/firebase'
 import { storeToRefs } from 'pinia'
-import { firebaseUploadFile, firebaseGetFile } from 'src/boot/firebase'
+// import { firebaseUploadFile, firebaseGetFile } from 'src/boot/firebase'
 
 export default defineComponent({
   name: 'ProductsForm',
@@ -231,9 +231,9 @@ export default defineComponent({
         this.$router.push('/products')
         return
       }
-      firebaseGetFile(`product-${row.name}`).then((res) => {
-        this.image = res
-      })
+      // firebaseGetFile(`product-${row.name}`).then((res) => {
+      //   this.image = res
+      // })
       this.currentInventory = this.countProductsStockHistoryById(row.id)
       const isView = this.$route.name === 'products.view'
       this[isView ? 'view' : 'edit'](row)

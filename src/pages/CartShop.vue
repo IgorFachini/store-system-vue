@@ -111,6 +111,16 @@
               </div>
             </q-field>
             <q-field
+              :label="$t('currentInventory')"
+              readonly
+              stack-label
+              class="col-12"
+            >
+              <div class="text-black">
+                {{ this.countProductsStockHistoryById(item.product.id) }}
+              </div>
+            </q-field>
+            <q-field
               :label="$t('originalSellValue')"
               readonly
               stack-label
@@ -751,6 +761,7 @@ export default defineComponent({
           sale.purchasePayed = this.purchasePayed
         }
         this.firebaseMixin('cashFlow').add({ ...sale }).then((res) => {
+          // TODO not trigger when offline
           this.cartShopGroupedArray.forEach(item => {
             if (item.decreaseStock) {
               this.firebaseMixin('productsStockHistory').add({
@@ -761,6 +772,7 @@ export default defineComponent({
               })
             }
           })
+          this.reset()
         })
 
         Notify.create({
@@ -768,7 +780,6 @@ export default defineComponent({
           color: 'positive',
           closeBtn: true
         })
-        this.reset()
       })
     },
     reset () {
