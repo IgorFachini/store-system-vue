@@ -438,6 +438,10 @@ const labels = {
   selected: {
     enUS: 'Selected | Selecteds',
     pt: 'Selecionado | Selecionados'
+  },
+  currentCustomer: {
+    enUS: 'Current Customer',
+    pt: 'Cliente Atual'
   }
 }
 

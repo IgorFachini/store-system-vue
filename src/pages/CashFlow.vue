@@ -3,8 +3,8 @@
     class="row"
     padding
   >
-    <cash-flow-table :customer-id="$route.params.id" />
     <fast-action />
+    <cash-flow-table :customer-id="$route.params.id" />
   </q-page>
 </template>
 

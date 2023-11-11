@@ -64,6 +64,14 @@ const routes = [
         component: () => import('src/pages/CartShop.vue')
       },
       {
+        path: '/cart-shop/edit/:id',
+        meta: {
+          title: 'Editar Carrinho de compras'
+        },
+        name: 'cartShop.edit',
+        component: () => import('src/pages/CartShop.vue')
+      },
+      {
         path: '/cash-flow',
         component: () => import('src/pages/CashFlow.vue')
       },
