@@ -52,8 +52,14 @@ const expensesFilterDateRange = computed(() => {
   });
 });
 
-const totalPurchase = computed(() => {
-  return cashFlowFilterDateRange.value.filter(c => c.type === 'purchase').reduce((total, item) => {
+const totalPurchasePaid = computed(() => {
+  return cashFlowFilterDateRange.value.filter(c => c.type === 'purchase' && c.purchasePayed === true).reduce((total, item) => {
+    return total + item.total;
+  }, 0);
+});
+
+const totalPurchaseUnpaid = computed(() => {
+  return cashFlowFilterDateRange.value.filter(c => c.type === 'purchase' && c.purchasePayed === false).reduce((total, item) => {
     return total + item.total;
   }, 0);
 });
@@ -77,7 +83,15 @@ const totalQuickExit = computed(() => {
 });
 
 const totalEntry = computed(() => {
-  return totalFastsale.value + totalPayment.value;
+  return totalFastsale.value + totalPayment.value + totalPurchasePaid.value;
+});
+
+const totalExit = computed(() => {
+  return totalQuickExit.value + totalExpenses.value + totalPurchaseUnpaid.value;
+});
+
+const finalValue = computed(() => {
+  return totalEntry.value - totalExit.value;
 });
 
 const totalExpenses = computed(() => {
@@ -92,12 +106,16 @@ const customersCashFlowGrouped = computed(() => {
         acc.push({
           ...item.customer,
           cashFlow: [item],
-          total: item.total
+          total: item.total,
+          totalPurchaseUnpaid: item.purchasePayed === false ? 1 : 0
         });
       } else {
         const customer = acc[customerIndex];
         customer.total += item.total;
         customer.cashFlow.push(item);
+        if (item.purchasePayed === false) {
+          customer.totalPurchaseUnpaid += 1;
+        }
       }
       return acc;
     }, []);
@@ -107,6 +125,7 @@ const customersCashFlowGroupedColumns = computed(() => {
   return [
     { name: 'name', label: t('name'), field: 'name', sortable: true },
     { name: 'total', label: 'Total', field: 'total', format: value => value.toFixed(2), sortable: true },
+    { name: 'totalPurchaseUnpaid', label: 'Total ' + t('unpaidPurchase', 2), field: 'totalPurchaseUnpaid', sortable: true, align: 'left', format: val => val !== undefined ? val : '-' },
     { name: 'expand', label: t('cashFlow') }
   ];
 });
@@ -115,6 +134,7 @@ const customersCashFlowGroupedCashFlowColumns = computed(() => {
   return [
     { name: 'total', label: 'Total', field: 'total', format: value => value.toFixed(2), sortable: true },
     { name: 'description', label: t('description'), field: 'description' },
+    { name: 'purchasePayed', label: t('purchasePayed'), field: 'purchasePayed', sortable: true, align: 'left', format: val => val !== undefined ? t(val ? 'yes' : 'no') : '-' },
     {
       name: 'date',
       label: t('date'),
@@ -156,19 +176,27 @@ q-page(class="q-col-gutter-md" padding)
     v-date(v-model="dateTo" label="Data de compra fim")
   div(class="row q-col-gutter-md")
     div.col-6
-      q-field(:label="t('sold')" readonly stack-label)
-        div.text-blue {{ totalPurchase.toFixed(2) }}
-      q-field(:label="t('receveid')" readonly stack-label)
+      q-field(:label="t('paidPurchase', 2)" readonly stack-label)
+        div.text-blue {{ totalPurchasePaid.toFixed(2) }}
+      q-field(:label="t('payment', 2)" readonly stack-label)
         div.text-green {{ totalPayment.toFixed(2) }}
       q-field(:label="t('fastSale')" readonly stack-label)
         div.text-green {{ totalFastsale.toFixed(2) }}
-      q-field(:label="t('totalEntry')" readonly stack-label)
+      q-field(:label="t('totalEntry')" readonly stack-label, :hint="`${t('paidPurchase', 2)} + ${t('payment', 2)} + ${t('fastSale')}`")
         div.text-green {{ totalEntry.toFixed(2) }}
     div.col-6
+      q-field(:label="t('unpaidPurchase', 2)" readonly stack-label)
+        div.text-blue {{ totalPurchaseUnpaid.toFixed(2) }}
       q-field(:label="t('expense', 2)" readonly stack-label)
         div.text-red {{ totalExpenses.toFixed(2) }}
       q-field(:label="t('quickExit')" readonly stack-label)
         div.text-red {{ totalQuickExit.toFixed(2) }}
+      q-field(:label="t('totalExit')" readonly stack-label, :hint="`${t('unpaidPurchase', 2)} + ${t('expense', 2)} + ${t('quickExit')}`")
+        div.text-red {{ totalExit.toFixed(2) }}
+  div.row.q-gutter-md
+    div.col-12
+      q-field(:label="t('finalValue')" readonly stack-label, :hint="`${t('totalEntry', 2)} - ${t('totalExit', 2)} `")
+        div(:class="finalValue < 0 ? 'text-red' : 'text-green'") {{ finalValue.toFixed(2) }}
   div
     v-table-crud(
       :title="t('purchase', 2) + ' - ' + t('customer', 2)"

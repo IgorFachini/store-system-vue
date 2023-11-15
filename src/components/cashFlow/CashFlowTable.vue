@@ -52,10 +52,10 @@ const cashFlow = computed(() => {
 
 const debt = computed(() => {
   return cashFlow.value.reduce((acc, row) => {
-    if (row.type === 'fastSale' || row.type === 'payment') {
+    if (row.type === 'fastSale' || row.type === 'payment' || row.purchasePayed === true) {
       return acc + row.total
     }
-    if (row.type === 'purchase') {
+    if (row.purchasePayed === false || row.type === 'quickExit') {
       return acc - row.total
     }
 
@@ -70,6 +70,7 @@ const columnsCashFlow = computed(() => {
       label: $t('description'),
       align: 'left'
     },
+    { name: 'customer', label: $t('customer'), field: 'customer', sortable: true, align: 'left', format: val => val !== undefined ? val.name : '-' },
     { name: 'total', label: 'Total', field: 'total', classes: row => getClassColor(row.type), sortable: true },
     { name: 'purchasePayed', label: $t('purchasePayed'), field: 'purchasePayed', sortable: true, align: 'left', format: val => val !== undefined ? $t(val ? 'yes' : 'no') : '-' },
     { name: 'type', label: $t('type'), field: 'type', sortable: true, align: 'left', format: val => $t(val) },
@@ -208,9 +209,9 @@ q-table(
         | {{ $t('cashFlow') }}
       div(v-if="customerId" class="q-table__title")
         | {{ $t('customer') }}: {{ customer.name }}
-      div.row {{ $t('debt') }}:
-        div(:class="debt < 0 ? 'text-red' : 'text-green'")
-          | {{ debt.toFixed(2) }}
+      div.row
+        q-field(:label="t('debt')" readonly stack-label, :hint="`(${$t('fastSale')} + ${$t('payment')} + ${$t('purchasePayed')}) - (${$t('unpaidPurchase')} + ${$t('quickExit')})`")
+          div(:class="debt < 0 ? 'text-red' : 'text-green'") {{ debt.toFixed(2) }}
   template(
     #top-right
   )
@@ -248,7 +249,7 @@ q-table(
   )
     q-td(:class="getClassColor(row.type)")
       div
-        | {{ row.description || $t(row.type) }} {{ row.customer ? `: ${row.customer.name}` : '' }}
+        | {{ row.description || $t(row.type) }}
       div(v-for="product in row.products" :key="product.name")
         div(v-if="product.discountObject")
           | {{ product.name }}: {{ product.unitaryValue }} {{ $t('by') }} {{ calcDiscountResult(product.discountObject, product.unitaryValue).toFixed(2) }} x  {{ product.quantity }} = {{ (calcDiscountResult(product.discountObject, product.unitaryValue) * product.quantity).toFixed(2) }}

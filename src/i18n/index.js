@@ -356,8 +356,8 @@ const labels = {
     pt: 'Compra | Compras'
   },
   payment: {
-    enUS: 'Payment',
-    pt: 'Pagamento'
+    enUS: 'Payment | Payments',
+    pt: 'Pagamento | Pagamentos'
   },
   by: {
     enUS: 'By',
@@ -382,6 +382,10 @@ const labels = {
   totalEntry: {
     enUS: 'Total Entry',
     pt: 'Entrada Total'
+  },
+  totalExit: {
+    enUS: 'Total Exit',
+    pt: 'Saída Total'
   },
   sold: {
     enUS: 'Sold',
@@ -442,6 +446,14 @@ const labels = {
   currentCustomer: {
     enUS: 'Current Customer',
     pt: 'Cliente Atual'
+  },
+  paidPurchase: {
+    enUS: 'Paid Purchase | Paid Purchases',
+    pt: 'Compra Paga | Compras Pagas'
+  },
+  unpaidPurchase: {
+    enUS: 'Unpaid Purchase | Unpaid Purchases',
+    pt: 'Compra Não Paga | Compras Não Pagas'
   }
 }
 
