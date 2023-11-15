@@ -439,9 +439,18 @@
             {{ $t('select') }}
           </div>
           <q-btn
+            v-if="!!saleEdit?.customer?.name"
+            flat
+            class="col-12"
+            icon="person"
+            align="left"
+            :label="`${$t('currentCustomer')} : ${saleEdit?.customer?.name}`"
+            @click="save(saleEdit?.customer?.id)"
+          />
+          <q-btn
             flat
             class="col-12 text-end"
-            icon="person"
+            icon="person_add"
             align="left"
             :label="$t('customer')"
             @click="chooseCustomerModalOpen = true"
@@ -482,13 +491,15 @@ export default defineComponent({
 
   setup () {
     const storeFirebase = useFirebaseStore()
-    const { products, countProductsStockHistoryById, loadingDatabase, customerById } = storeToRefs(storeFirebase)
+    const { products, cashFlow, productsStockHistory, countProductsStockHistoryById, loadingDatabase, customerById } = storeToRefs(storeFirebase)
 
     return {
       products,
+      cashFlow,
       countProductsStockHistoryById,
       loadingDatabase,
-      customerById
+      customerById,
+      productsStockHistory
     }
   },
 
@@ -512,7 +523,8 @@ export default defineComponent({
       chooseCustomerModalOpen: false,
       addCustomerModalOpen: false,
       date: null,
-      purchasePayed: true
+      purchasePayed: true,
+      saleEdit: null
     }
   },
 
@@ -569,6 +581,9 @@ export default defineComponent({
       if (this.$route.params.customerId) {
         this.checkCustomerExists(this.$route.params.customerId)
       }
+      if (this.$route.params.id && !val) {
+        this.checkExistsAndIsPurchase(this.$route.params.id)
+      }
     }
   },
 
@@ -583,28 +598,47 @@ export default defineComponent({
     if (this.$route.params.customerId && !this.loadingDatabase) {
       this.checkCustomerExists(this.$route.params.customerId)
     }
+    if (this.$route.params.id) {
+      this.checkExistsAndIsPurchase(this.$route.params.id)
+    }
   },
 
-  // mounted () {
-  //   this.loading = true
-  //   this.firebaseMixinInstance = this.firebaseMixin('products')
-  //   this.firebaseMixinInstance.bindField('products').then(products => {
-  //     products.forEach((product, index) => {
-  //       this.stockHistoryCount(product).then(count => {
-  //         this.products[index].currentInventory = count
-  //       })
-  //     })
-  //   }).finally(() => {
-  //     this.loading = false
-  //   })
-  // },
-
   methods: {
-    // stockHistoryCount (row) {
-    //   return this.firebaseMixin('stockHistory').ref().where('productId', '==', row.id).get().then(snapshot => snapshot.docs.map(doc => doc.data()).reduce((acc, item) => {
-    //     return acc + item.quantity
-    //   }, 0))
-    // },
+    checkExistsAndIsPurchase (id) {
+      const sale = this.cashFlow.find(item => item.id === id)
+      if (!sale) {
+        Notify.create({
+          message: `${this.$t('sale')} ${this.$t('notExist')}`,
+          color: 'negative',
+          closeBtn: true
+        })
+        this.$router.push('/cart-shop')
+      }
+      if (sale?.type !== 'purchase' && !sale.products) {
+        Notify.create({
+          message: `${this.$t('sale')} ${this.$t('notExist')}`,
+          color: 'negative',
+          closeBtn: true
+        })
+        this.$router.push('/cash-flow')
+      }
+      this.saleEdit = sale
+      this.date = formatDate(sale.date, 'DD/MM/YYYY')
+      sale.products.forEach(item => {
+        this.cartShopProducts[item.id] = {
+          product: {
+            id: item.id,
+            ...item
+          },
+          unitaryValue: item.unitaryValue,
+          quantity: item.quantity,
+          decreaseStock: true,
+          ...(item.discountObject?.type) && { discountObject: item.discountObject }
+        }
+        this.subTotalDiscountObject = sale.subTotalDiscountObject || {}
+      })
+      console.log('sale', sale)
+    },
     getCollRowValue (col, row) {
       if (typeof col.field === 'function') {
         return col.field(row)
@@ -760,15 +794,23 @@ export default defineComponent({
         if (customer?.name) {
           sale.purchasePayed = this.purchasePayed
         }
-        this.firebaseMixin('cashFlow').add({ ...sale }).then((res) => {
-          // TODO not trigger when offline
+        const ref = this.firebaseMixin('cashFlow')
+        const action = this.saleEdit
+          ? ref.id(this.saleEdit.id).update : ref.add
+        action({ ...sale }).then((res) => {
+          // TODO not trigger when offline, maybe generate before id
+          if (this.saleEdit) {
+            this.productsStockHistory.filter(item => item.refId === this.saleEdit.id).forEach(item => {
+              this.firebaseMixin('productsStockHistory').id(item.id).delete()
+            })
+          }
           this.cartShopGroupedArray.forEach(item => {
             if (item.decreaseStock) {
               this.firebaseMixin('productsStockHistory').add({
                 productId: item.product.id,
                 quantity: -Math.abs(item.quantity),
                 description: `${this.$t('boughtBy')} ` + (customerId ? `${this.$t('customer')}: ${customer?.name}` : this.$t('fastSale')),
-                refId: res.id
+                refId: res?.id || this.saleEdit?.id
               })
             }
           })
@@ -786,7 +828,11 @@ export default defineComponent({
       this.date = formatDate(Date.now(), 'DD/MM/YYYY')
       this.cartShopProducts = {}
       this.subTotalDiscountObject = {}
+      this.saleEdit = null
       this.tab = 'products'
+      if (this.$route.params.id) {
+        this.$router.push('/cash-flow')
+      }
     }
   }
 })
