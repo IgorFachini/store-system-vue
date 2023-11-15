@@ -193,7 +193,6 @@ q-page(class="q-col-gutter-md" padding)
         div.text-red {{ totalQuickExit.toFixed(2) }}
       q-field(:label="t('totalExit')" readonly stack-label, :hint="`${t('unpaidPurchase', 2)} + ${t('expense', 2)} + ${t('quickExit')}`")
         div.text-red {{ totalExit.toFixed(2) }}
-  //- finalValue
   div.row.q-gutter-md
     div.col-12
       q-field(:label="t('finalValue')" readonly stack-label, :hint="`${t('totalEntry', 2)} - ${t('totalExit', 2)} `")

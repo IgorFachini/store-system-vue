@@ -70,7 +70,6 @@ const columnsCashFlow = computed(() => {
       label: $t('description'),
       align: 'left'
     },
-    // customer
     { name: 'customer', label: $t('customer'), field: 'customer', sortable: true, align: 'left', format: val => val !== undefined ? val.name : '-' },
     { name: 'total', label: 'Total', field: 'total', classes: row => getClassColor(row.type), sortable: true },
     { name: 'purchasePayed', label: $t('purchasePayed'), field: 'purchasePayed', sortable: true, align: 'left', format: val => val !== undefined ? $t(val ? 'yes' : 'no') : '-' },
