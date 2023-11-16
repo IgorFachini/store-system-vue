@@ -63,22 +63,27 @@ q-form.q-gutter-sm.full-width(
     :disable="viewMode"
   )
   //- TODO add image
-  //- div.row.justify-center
-  //-   q-img(
-  //-     v-if="image"
-  //-     :src="image"
-  //-     style="height: 280px; max-width: 300px"
-  //-   )
-  //-     div.absolute-bottom.text-subtitle1.text-center Imagem Atual
-  //-   q-uploader(
-  //-     label="Imagem"
-  //-     hide-upload-btn
-  //-     ref="uploader"
-  //-   )
+  div.row.justify-center
+    q-img(
+      v-if="image"
+      :src="image"
+      style="height: 280px; max-width: 300px"
+    )
+      div.absolute-bottom.text-subtitle1.text-center Imagem Atual
+    q-uploader(
+      label="Imagem"
+      hide-upload-btn
+      ref="uploader"
+      accept="image/*"
+    )
   div.row.q-gutter-md.q-mt-md.justify-between
     q-btn(
       label="Reset"
       @click="reset"
+    )
+    q-btn(
+      label="u"
+      @click="upload()"
     )
     q-btn(
       :label="$t('save')"
@@ -99,6 +104,7 @@ import BarcodeReaderModal from 'components/common/BarcodeReaderModal.vue'
 import { useFirebaseStore } from 'stores/firebase'
 import { storeToRefs } from 'pinia'
 // import { firebaseUploadFile, firebaseGetFile } from 'src/boot/firebase'
+import { googleDriveApi } from 'src/boot/google-drive-api'
 
 export default defineComponent({
   name: 'ProductsForm',
@@ -188,6 +194,12 @@ export default defineComponent({
         this.$refs.form?.resetValidation()
       })
     },
+    upload () {
+      const files = this.$refs.uploader.files,
+        file = files[0]
+      console.log('file', file)
+      googleDriveApi().MultipartUpload('test.png', file)
+    },
     save () {
       const description = this.$t('entry')
       const ref = this.firebaseMixinInstance
@@ -207,10 +219,19 @@ export default defineComponent({
       }).catch((err) => {
         console.log('err', err)
       })
-      // const files = this.$refs.uploader.files
-      // if (files.length) {
-      //   firebaseUploadFile(files[0], `product-${form.name}`)
+      const files = this.$refs.uploader.files
+      if (files.length) {
+        // requestBody,media example
+        // requestBody: {
+      //   name: 'example.jpg', // This can be name of your choice
+      //   mimeType: 'image/svg'
+      // },
+      // media: {
+      //   mimeType: 'image/jpg',
+      //   body: fs.createReadStream(filePath)
       // }
+        // uploadFile
+      }
       Notify.create({
         message: this.$t('savedOperation'),
         color: 'positive',
