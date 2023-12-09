@@ -3,7 +3,7 @@
 import { date } from 'quasar'
 import { useRouter } from 'vue-router'
 import { useFirebaseStore } from 'stores/firebase'
-import { firebaseMixin } from 'boot/firebase'
+import { firebaseMixin, firebaseDeleteItem, firebaseDeleteFile } from 'boot/firebase'
 import { useI18n } from 'vue-i18n';
 import { storeToRefs } from 'pinia';
 import { computed } from 'vue';
@@ -20,7 +20,7 @@ const columns = computed(() => [
   // { name: 'expand', label: t('recipe'), align: 'left' },
   { name: 'action', label: t('action'), align: 'left' },
   // ADD image
-  // { name: 'image', label: t('image'), field: row => { firebaseGetFile(`product-${row.name}`).then((image) => { row.image = image }) }, align: 'left' },
+  { name: 'image', label: t('image'), align: 'left' },
   { name: 'name', label: t('name'), field: 'name', sortable: true },
   { name: 'saleValue', label: t('saleValue'), field: 'saleValue', sortable: true },
   { name: 'purchasePrice', label: t('purchasePrice'), field: 'purchasePrice', sortable: true },
@@ -43,7 +43,7 @@ const columns = computed(() => [
     name: 'createdAt',
     label: t('createdAt'),
     field: 'createdAt',
-    format: val => formatDate(val ? val.toDate() : '', 'DD/MM/YYYY'),
+    format: val => formatDate(val ? val.toDate() : '', 'DD/MM/YYYY HH:mm'),
     sortable: true
   },
   {
@@ -75,6 +75,13 @@ function deleteStockHistory (id) {
     })
   })
 }
+
+function deleteRow (row) {
+  firebaseDeleteItem('products', 'product', row).then(() => {
+    deleteStockHistory(row.id)
+    firebaseDeleteFile(`product-${row.name}`)
+  })
+}
 </script>
 
 <template lang="pug">
@@ -84,7 +91,7 @@ v-table-crud(
   :columns="columns"
   :loading="loadingDatabase"
   @edit="edit"
-  @delete="row => firebaseDeleteItem('products', 'product', row).then(() => deleteStockHistory(row.id))"
+  @delete="row => deleteRow(row)"
 )
   template(#body-cell-image="props")
     q-img(
