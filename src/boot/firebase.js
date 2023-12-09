@@ -6,7 +6,8 @@ import {
   getDownloadURL,
   ref as firebaseRef,
   uploadBytesResumable,
-  getStorage
+  getStorage,
+  deleteObject
 } from '@firebase/storage'
 
 import 'firebase/compat/firestore'
@@ -86,7 +87,6 @@ function firebaseGetFile (directory) {
   return new Promise((resolve, reject) => {
     const storageRef = firebaseRef(getStorage(firebaseApp), directory)
     getDownloadURL(storageRef).then((url) => {
-      console.log('test', directory, url)
       resolve(url)
     }).catch((error) => {
       reject(error)
@@ -94,16 +94,16 @@ function firebaseGetFile (directory) {
   })
 }
 
-// function firebaseDeleteFile (directory) {
-//   return new Promise((resolve, reject) => {
-//     const storageRef = firebaseRef(getStorage(firebaseApp), directory)
-//     storageRef.delete().then(() => {
-//       resolve()
-//     }).catch((error) => {
-//       reject(error)
-//     })
-//   })
-// }
+function firebaseDeleteFile (directory) {
+  return new Promise((resolve, reject) => {
+    const storageRef = firebaseRef(getStorage(firebaseApp), directory)
+    deleteObject(storageRef).then(() => {
+      resolve()
+    }).catch((error) => {
+      reject(error)
+    })
+  })
+}
 
 function firebaseMixin (refName, rtdb) {
   const refThis = this
@@ -133,7 +133,9 @@ function firebaseMixin (refName, rtdb) {
         set (data) {
           data = covertDateFieldName(data, null, rtdb ? dateGetTimeFn : firebaseDateFn)
           const setRef = rtdb ? db.ref(`${refName}/${id}`) : ref.doc(id)
-
+          if (!data.createdAt) {
+            data.createdAt = rtdb ? new Date().getTime() : Timestamp.fromDate(new Date())
+          }
           return setRef.set({
             ...data,
             updatedAt: rtdb ? new Date().getTime() : Timestamp.fromDate(new Date())
@@ -197,4 +199,15 @@ export default boot(({ app }) => {
   return firebaseMixin
 })
 
-export { firebaseApp, firebaseAuth, fr, Timestamp, firebaseMixin, firebaseUploadFile, firebaseGetFile, methods }
+export {
+  firebaseApp,
+  firebaseAuth,
+  fr,
+  Timestamp,
+  firebaseDeleteItem,
+  firebaseDeleteFile,
+  firebaseMixin,
+  firebaseUploadFile,
+  firebaseGetFile,
+  methods
+}

@@ -63,18 +63,20 @@ q-form.q-gutter-sm.full-width(
     :disable="viewMode"
   )
   //- TODO add image
-  //- div.row.justify-center
-  //-   q-img(
-  //-     v-if="image"
-  //-     :src="image"
-  //-     style="height: 280px; max-width: 300px"
-  //-   )
-  //-     div.absolute-bottom.text-subtitle1.text-center Imagem Atual
-  //-   q-uploader(
-  //-     label="Imagem"
-  //-     hide-upload-btn
-  //-     ref="uploader"
-  //-   )
+  div.row.justify-center
+    q-img(
+      v-if="form.image"
+      :src="form.image"
+      spinner-color="white"
+      style="height: 280px; max-width: 300px"
+    )
+      div.absolute-bottom.text-subtitle1.text-center Imagem Atual
+    q-uploader(
+      label="Imagem"
+      hide-upload-btn
+      ref="uploader"
+      accept="image/*"
+    )
   div.row.q-gutter-md.q-mt-md.justify-between
     q-btn(
       label="Reset"
@@ -98,7 +100,8 @@ import { defineComponent } from 'vue'
 import BarcodeReaderModal from 'components/common/BarcodeReaderModal.vue'
 import { useFirebaseStore } from 'stores/firebase'
 import { storeToRefs } from 'pinia'
-// import { firebaseUploadFile, firebaseGetFile } from 'src/boot/firebase'
+import { firebaseUploadFile, firebaseGetFile } from 'src/boot/firebase'
+import imageCompression from 'browser-image-compression';
 
 export default defineComponent({
   name: 'ProductsForm',
@@ -121,7 +124,6 @@ export default defineComponent({
       products,
       countProductsStockHistoryById,
       loadingDatabase,
-      image: '',
       modelForm: {
         name: '',
         description: '',
@@ -131,9 +133,9 @@ export default defineComponent({
       }
     }
   },
-
   data () {
     return {
+      image: '',
       form: {},
       recipeForm: {},
       loading: false,
@@ -193,31 +195,44 @@ export default defineComponent({
       const ref = this.firebaseMixinInstance
       const form = { ...this.form }
       const currentInventory = this.currentInventory
+      try {
+        const dateNow = `product_${Date.now()}`
 
-      const action = form.id
-        ? ref.id(form.id).update : ref.add
-      action(form).then((res) => {
+        const action = form.id
+          ? ref.id(form.id).update : ref.id(dateNow).set
+        action(form).catch((err) => {
+          console.log('err', err)
+        })
         if (!form.id && currentInventory !== 0) {
           this.firebaseMixin('productsStockHistory').add({
-            productId: res.id,
+            productId: dateNow,
             quantity: currentInventory,
             description
           })
         }
-      }).catch((err) => {
-        console.log('err', err)
-      })
-      // const files = this.$refs.uploader.files
-      // if (files.length) {
-      //   firebaseUploadFile(files[0], `product-${form.name}`)
-      // }
-      Notify.create({
-        message: this.$t('savedOperation'),
-        color: 'positive',
-        closeBtn: true
-      })
-      this.reset()
-      this.$emit('done')
+        const files = this.$refs.uploader.files
+        if (files.length) {
+          const options = {
+            maxSizeMB: 2,
+            maxWidthOrHeight: 500,
+            useWebWorker: true
+          };
+          imageCompression(files[0], options).then((img) => {
+            firebaseUploadFile(img, `product-${form.name}`).then((res) => {
+              ref.id(form.id ? form.id : dateNow).update({ image: res })
+            })
+          });
+        }
+        Notify.create({
+          message: this.$t('savedOperation'),
+          color: 'positive',
+          closeBtn: true
+        })
+        this.reset()
+        this.$emit('done')
+      } catch (error) {
+        console.log('error', error)
+      }
     },
     checkExists (id) {
       const row = this.products.find(p => p.id === id)
@@ -231,9 +246,9 @@ export default defineComponent({
         this.$router.push('/products')
         return
       }
-      // firebaseGetFile(`product-${row.name}`).then((res) => {
-      //   this.image = res
-      // })
+      firebaseGetFile(`product-${row.name}`).then((res) => {
+        this.image = res
+      })
       this.currentInventory = this.countProductsStockHistoryById(row.id)
       const isView = this.$route.name === 'products.view'
       this[isView ? 'view' : 'edit'](row)

@@ -12,11 +12,11 @@
   "dependencies": {
     "@quasar/extras": "^1.0.0",
     "axios": "^0.21.1",
+    "browser-image-compression": "^2.0.2",
     "core-js": "^3.6.5",
     "dotenv": "^16.3.1",
     "eslint-config-prettier": "^9.0.0",
     "firebase": "^10.3.0",
-    "googleapis": "^128.0.0",
     "moment": "^2.29.4",
     "pinia": "^2.0.11",
     "pug": "^3.0.2",

@@ -69,18 +69,31 @@
           <template #item="props">
             <q-item
               clickable
-              class="q-table__grid-item col-xs-6 col-sm-6 col-md-4 col-lg-3"
+              class="q-table__grid-item col-xs-12 col-sm-6 col-md-4 col-lg-3"
               @click="addToCartShop(props.row)"
             >
-              <div class="q-table__grid-item-card q-table__card fit">
+              <div class="q-table__grid-item-card q-table__card fit row">
+                <q-img
+                  class="full-width"
+                  v-if="props.row.image"
+                  :src="props.row.image"
+                  style="height: 200px; width: 100px"
+                />
+                <div v-else class="full-width row justify-center">
+                  <q-icon
+                    name="image"
+                    size="200px"
+                    class="text-grey"
+                  />
+                </div>
                 <div
                   v-for="col in columnsProduct"
                   :key="col.name"
-                  class="q-table__grid-item-row"
+                  class="col-6"
                 >
                   <div class="q-table__grid-item-title">
                     {{ col.label }}
-                  </div><div class="q-table__grid-item-value">
+                  </div><div class="q-table__grid-item-value text-h6">
                     {{ getCollRowValue(col, props.row) }}
                   </div>
                 </div>

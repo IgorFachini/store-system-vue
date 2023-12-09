@@ -67,7 +67,8 @@ module.exports = configure(function (ctx) {
         FIREBASE_MESSAGING_SENDER_ID: env.FIREBASE_MESSAGING_SENDER_ID,
         FIREBASE_APP_ID: env.FIREBASE_APP_ID,
         FIREBASE_MEASUREMENT_ID: env.FIREBASE_MEASUREMENT_ID,
-        DEPLOY: env.DEPLOY || 'development'
+        DEPLOY: env.DEPLOY || 'development',
+        GOOGLE_DRIVE_URL_API: env.GOOGLE_DRIVE_URL_API
       },
       target: {
         browser: ['es2019', 'edge88', 'firefox78', 'chrome87', 'safari13.1'],
