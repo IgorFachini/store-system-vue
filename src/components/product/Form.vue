@@ -62,7 +62,7 @@ q-form.q-gutter-sm.full-width(
     currency
     :disable="viewMode"
   )
-  //- TODO add image
+
   div.row.justify-center
     q-img(
       v-if="form.image"

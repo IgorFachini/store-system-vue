@@ -454,7 +454,16 @@ const labels = {
   unpaidPurchase: {
     enUS: 'Unpaid Purchase | Unpaid Purchases',
     pt: 'Compra Não Paga | Compras Não Pagas'
+  },
+  deleteAllStockHistory: {
+    enUS: 'Delete All Stock History ?',
+    pt: 'Excluir Todo o Histórico de Estoque ?'
+  },
+  searchAloneAsYouType: {
+    enUS: 'Search alone as you type',
+    pt: 'Pesquisa sozinho conforme digita'
   }
+
 }
 
 const getLabelsLanguageObject = (language) => {
