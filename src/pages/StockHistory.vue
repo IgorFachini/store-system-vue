@@ -155,7 +155,7 @@ export default defineComponent({
   methods: {
     deleteAllRows () {
       Dialog.create({
-        title: 'Deletar todo o histórico de estoque ?',
+        title: this.$t('deleteAllStockHistory'),
         cancel: true,
         persistent: true
       }).onOk(() => {

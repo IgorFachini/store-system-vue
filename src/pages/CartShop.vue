@@ -6,7 +6,6 @@
     <div class="row justify-around">
       <q-tabs
         v-model="tab"
-        dense
         class="text-grey"
         active-color="primary"
         indicator-color="primary"
@@ -52,14 +51,15 @@
           :columns="columnsProduct"
           row-key="name"
           :filter="filter"
-          hide-header
+          table-header-class="bg-grey-3"
         >
           <template #top-right>
             <q-input
               v-model="filter"
-              dense
+              outlined
               debounce="300"
               :placeholder="$t('search')"
+              :hint="$t('searchAloneAsYouType')"
             >
               <template #append>
                 <q-icon name="search" />
@@ -72,32 +72,45 @@
               class="q-table__grid-item col-xs-12 col-sm-6 col-md-4 col-lg-3"
               @click="addToCartShop(props.row)"
             >
-              <div class="q-table__grid-item-card q-table__card fit row">
-                <q-img
-                  class="full-width"
-                  v-if="props.row.image"
-                  :src="props.row.image"
-                  style="height: 200px; width: 100px"
-                />
-                <div v-else class="full-width row justify-center">
+              <q-card class="fit">
+                <div class="row full-width justify-center q-mb-sm">
+                  <q-img
+                    fit="contain"
+                    class="full-width"
+                    v-if="props.row.image"
+                    :src="props.row.image"
+                    style="height: 200px; width: 200px"
+                  />
                   <q-icon
+                    v-else
                     name="image"
                     size="200px"
                     class="text-grey"
                   />
                 </div>
-                <div
-                  v-for="col in columnsProduct"
-                  :key="col.name"
-                  class="col-6"
-                >
-                  <div class="q-table__grid-item-title">
-                    {{ col.label }}
-                  </div><div class="q-table__grid-item-value text-h6">
-                    {{ getCollRowValue(col, props.row) }}
+                <div class="row q-pa-md">
+                  <div
+                    v-for="col in columnsProduct"
+                    :key="col.name"
+                    class="col-6"
+                  >
+                    <div>
+                      {{ col.label }}
+                    </div>
+                    <div :class="`text-h6 ${col.class}`">
+                      {{ getCollRowValue(col, props.row) }}
+                    </div>
+                  </div>
+                  <div class="col-12">
+                    <div>
+                      {{ $t('description') }}
+                    </div>
+                    <div class="text-h6">
+                      {{ props.row.description || '-' }}
+                    </div>
                   </div>
                 </div>
-              </div>
+              </q-card>
             </q-item>
           </template>
         </q-table>
@@ -105,13 +118,14 @@
 
       <q-tab-panel
         name="shoppingCart"
-        class="fit q-gutter-y-md"
+        class="q-gutter-y-md"
       >
+        <!-- TODO gutter x not work -->
         <div class="row q-gutter-y-md">
           <q-card
             v-for="item of cartShopGroupedArray"
             :key="item.product.id"
-            class="q-table__card col-xs-12 col-sm-12 col-md-6 col-lg-6 row q-pa-md"
+            class="col-xs-12 col-sm-12 col-md-6 col-lg-6 row q-pa-md"
           >
             <q-field
               :label="$t('name')"
@@ -173,30 +187,14 @@
               <v-input
                 v-model="cartShopProducts[item.product.id].quantity"
                 type="number"
-                class="col-3"
+                class="col-6"
                 :label="$t('quantity')"
                 @blur="updateCartShopItemQuantity(item.product.id, cartShopProducts[item.product.id].quantity)"
-              />
-              <q-btn
-                :label="`${$t('discount')} ${$t('product')}`"
-                icon="local_offer"
-                color="green"
-                class="col-2"
-                outline
-                @click="openDiscountModal(item.product.id)"
-              />
-              <q-btn
-                :label="$t('removeItem')"
-                icon="delete"
-                color="red"
-                class="col-2"
-                outline
-                @click="removeItem(item.product.id)"
               />
               <q-checkbox
                 v-model="item.decreaseStock"
                 :label="$t('decreaseStock')"
-                class="col-5"
+                class="col-6"
               />
             </div>
             <q-field
@@ -212,6 +210,24 @@
                 }}
               </div>
             </q-field>
+            <q-btn
+              :label="`${$t('discount')} ${$t('product')}`"
+              icon="local_offer"
+              color="green"
+              class="col-6"
+              outline
+              dense
+              @click="openDiscountModal(item.product.id)"
+            />
+            <q-btn
+              :label="$t('removeItem')"
+              icon="delete"
+              color="red"
+              class="col-6"
+              outline
+              dense
+              @click="removeItem(item.product.id)"
+            />
           </q-card>
         </div>
         <div class="row justify-around">
@@ -519,11 +535,8 @@ export default defineComponent({
   data () {
     return {
       tab: 'products',
-      // loading: false,
-      // saving: false,
       filter: '',
       firebaseMixinInstance: null,
-      // products: [],
       pagination: {
         rowsPerPage: 0,
         sortBy: 'createdAt',
@@ -549,7 +562,7 @@ export default defineComponent({
     },
     columnsProduct () {
       return [
-        { name: 'name', label: this.$t('name'), field: 'name', sortable: true },
+        { name: 'name', label: this.$t('name'), field: 'name', sortable: true, class: 'text-green' },
         { name: 'saleValue', label: this.$t('saleValue'), field: 'saleValue', sortable: true },
         {
           name: 'currentInventory',
@@ -807,28 +820,31 @@ export default defineComponent({
         if (customer?.name) {
           sale.purchasePayed = this.purchasePayed
         }
+
+        const saleId = this.saleEdit?.id ? this.saleEdit.id : `${Date.now()}`
+
         const ref = this.firebaseMixin('cashFlow')
         const action = this.saleEdit
-          ? ref.id(this.saleEdit.id).update : ref.add
-        action({ ...sale }).then((res) => {
-          // TODO not trigger when offline, maybe generate before id
-          if (this.saleEdit) {
-            this.productsStockHistory.filter(item => item.refId === this.saleEdit.id).forEach(item => {
-              this.firebaseMixin('productsStockHistory').id(item.id).delete()
+          ? ref.id(this.saleEdit.id).update : ref.id(saleId).set
+
+        action({ ...sale })
+
+        if (this.saleEdit) {
+          this.productsStockHistory.filter(item => item.refId === this.saleEdit.id).forEach(item => {
+            this.firebaseMixin('productsStockHistory').id(item.id).delete()
+          })
+        }
+        this.cartShopGroupedArray.forEach(item => {
+          if (item.decreaseStock) {
+            this.firebaseMixin('productsStockHistory').add({
+              productId: item.product.id,
+              quantity: -Math.abs(item.quantity),
+              description: `${this.$t('boughtBy')} ` + (customerId ? `${this.$t('customer')}: ${customer?.name}` : this.$t('fastSale')),
+              refId: saleId
             })
           }
-          this.cartShopGroupedArray.forEach(item => {
-            if (item.decreaseStock) {
-              this.firebaseMixin('productsStockHistory').add({
-                productId: item.product.id,
-                quantity: -Math.abs(item.quantity),
-                description: `${this.$t('boughtBy')} ` + (customerId ? `${this.$t('customer')}: ${customer?.name}` : this.$t('fastSale')),
-                refId: res?.id || this.saleEdit?.id
-              })
-            }
-          })
-          this.reset()
         })
+        this.reset()
 
         Notify.create({
           message: this.$t('savedOperation'),
