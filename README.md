@@ -2,16 +2,22 @@
 
 A Quasar Framework app, made for simple stores.
 
-Focused on salespeople who sell products to customers.
+Focused on sales people who sell products to customers.
 
 Database: Firestore Database Only
+
+## User to testing in live preview (fake)
+
+- Link: [https://store-system-vue-stage.vercel.app/](https://store-system-vue-stage.vercel.app/)
+- Email: staging@staging.com
+- Password: staging
 
 ## Functionalities
 
 + All pages protected
 + Authentication by email registered in firebase, multi users support
 + PWA support
-+ All data is saved offline when pwa is installed, and updated in real time when connected to the “internet”
++ All data is saved offline when pwa is installed, and updated in real time when connected to the “internet” (Not working)
 
 + Language support (i18n)
     + English
@@ -19,25 +25,30 @@ Database: Firestore Database Only
 
 <br>
 
-+ Home Dashboard
+### Pages
+
++ Home Dashboard: Total Resume of all cash flow
+    + Paid purchases: Total of all purchases paid by the customer
+    + Unpaid purchases: Total of all purchases unpaid by the customer
+    + Payments: Total of all payments by the customer
+    + Expenses: Total of all expenses
+
 + CRUD (Create, Read, Update, Delete)
     + Customers
     + Products
-    + Categories
-    + Expenses Products
-    + Expenses
+    + Expenses: Products purchased for resale are considered expenses
+      - (It is necessary to register products and suppliers to register expenses)
+    + Suppliers: Restock products for resale
 
 <br>
 
-+ Stock history
-    + Expense Products
++ Stock history: Hisotry of all stock changes
     + Products
 
 <br>
 
-+ Cash Flow (Fast Sales, Purchases, Payments, Quick Exit)
-    + All Cash Flow
-    + Customer cash flow
++ Cash Flow (Fast Sales, Purchases, Payments, Quick Exit):
+    + All Cash Flow: All entries and exits of money
 
 <br>
 
@@ -48,16 +59,6 @@ Database: Firestore Database Only
 
 <br>
 
-+ Recipe for product (Materials from the expense product list that make up the product.)
-    + Option for when product inventory increases, decrease inventory of expense products used in the product.
-
-
-## User to testing in live preview (fake)
-
-Email: staging@staging.com
-
-Password: staging
-
 ## Example dev  firebase variables, .env file
 
 ```
@@ -66,9 +67,12 @@ FIREBASE_PROJECT_ID=variable
 ```
 ### Optional
 ```
+<!-- Necessary if you want to use firebase storage -->
+FIREBASE_STORAGE_BUCKET=variable
+
+--------------------------------------------
 FIREBASE_DATABASE_URL=variable
 FIREBASE_AUTH_DOMAIN=variable
-FIREBASE_STORAGE_BUCKET=variable
 FIREBASE_MESSAGING_SENDER_ID=variable
 FIREBASE_APP_ID=variable
 FIREBASE_MEASUREMENT_ID=variable

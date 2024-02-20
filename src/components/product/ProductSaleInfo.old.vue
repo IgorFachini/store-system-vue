@@ -1,4 +1,5 @@
 <template>
+  <!-- File not used anymore -->
   <q-item
     v-ripple
     clickable
