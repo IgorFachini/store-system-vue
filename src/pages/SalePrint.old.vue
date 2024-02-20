@@ -1,4 +1,5 @@
 <template>
+  <!-- File not used anymore -->
   <q-page class="q-col-gutter-md">
     <q-field
       :label="$t('date')"

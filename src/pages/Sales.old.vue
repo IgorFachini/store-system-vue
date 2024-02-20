@@ -1,4 +1,5 @@
 <template>
+<!-- File not used anymore -->
   <q-page
     class="row q-col-gutter-md"
     padding
