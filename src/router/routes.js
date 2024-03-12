@@ -88,22 +88,22 @@ const routes = [
     ]
   },
 
-  // Not Used
-  // {
-  //   path: '/',
-  //   component: () => import('layouts/EmptyLayout.vue'),
-  //   children: [
-  //     { path: 'login', component: () => import('src/pages/Login.vue') },
-  //     {
-  //       path: '/sales/:id/print',
-  //       props: true,
-  //       component: () => import('src/pages/SalePrint.vue'),
-  //       meta: {
-  //         requiresAuth: true
-  //       }
-  //     }
-  //   ]
-  // },
+  {
+    path: '/',
+    component: () => import('layouts/EmptyLayout.vue'),
+    children: [
+      { path: 'login', component: () => import('src/pages/Login.vue') }
+      // Not Used
+      // {
+      //   path: '/sales/:id/print',
+      //   props: true,
+      //   component: () => import('src/pages/SalePrint.vue'),
+      //   meta: {
+      //     requiresAuth: true
+      //   }
+      // }
+    ]
+  },
 
   // Always leave this as last one,
   // but you can also remove it
