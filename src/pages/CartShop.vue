@@ -588,14 +588,15 @@ export default defineComponent({
     totalProductsWithDiscount () {
       return this.cartShopGroupedArrayDiscountSum ? this.cartShopGroupedArray.reduce((acc, item) => acc + item.unitaryValue * item.quantity, 0) - this.cartShopGroupedArrayDiscountSum : 0
     },
+    // TODO cartshop % discount not working
     discountSubTotalValue () {
       return this.calcDiscountResult(this.subTotalDiscountObject, this.totalProductsWithDiscount)
     },
     totalDiscount () {
-      return (this.cartShopGroupedArrayDiscountSum + this.discountSubTotalValue)
+      return (this.cartShopGroupedArrayDiscountSum + this.subTotalDiscountObject?.discount || 0)
     },
     total () {
-      return this.cartShopGroupedArrayDiscountSum ? this.totalProductsWithDiscount - this.getDiscountValue(this.subTotalDiscountObject, this.totalProductsWithDiscount) : this.subtotal
+      return this.cartShopGroupedArrayDiscountSum ? this.totalProductsWithDiscount - this.getDiscountValue(this.subTotalDiscountObject, this.totalProductsWithDiscount) : this.subtotal - this.totalDiscount
     }
   },
 
