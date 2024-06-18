@@ -462,6 +462,14 @@ const labels = {
   searchAloneAsYouType: {
     enUS: 'Search alone as you type',
     pt: 'Pesquisa sozinho conforme digita'
+  },
+  cardMode: {
+    enUS: 'Card Mode',
+    pt: 'Modo Cartão'
+  },
+  tableMode: {
+    enUS: 'Table Mode',
+    pt: 'Modo Tabela'
   }
 
 }
