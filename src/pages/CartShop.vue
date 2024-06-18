@@ -44,7 +44,7 @@
           v-model:pagination="pagination"
           :loading="loadingDatabase"
           class="full-width table-cart-shop"
-          grid
+          :grid="tableType === 'card'"
           grid-header
           :title="$t('product', 2)"
           :rows="products"
@@ -54,22 +54,41 @@
           table-header-class="bg-grey-3"
         >
           <template #top-right>
-            <q-input
-              v-model="filter"
-              outlined
-              debounce="300"
-              :placeholder="$t('search')"
-              :hint="$t('searchAloneAsYouType')"
+            <div class="q-gutter-x-md row">
+              <q-radio v-model="tableType" val="table" :label="$t('tableMode')" />
+              <q-radio v-model="tableType" val="card" :label="$t('cardMode')" />
+              <q-input
+                v-model="filter"
+                outlined
+                debounce="300"
+                :placeholder="$t('search')"
+                :hint="$t('searchAloneAsYouType')"
+              >
+                <template #append>
+                  <q-icon name="search" />
+                </template>
+              </q-input>
+            </div>
+          </template>
+          <template #body="props">
+            <q-tr
+              :class="[{ 'bg-green-2': cartShopProducts[props.row.id] }, 'cursor-pointer']"
+              :props="props"
+              @click="addToCartShop(props.row)"
             >
-              <template #append>
-                <q-icon name="search" />
-              </template>
-            </q-input>
+              <q-td
+                v-for="col in columnsProduct"
+                :key="col.name"
+                :props="props"
+              >
+                {{ getCollRowValue(col, props.row) }}
+              </q-td>
+            </q-tr>
           </template>
           <template #item="props">
             <q-item
               clickable
-              class="q-table__grid-item col-xs-12 col-sm-6 col-md-4 col-lg-3"
+              :class="[{ 'bg-green-2': cartShopProducts[props.row.id] }, 'q-table__grid-item col-xs-12 col-sm-6 col-md-4 col-lg-3']"
               @click="addToCartShop(props.row)"
             >
               <q-card class="fit">
@@ -346,6 +365,13 @@
             </q-item>
             <q-item>
               <q-item-section>
+                <q-input
+                  v-model="description"
+                  :label="$t('description')"
+                  counter
+                  maxlength="100"
+                  type="textarea"
+                />
                 <v-date
                   v-model="date"
                   :label="$t('purchaseDate')"
@@ -535,6 +561,7 @@ export default defineComponent({
   data () {
     return {
       tab: 'products',
+      tableType: 'table',
       filter: '',
       firebaseMixinInstance: null,
       pagination: {
@@ -550,7 +577,8 @@ export default defineComponent({
       addCustomerModalOpen: false,
       date: null,
       purchasePayed: true,
-      saleEdit: null
+      saleEdit: null,
+      description: ''
     }
   },
 
@@ -562,13 +590,28 @@ export default defineComponent({
     },
     columnsProduct () {
       return [
-        { name: 'name', label: this.$t('name'), field: 'name', sortable: true, class: 'text-green' },
-        { name: 'saleValue', label: this.$t('saleValue'), field: 'saleValue', sortable: true },
+        { name: 'name', label: this.$t('name'), field: 'name', sortable: true, class: 'text-green', align: 'left' },
+        { name: 'saleValue', label: this.$t('saleValue'), field: 'saleValue', sortable: true, align: 'left' },
         {
           name: 'currentInventory',
           label: this.$t('currentInventory'),
           field: row => this.countProductsStockHistoryById(row.id),
-          sortable: true
+          sortable: true,
+          align: 'left'
+        },
+        {
+          name: 'description',
+          label: this.$t('description'),
+          field: 'description',
+          sortable: true,
+          align: 'left'
+        },
+        {
+          name: 'cartQuantity',
+          label: this.$t('cartQuantity'),
+          field: row => this.cartShopProducts[row.id] ? this.cartShopProducts[row.id].quantity : 0,
+          sortable: true,
+          align: 'left'
         },
         {
           name: 'createdAt',
@@ -650,6 +693,7 @@ export default defineComponent({
         this.$router.push('/cash-flow')
       }
       this.saleEdit = sale
+      this.description = sale.description
       this.date = formatDate(sale.date, 'DD/MM/YYYY')
       sale.products.forEach(item => {
         this.cartShopProducts[item.id] = {
@@ -801,6 +845,7 @@ export default defineComponent({
       }).onOk(async () => {
         const sale = {
           type: customer?.name ? 'purchase' : 'fastSale',
+          description: this.description,
           ...(this.subTotalDiscountObject?.type) && { subTotalDiscountObject: this.subTotalDiscountObject },
           date: moment(this.date, 'DD/MM/YYYY').toDate(),
           total: this.total,
