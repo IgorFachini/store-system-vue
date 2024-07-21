@@ -386,7 +386,7 @@ q-table(
         div(v-if="product.discountObject")
           | {{ product.name }}: {{ product.unitaryValue }} {{ $t('by') }} {{ calcDiscountResult(product.discountObject, product.unitaryValue).toFixed(2) }} x  {{ product.quantity }} = {{ (calcDiscountResult(product.discountObject, product.unitaryValue) * product.quantity).toFixed(2) }}
         div(v-else)
-          | {{ product.name }}: {{ product.unitaryValue }} x {{ product.quantity }} = {{ (product.unitaryValue * product.quantity) }}
+          | {{ product.name }}: {{ product.unitaryValue }} x {{ product.quantity }} = {{ (product.unitaryValue * product.quantity).toFixed(2) }}
       div(v-if="row.subTotalDiscountObject")
         | {{ $t('discount') }}: {{ getDiscountValue(row.subTotalDiscountObject, sumProductsWithDiscountValue(row.products)) }}
   template(
