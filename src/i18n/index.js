@@ -470,6 +470,14 @@ const labels = {
   tableMode: {
     enUS: 'Table Mode',
     pt: 'Modo Tabela'
+  },
+  cartQuantity: {
+    enUS: 'Cart Quantity',
+    pt: 'Quantidade no Carrinho'
+  },
+  printOrderBluetoothPrinter: {
+    enUS: 'Print Order (Bluetooth Printer)',
+    pt: 'Imprimir Pedido (Impressora Bluetooth)'
   }
 
 }

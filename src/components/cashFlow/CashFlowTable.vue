@@ -12,7 +12,7 @@ import { useI18n } from 'vue-i18n';
 const { t } = useI18n({ useScope: 'global' });
 const $t = t
 const storeFirebase = useFirebaseStore()
-const { loadingDatabase, productsStockHistory } = storeToRefs(storeFirebase)
+const { loadingDatabase, productsStockHistory, products } = storeToRefs(storeFirebase)
 
 const cashFlowToEditDialog = ref({})
 const dialogOpen = ref(false)
@@ -178,6 +178,138 @@ function resetDialog () {
   cashFlowToEditDialog.value = {}
 }
 
+async function printSale (row) {
+  console.log('printSale', row, getPrinterLines(row))
+  // example of row
+  // {
+  //   "id": "1710281236255",
+  //   "createdAt": {
+  //       "seconds": 1710281236,
+  //       "nanoseconds": 255000000
+  //   },
+  //   "total": 80,
+  //   "updatedAt": {
+  //       "seconds": 1710281236,
+  //       "nanoseconds": 255000000
+  //   },
+  //   "customer": {
+  //       "id": "pUSqvf7pRcNpXIy3DlQO",
+  //       "name": "mercado são joão"
+  //   },
+  //   "products": [{
+  //       "id": "product_1702162203881",
+  //       "unitaryValue": 40,
+  //       "name": "aaa11",
+  //       "quantity": 2
+  //   }],
+  //   "purchasePayed": true,
+  //   "date": "2024/03/12 00:00",
+  //   "type": "purchase"
+  // }
+  let printerDevice;
+  let printerServer;
+  let printerService;
+  let printerCharacteristic;
+  // https://github.com/lucianopereira86/Quasar-PWA-Bluetooth-Printer/blob/master/src/pages/Index.vue
+  try {
+    printerDevice = await navigator.bluetooth.requestDevice({
+      filters: [{
+        services: ['000018f0-0000-1000-8000-00805f9b34fb']
+      }],
+      optionalServices: ['000018f0-0000-1000-8000-00805f9b34fb'],
+      characteristic: '00002af1-0000-1000-8000-00805f9b34fb'
+    });
+
+    printerServer = await printerDevice.gatt.connect();
+    const services = await printerServer.getPrimaryServices();
+
+    if (services.length > 0) {
+      console.log('Serviços encontrados:');
+      services.forEach(service => console.log(service.uuid));
+
+      // Tente conectar ao primeiro serviço encontrado
+      printerService = services[0];
+      const characteristics = await printerService.getCharacteristics();
+
+      if (characteristics.length > 0) {
+        console.log('Características encontradas:');
+        characteristics.forEach(characteristic => console.log(characteristic.uuid));
+
+        // Conectar à primeira característica encontrada
+        printerCharacteristic = characteristics[1];
+        console.log('Conectado à impressora 3D!');
+
+        if (!printerCharacteristic) {
+          alert('Você precisa se conectar à impressora primeiro!');
+          return;
+        }
+
+        const gcodeCommands = getPrinterLines(row);
+
+        for (const command of gcodeCommands) {
+          const commandBuffer = new TextEncoder().encode(command + '\n');
+          try {
+            await printerCharacteristic.writeValue(commandBuffer);
+            await new Promise(resolve => setTimeout(resolve,
+              500)); // Aguarde um pouco antes de enviar o próximo comando
+          } catch (error) {
+            console.error('Erro ao enviar comando G-code: ', error);
+          }
+        }
+        console.log('Comandos enviados à impressora!');
+        // desconectar da impressora
+        await printerServer.disconnect();
+      } else {
+        throw new Error('Nenhuma característica encontrada no serviço selecionado.');
+      }
+    } else {
+      throw new Error('Nenhum serviço encontrado no dispositivo selecionado.');
+    }
+  } catch (error) {
+    console.error('Erro ao conectar à impressora 3D: ', error);
+  }
+}
+
+// construir cada linha do pedido na mini impressora 3d conforme exemplo abaixo
+// deve conter
+// Impresso em dd/mm/yyyy hh:mm
+// -----------------------
+// Emissao: dd/mm/yyyy
+// -----------------------
+// # QTD UN VL UN R$
+// -----------------------
+// 001 (codigo do produto) (nome do produto)
+//     2 UN X 10,00                            20,00
+// 002 (codigo do produto) (nome do produto)
+//     1 UN X 5,00                              5,00
+// -----------------------
+// Total: R$                                   25,00
+function getPrinterLines (row) {
+  return [
+    `Impresso em ${formatDate(new Date(), 'DD/MM/YYYY HH:mm')}`,
+    '-----------------------',
+    `Emissao: ${formatDate(row.date, 'DD/MM/YYYY')}`,
+    '-----------------------',
+    '# QTD UN VL UN R$',
+    '-----------------------',
+    ...row.products.map((product, index) => {
+      const productIndex = index + 1;
+      const productCode = products.value.find(p => p.id === product.id)?.code || '-';
+      const productName = product.name;
+      const productQuantity = product.quantity;
+      const productUnitaryValue = product.unitaryValue;
+      const productTotalValue = productQuantity * productUnitaryValue;
+
+      return `${productIndex} ${productCode} ${productName}\n    ${productQuantity} UN X ${productUnitaryValue.toFixed(2)} = ${productTotalValue.toFixed(2)}`;
+    }),
+    '-----------------------',
+    `Total: R$ ${row.total.toFixed(2)}`,
+    '',
+    '',
+    ''
+  ]
+}
+
 </script>
 
 <template lang="pug">
@@ -274,6 +406,13 @@ q-table(
             dense
             color="primary"
             @click="edit(row)"
+          )
+          q-btn(
+            v-if="row.type === 'purchase' || row.products"
+            :label="$t('printOrderBluetoothPrinter')"
+            dense
+            color="primary"
+            @click="printSale(row)"
           )
           q-btn(
             :label="$t('delete')"

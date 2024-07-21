@@ -54,7 +54,7 @@
           table-header-class="bg-grey-3"
         >
           <template #top-right>
-            <div class="q-gutter-x-md row">
+            <div class="q-gutter-x-md">
               <q-radio v-model="tableType" val="table" :label="$t('tableMode')" />
               <q-radio v-model="tableType" val="card" :label="$t('cardMode')" />
               <q-input
@@ -63,6 +63,7 @@
                 debounce="300"
                 :placeholder="$t('search')"
                 :hint="$t('searchAloneAsYouType')"
+                clearable
               >
                 <template #append>
                   <q-icon name="search" />
@@ -74,14 +75,30 @@
             <q-tr
               :class="[{ 'bg-green-2': cartShopProducts[props.row.id] }, 'cursor-pointer']"
               :props="props"
-              @click="addToCartShop(props.row)"
             >
               <q-td
                 v-for="col in columnsProduct"
                 :key="col.name"
                 :props="props"
+                @click="col.name !== 'cartQuantity' ? addToCartShop(props.row) : ''"
               >
-                {{ getCollRowValue(col, props.row) }}
+                <div class="row justify-between items-center">
+                  <q-btn
+                    v-if="col.name === 'cartQuantity' && cartShopProducts[props.row.id]"
+                    icon="remove"
+                    color="red"
+                    dense
+                    @click="cartShopProducts[props.row.id].quantity--, checkCartShopItemQuantityRemove(props.row.id, cartShopProducts[props.row.id].quantity)"
+                  />
+                  {{ getCollRowValue(col, props.row) }}
+                  <q-btn
+                    v-if="col.name === 'cartQuantity'"
+                    icon="add"
+                    color="green"
+                    dense
+                    @click="addToCartShop(props.row)"
+                  />
+                </div>
               </q-td>
             </q-tr>
           </template>
@@ -144,7 +161,7 @@
           <q-card
             v-for="item of cartShopGroupedArray"
             :key="item.product.id"
-            class="col-xs-12 col-sm-12 col-md-6 col-lg-6 row q-pa-md"
+            class="col-xs-12 col-sm-12 col-md-6 col-lg-6 row q-pa-md q-gutter-y-sm"
           >
             <q-field
               :label="$t('name')"
@@ -208,27 +225,41 @@
                 type="number"
                 class="col-6"
                 :label="$t('quantity')"
-                @blur="updateCartShopItemQuantity(item.product.id, cartShopProducts[item.product.id].quantity)"
+                @blur="checkCartShopItemQuantityRemove(item.product.id, cartShopProducts[item.product.id].quantity)"
               />
+              <q-btn
+                class="col-3"
+                icon="remove"
+                color="red"
+                @click="cartShopProducts[item.product.id].quantity--, checkCartShopItemQuantityRemove(item.product.id, cartShopProducts[item.product.id].quantity)"
+              />
+              <q-btn
+                class="col-3"
+                icon="add"
+                color="green"
+                @click="cartShopProducts[item.product.id].quantity++"
+              />
+            </div>
+            <div class="row full-width">
+              <q-field
+                label="Total"
+                readonly
+                stack-label
+                class="col-6"
+              >
+                <div class="text-blue">
+                  {{ item.discountObject
+                    ? (calcDiscountResult(item.discountObject, item.unitaryValue) * item.quantity).toFixed(2)
+                    : (item.unitaryValue * item.quantity).toFixed(2)
+                  }}
+                </div>
+              </q-field>
               <q-checkbox
                 v-model="item.decreaseStock"
                 :label="$t('decreaseStock')"
                 class="col-6"
               />
             </div>
-            <q-field
-              label="Total"
-              readonly
-              stack-label
-              class="col-12"
-            >
-              <div class="text-blue">
-                {{ item.discountObject
-                  ? (calcDiscountResult(item.discountObject, item.unitaryValue) * item.quantity).toFixed(2)
-                  : (item.unitaryValue * item.quantity).toFixed(2)
-                }}
-              </div>
-            </q-field>
             <q-btn
               :label="`${$t('discount')} ${$t('product')}`"
               icon="local_offer"
@@ -600,6 +631,13 @@ export default defineComponent({
           align: 'left'
         },
         {
+          name: 'cartQuantity',
+          label: this.$t('cartQuantity'),
+          field: row => this.cartShopProducts[row.id] ? this.cartShopProducts[row.id].quantity : 0,
+          sortable: true,
+          align: 'left'
+        },
+        {
           name: 'description',
           label: this.$t('description'),
           field: 'description',
@@ -607,9 +645,9 @@ export default defineComponent({
           align: 'left'
         },
         {
-          name: 'cartQuantity',
-          label: this.$t('cartQuantity'),
-          field: row => this.cartShopProducts[row.id] ? this.cartShopProducts[row.id].quantity : 0,
+          name: 'code',
+          label: this.$t('code'),
+          field: 'code',
           sortable: true,
           align: 'left'
         },
@@ -747,7 +785,7 @@ export default defineComponent({
       }
       this.cartShopProducts[result.options.id].discountObject = result.discountObject
     },
-    updateCartShopItemQuantity (id, quantity) {
+    checkCartShopItemQuantityRemove (id, quantity) {
       if (quantity < 1) {
         this.removeItem(id)
       }
