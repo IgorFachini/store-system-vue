@@ -470,6 +470,10 @@ const labels = {
   tableMode: {
     enUS: 'Table Mode',
     pt: 'Modo Tabela'
+  },
+  cartQuantity: {
+    enUS: 'Cart Quantity',
+    pt: 'Quantidade no Carrinho'
   }
 
 }
