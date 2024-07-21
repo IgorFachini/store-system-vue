@@ -292,7 +292,7 @@ function getPrinterLines (row) {
     '-----------------------',
     ...row.products.map((product, index) => {
       const productIndex = index + 1;
-      const productCode = products.value.find(p => p.id === product.id).code || '-';
+      const productCode = products.value.find(p => p.id === product.id)?.code || '-';
       const productName = product.name;
       const productQuantity = product.quantity;
       const productUnitaryValue = product.unitaryValue;
