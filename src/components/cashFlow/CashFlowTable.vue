@@ -257,6 +257,8 @@ async function printSale (row) {
           }
         }
         console.log('Comandos enviados à impressora!');
+        // desconectar da impressora
+        await printerServer.disconnect();
       } else {
         throw new Error('Nenhuma característica encontrada no serviço selecionado.');
       }
@@ -406,6 +408,7 @@ q-table(
             @click="edit(row)"
           )
           q-btn(
+            v-if="row.type === 'purchase' || row.products"
             :label="$t('printOrderBluetoothPrinter')"
             dense
             color="primary"
